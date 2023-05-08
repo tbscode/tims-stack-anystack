@@ -1,0 +1,54 @@
+useCertManager: false
+rootNamespace: tiny-django
+baseAppUrl: localhost
+registryAuthRequired: false
+production: false
+development: true
+useRedis: false
+cert-manager:
+  secretKeyName: letsencrypt-prod
+  email: benjamin.tim@gmx.de
+  apiServer: https://acme-v02.api.letsencrypt.org/directory
+  name: some
+redis:
+  port: 6379
+  deploymentName: redis-db
+  serviceName: redis-db-svc
+backend:
+  port: 8000
+  replicas: 1
+  serviceName: backend-service
+  imageURL: localhost:32000/backend-image:latest
+  deploymentName: backend-deployment
+  secretName: backend-secret
+  requiresRegistryAuth: false
+  imagePullSecretName: backend-image-pull-secret
+  useSockets: false
+  mountCodeRoot: true
+  mount:
+    pvcName: backend-pvc
+    volumeName: backend-dev-volume
+    storage: 5Gi
+  env:
+    ROOT_URL: 'http://localhost'
+    DJANGO_SECRET_KEY: 'SomeSecret'
+    DJANGO_ALLOWED_HOSTS: '*'
+    REDIS_URL: 'redis://redis:6379/0'
+    USE_NEXTJS_PROXY_ROUTES: 'true'
+    NEXTJS_HOST_URL: 'http://frontend-service.tiny-django.svc.cluster.local:3000'
+frontend:
+  port: 3000
+  serviceName: frontend-service
+  imageURL: localhost:32000/frontend-image:latest
+  deploymentName: frontend-deployment
+  secretName: frontend-secret
+  requiresRegistryAuth: false
+  imagePullSecretName: frontend-image-pull-secret
+  mountCodeRoot: true
+  mount:
+    pvcName: frontend-pvc
+    volumeName: frontend-dev-volume
+    storage: 5Gi
+  env:
+    ROOT_URL: 'http://localhost'
+    WEBSOCKET_PROTOCOL: 'ws://'

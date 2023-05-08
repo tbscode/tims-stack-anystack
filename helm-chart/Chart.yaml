@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tiny-django-helm-chart
+description: A simple helm chart for a django + nextjs setup
+type: application
+version: 0.1.0
+appVersion: '1.16.0'
