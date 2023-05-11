@@ -8,9 +8,9 @@ backend_pod_name := backend-deployment
 helm_installation_name := tiny-django
 
 backend_migrate_static:
-	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 app.py makemigrations
-	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 app.py migrate
-	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 app.py collectstatic --noinput
+	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 manage.py makemigrations
+	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 manage.py migrate
+	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 manage.py collectstatic --noinput
 
 backend_build:
 	docker build --progress=plain -t localhost:32000/backend-image:latest -f Dockerfile.back_dev back
@@ -58,6 +58,9 @@ frontend_build_push_prod:
 	$(MAKE) frontend_build_prod
 	$(MAKE) frontend_push_prod
 	
+capacitor_init:
+	npx @capacitor/cli init
+	
 full_build_deploy:
 	$(MAKE) backend_build_push
 	$(MAKE) frontend_build_push
@@ -82,6 +85,15 @@ helm_dry_install:
 	
 helm_install:
 	microk8s helm install --debug $(helm_installation_name) ./helm-chart/ --set rootDir=$(root_dir)
+	
+start_redis:
+	docker run -p 6379:6379 redis:5
 
 helm_uninstall:
 	microk8s helm uninstall $(helm_installation_name)
+
+helm_install_prod:
+	microk8s helm install --debug $(helm_installation_name) ./helm-chart/ --set rootDir=$(root_dir) --values ./helm-chart/production-values.yaml
+
+helm_install_prod_dry:
+	microk8s helm install --debug $(helm_installation_name) ./helm-chart/ --set rootDir=$(root_dir) --values ./helm-chart/production-values.yaml --dry-run
