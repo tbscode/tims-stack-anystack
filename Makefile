@@ -94,6 +94,9 @@ helm_uninstall:
 
 helm_install_prod:
 	microk8s helm install --debug $(helm_installation_name) ./helm-chart/ --set rootDir=$(root_dir) --values ./helm-chart/production-values.yaml
+	
+backend_create_dev_admin:
+	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 manage.py shell --command 'from core.tools import get_or_create_base_admin; get_or_create_base_admin()'
 
 helm_install_prod_dry:
 	microk8s helm install --debug $(helm_installation_name) ./helm-chart/ --set rootDir=$(root_dir) --values ./helm-chart/production-values.yaml --dry-run
