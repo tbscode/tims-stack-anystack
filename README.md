@@ -13,3 +13,14 @@ On top of that is adds a basic setup for usage with capacitor to build ios and a
 
 - [ ] add electron for desktop applications
 - [ ] add simple to use caching / online check layer that allowes to use most app features offline
+
+#### Android
+
+Install android studio, open project `/front/android` run the app in the emulator!
+
+#### IOS
+
+I don't like being forced to buy a apple devide just to be able to develop ios applications ( f\*\*k u apple! ;) ).
+A simple way to cheat this restriction is to just run OSX from a docker container using: https://github.com/sickcodes/Docker-OSX
+
+This is sufficient for testing the ios application but not for puplishing it to the apple store, cause apple will quickly lock your apple-id when used in such a virtualization environment.
