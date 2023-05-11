@@ -6,10 +6,11 @@ from django.shortcuts import redirect
 
 
 def index(request, path):
+    # TODO: use authentication based redirect instead
     if request.user.is_authenticated:
         return render_nextjs_page(get_user_data(request.user), path=path)
     else:
-        return render_nextjs_page({"test": "test"}, path="login")
+        return render_nextjs_page({"test": "test"}, path=path)
 
 
 def render_nextjs_page(data, path=""):
