@@ -20,9 +20,19 @@ if settings.USE_NEXTJS_PROXY_ROUTES:
         0, path("_next/webpack-hmr", NextJSProxyWebsocketConsumer.as_asgi()))
 
 
+def get_urls_patterns():
+    from core.consumer import CoreConsumer
+    websocket_routers.insert(
+        0, path("_next/webpack-hmr", NextJSProxyWebsocketConsumer.as_asgi()))
+
+    websocket_routers.insert(1, re_path(
+        rf'^api/core/ws$', CoreConsumer.as_asgi()))
+    return websocket_routers
+
+
 application = ProtocolTypeRouter(
     {
         "http": URLRouter(http_routes),
-        "websocket": AuthMiddlewareStack(URLRouter(websocket_routers)),
+        "websocket": AuthMiddlewareStack(URLRouter(get_urls_patterns())),
     }
 )
