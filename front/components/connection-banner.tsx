@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { getCookiesAsObject } from "@/utils/tools";
+import { Preferences } from '@capacitor/preferences';
+import { Capacitor } from "@capacitor/core";
+import { useRouter } from "next/router";
 
 enum BannerState {
     idle = "idle",
     online = "online",
     offline = "offline",
+    offlineCache = "offlineCache",
     error = "error",
     loading = "loading",
+    unauthenticated = "unauthenticated",
 }
 
 interface BannerInfo {
@@ -38,6 +44,20 @@ const bannerInfoMap: Record<BannerState, BannerInfo> = {
         text: "Offline",
         visible: true,
     },
+    [BannerState.unauthenticated]: {
+        state: BannerState.offline,
+        backgroundColor: "bg-red-500",
+        textColor: "text-white",
+        text: "Unauthenticated",
+        visible: true,
+    },
+    [BannerState.offlineCache]: {
+        state: BannerState.offlineCache,
+        backgroundColor: "bg-red-500",
+        textColor: "text-white",
+        text: "Offline",
+        visible: true,
+    },
     [BannerState.error]: {
         state: BannerState.error,
         backgroundColor: "bg-red-500",
@@ -60,30 +80,88 @@ interface ConnectionBannerProps {
 
 const getConnectionState = (state) => {
     console.log("STATE", state);
-    // a frontend error occured, render the error ...
-    if (state.frontendError !== undefined)
-      return BannerState.error;
-  
-    // device is net yet defined, so the render is ongoing or we are on mobile
-    if (state.device === undefined)
-      return BannerState.loading;
-  
-    // the internet connection and data are still undefined, definately still loading...
-    if (
-      state.device.internetConnection === undefined &&
-      state.data === undefined
-    ) {
-      return BannerState.loading;
-    }
-  
-    // internet connection available and data defined -> we are online and loaded!
-    if (state.device.internetConnection || state.data !== undefined)
-      return BannerState.online;
-  
+    if (state === undefined || state.state === undefined) return BannerState.loading;
+
     // default state offline ( reload anytime, todo maybe autoreload after some time )
-    return BannerState.offline;
+    return state.state;
   };
   
+  interface ConnectionState {
+    userData: any,
+    state: BannerState,
+    info: any,
+    isNative: boolean,
+  }
+  
+  export const connectionStateAndUserData = async (state) => {
+  
+    let connectionState: ConnectionState = {
+      userData: {},
+      state: BannerState.offline,
+      isNative: Capacitor.isNativePlatform(),
+      info: {},
+    };
+  
+    if (typeof window === "undefined") {
+      // then we are still on serverside
+      return connectionState;
+    }
+  
+    if (state.data === undefined || state.data.uuid === undefined) {
+      try {
+        console.log("COOKIES",getCookiesAsObject())
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user_data`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'X-CSRFToken': getCookiesAsObject().csrftoken,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({}),
+        });
+  
+        if (res.ok) {
+          const data = await res.json();
+          connectionState.userData = data;
+          connectionState.state = BannerState.online;
+          connectionState.info = "Online, data updated";
+        } else if (res.status === 401 || res.status === 403) {
+          connectionState.state = BannerState.unauthenticated;
+          connectionState.info = `Offline, not logged in ${res.status} ${res.statusText}`;
+          console.log("FETCHDATA", "unauthenticated", res.status, res.statusText)
+        } else {
+          connectionState.userData = getCookiesAsObject();
+          connectionState.state = BannerState.error;
+          connectionState.info = `Offline, error unknown reason ${res.status} ${res.statusText}`;
+          console.log("FETCHDATA", "error", connectionState.info)
+        }
+      } catch (err) {
+        try {
+          const { value } = await Preferences.get({ key: 'data' });
+  
+          if (value !== null) {
+            connectionState.userData = JSON.parse(value);
+            connectionState.state = BannerState.offlineCache;
+            connectionState.info = "Offline, using cached data";
+          } else {
+            connectionState.state = BannerState.error;
+            connectionState.info = `Offline, no cached data found. ${err}`;
+          }
+        } catch (error) {
+          console.log("Error reading from cache:", error);
+        }
+      }
+    } else {
+      connectionState.userData = state.data;
+      connectionState.state = BannerState.online;
+      connectionState.info = "Online, data loaded";
+      Preferences.set({ key: 'data', value: JSON.stringify(state.data) });
+    }
+  
+    return connectionState;
+  };
+
 export const ConnectionBanner: React.FC = ({state}) => {
     /** 
      * Takes the application state and determines the banner state,
