@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getCookiesAsObject } from "@/utils/tools";
+import { getCookiesAsObject, getEnv } from "@/utils/tools";
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from "@capacitor/core";
 import { useRouter } from "next/router";
@@ -25,10 +25,10 @@ interface BannerInfo {
 const bannerInfoMap: Record<BannerState, BannerInfo> = {
     [BannerState.idle]: {
         state: BannerState.idle,
-        backgroundColor: "bg-blue-500",
+        backgroundColor: "bg-green-500",
         textColor: "text-white",
+        text: "",
         visible: false,
-        text: "Idle",
     },
     [BannerState.online]: {
         state: BannerState.online,
@@ -108,9 +108,9 @@ const getConnectionState = (state) => {
     }
   
     if (state.data === undefined || state.data.uuid === undefined) {
-      try {
         console.log("COOKIES",getCookiesAsObject())
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user_data`, {
+    try{
+        const res = await fetch(`${getEnv().serverUrl}/api/user_data`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -198,7 +198,7 @@ const ConnectionBannerDispatch: React.FC<ConnectionBannerProps> = ({ bannerState
 
     return (
       <div
-        className={`fixed bottom-0 left-0 w-full h-8 z-50 p-2 ${currentBannerInfo.backgroundColor} duration-500 ${currentBannerInfo.visible ? 'transform' : 'transform translate-y-full'}`}
+        className={`fixed bottom-0 left-0 w-full h-8 z-50 p-1 ${currentBannerInfo.backgroundColor} transition-all duration-500 ${currentBannerInfo.visible ? 'transform' : 'transform h-2'}`}
       >
         <span className={currentBannerInfo.textColor}>
           {currentBannerInfo.text}
