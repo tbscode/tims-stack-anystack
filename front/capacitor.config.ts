@@ -5,8 +5,22 @@ const config: CapacitorConfig = {
   appName: 'front',
   webDir: 'out',
   server: {
-    androidScheme: 'https'
+    //androidScheme: 'https'
+    //hostname: "10.0.2.2:8000"
+    allowNavigation: []
   },
+  plugins: {
+    CapacitorHttp: {
+      enabled: true,
+    },
+    CapacitorCookies: {
+      enabled: true
+    }
+  },
+  android: {
+    allowMixedContent: true
+  },
+  //url: 'http://10.0.2.2:8000',
   bundledWebRuntime: false
 };
 
