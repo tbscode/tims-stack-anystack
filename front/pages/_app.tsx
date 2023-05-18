@@ -32,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <div data-theme={stateData?.theme}>
-      <Component state={stateData} setState={setStateData} updateTheme={updateTheme} />
+      <Component pageState={stateData} setPageState={setStateData} updateTheme={updateTheme} />
     </div>
   )
 }
