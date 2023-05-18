@@ -45,7 +45,7 @@ const bannerInfoMap: Record<BannerState, BannerInfo> = {
         visible: true,
     },
     [BannerState.unauthenticated]: {
-        state: BannerState.offline,
+        state: BannerState.unauthenticated,
         backgroundColor: "bg-red-500",
         textColor: "text-white",
         text: "Unauthenticated",
@@ -55,7 +55,7 @@ const bannerInfoMap: Record<BannerState, BannerInfo> = {
         state: BannerState.offlineCache,
         backgroundColor: "bg-red-500",
         textColor: "text-white",
-        text: "Offline",
+        text: "Offline - Using cache",
         visible: true,
     },
     [BannerState.error]: {
@@ -126,12 +126,13 @@ const getConnectionState = (state) => {
           connectionState.userData = data;
           connectionState.state = BannerState.online;
           connectionState.info = "Online, data updated";
+          Preferences.set({ key: 'data', value: JSON.stringify({...state.data, ...data}) });
         } else if (res.status === 401 || res.status === 403) {
           connectionState.state = BannerState.unauthenticated;
           connectionState.info = `Offline, not logged in ${res.status} ${res.statusText}`;
           console.log("FETCHDATA", "unauthenticated", res.status, res.statusText)
         } else {
-          connectionState.userData = getCookiesAsObject();
+          connectionState.userData = {}// getCookiesAsObject();
           connectionState.state = BannerState.error;
           connectionState.info = `Offline, error unknown reason ${res.status} ${res.statusText}`;
           console.log("FETCHDATA", "error", connectionState.info)
@@ -156,7 +157,7 @@ const getConnectionState = (state) => {
       connectionState.userData = state.data;
       connectionState.state = BannerState.online;
       connectionState.info = "Online, data loaded";
-      Preferences.set({ key: 'data', value: JSON.stringify(state.data) });
+      Preferences.set({ key: 'data', value: JSON.stringify(state) });
     }
   
     return connectionState;
@@ -198,7 +199,7 @@ const ConnectionBannerDispatch: React.FC<ConnectionBannerProps> = ({ bannerState
 
     return (
       <div
-        className={`fixed bottom-0 left-0 w-full h-8 z-50 p-1 ${currentBannerInfo.backgroundColor} transition-all duration-500 ${currentBannerInfo.visible ? 'transform' : 'transform h-2'}`}
+        className={`fixed bottom-0 left-0 w-full z-50 ${currentBannerInfo.backgroundColor} transition-all duration-500 ${currentBannerInfo.visible ? 'transform h-6 p-1' : 'transform h-2'}`}
       >
         <span className={currentBannerInfo.textColor}>
           {currentBannerInfo.text}
