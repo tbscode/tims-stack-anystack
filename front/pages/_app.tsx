@@ -14,7 +14,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
       window.addEventListener('resize', handleWindowSizeChange);
-      setStateData(s => ({...s, ...{device: {isMobile768 : width <= 768}}}))
+      setStateData(s => ({...s, ...{device: {isMobile768 : width <= 768, isDesktopLandScape: width > 1024,  width: width, height: window.innerHeight}}}))
       return () => {
           window.removeEventListener('resize', handleWindowSizeChange);
       }
