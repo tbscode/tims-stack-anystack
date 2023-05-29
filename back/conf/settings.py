@@ -22,7 +22,8 @@ INSTALLED_APPS = [
     'django_nextjs.apps.DjangoNextJSConfig',
     'drf_spectacular',
     'drf_spectacular_sidecar',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'corsheaders',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -33,6 +34,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
 AUTH_USER_MODEL = 'core.User'
 DATABASES = {
@@ -78,6 +80,64 @@ REST_FRAMEWORK = {
         'user': '2000/day'
     }
 }
+
+if DEBUG:
+    LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'rest_framework': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'management': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+    }
+    CORS_ORIGIN_ALLOW_ALL = True
+
+    CORS_ALLOW_CREDENTIALS = True
+    
+    CSRF_TRUSTED_ORIGINS = ["http://localhost","http://localhost:3000", "http://localhost:8000"]
+
+
+    CORS_ALLOW_METHODS = [
+        "DELETE",
+        "GET",
+        "OPTIONS",
+        "PATCH",
+        "POST",
+        "PUT",
+    ]
+    CORS_ALLOW_HEADERS = [
+        "accept",
+        "accept-encoding",
+        "authorization",
+        "content-type",
+        "dnt",
+        "origin",
+        "user-agent",
+        "x-csrftoken",
+        "x-requested-with",
+    ]
 
 REDIS_URL = os.environ.get(
     "REDIS_URL", "redis://host.docker.internal:6379")
