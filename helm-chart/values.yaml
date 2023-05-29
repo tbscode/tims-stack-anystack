@@ -1,14 +1,14 @@
 useCertManager: false
-rootNamespace: tiny-django
+rootNamespace: anychat
 baseAppUrl: localhost
 registryAuthRequired: false
 production: false
 development: true
 useRedis: false
-cert-manager:
+certmanager:
   secretKeyName: letsencrypt-prod
-  email: benjamin.tim@gmx.de
-  apiServer: https://acme-v02.api.letsencrypt.org/directory
+  email: 'benjamin.tim@gmx.de'
+  apiServer: 'https://acme-v02.api.letsencrypt.org/directory'
   name: some
 redis:
   port: 6379
@@ -30,16 +30,19 @@ backend:
     volumeName: backend-dev-volume
     storage: 5Gi
   env:
+    DJANGO_DEBUG: 'true'
     ROOT_URL: 'http://localhost'
     DJANGO_SECRET_KEY: 'SomeSecret'
     DJANGO_ALLOWED_HOSTS: '*'
-    REDIS_URL: 'redis://redis:6379/0'
+    REDIS_URL: 'redis://redis-db-svc.anysearch.svc.cluster.local:6379'
     USE_NEXTJS_PROXY_ROUTES: 'true'
-    NEXTJS_HOST_URL: 'http://frontend-service.tiny-django.svc.cluster.local:3000'
+    NEXTJS_HOST_URL: 'http://frontend-service.anysearch.svc.cluster.local:3000'
+    BASE_ADMIN_USERNAME: 'admin'
+    BASE_ADMIN_USER_PASSWORD: 'password'
 frontend:
   port: 3000
   serviceName: frontend-service
-  imageURL: localhost:32000/frontend-image:latest
+  imageURL: localhost:32000/frontend-image-prod:latest
   deploymentName: frontend-deployment
   secretName: frontend-secret
   requiresRegistryAuth: false
