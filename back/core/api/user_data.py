@@ -14,6 +14,26 @@ from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async, async_to_sync
 
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+# Custom debug function
+def debug_request(request):
+    print("----- DEBUG REQUEST -----")
+    print("Method: ", request.method)
+    print("Path: ", request.path)
+
+    print("Headers:")
+    for header, value in request.META.items():
+        if header.startswith('HTTP_'):
+            print(f"{header[5:].title().replace('_', '-')}: {value}")
+
+    if request.data:
+        print("Data: ", request.data)
+
+    print("Query Params: ", request.query_params)
+    print("--------------------------")
+
 def get_user_data(user):
     """
     All the relevant user data for one user 
@@ -31,9 +51,10 @@ def get_user_data(user):
 @extend_schema(
     auth=["SessionAuthentication"],
 )
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated])
 def request_user_data(request):
 
-    return Response(get_user_data(request.user), status=status.HTTP_200_OK)
+    response = Response(get_user_data(request.user), status=status.HTTP_200_OK, content_type="application/json")
+    return response
