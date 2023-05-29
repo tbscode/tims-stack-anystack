@@ -18,6 +18,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.org/ssl-passthrough: "true"
+    kubernetes.io/ingress.class: public
 spec:
   rules:
   - host: k8s.t1m.me
