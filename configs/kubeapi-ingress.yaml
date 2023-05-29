@@ -29,4 +29,4 @@ spec:
           service:
             name: k8s-api
             port:
-              number: https
+              number: 16443
