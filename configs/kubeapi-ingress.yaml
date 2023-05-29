@@ -21,4 +21,4 @@ spec:
   tls:
   - hosts:
     - k8s.t1m.me
-    secretName: server-tls
+    secretName: kubeapi-secret-tls
