@@ -1,5 +1,18 @@
 # Tim's Stack: Dynamic cross plattform web app stack
 
+## Use Case
+
+This stack is meant for dynamic realtime web apps with mobile clients.
+Backend changes can directly be send to clients using a live websocket connection, 
+state in the client is managed with redux. 
+This allowes automaticly updating all affected clients on any backend changes.
+
+For the web-application setting the django backend dynamicly requests nextjs pages, 
+this includes dynamic page data so we get full ssr for all pages.
+
+The nextjs frontend is integrated with capacitor and directly exports to android and ios.
+In a native setting the frontend will try to request user data from the backend, 
+if it fails it can fallback to a chached version allowing the user to view the full state of the app in an 'offline' mode.
 
 ## Stack Components
 
@@ -28,6 +41,8 @@
     
 ## Usage
     
+This outlines manual usage, for usage with bunnyshell.com check the section above.
+    
 ### Local Development
     
 For full local development you have the choice between running the full stack withing `microk8s` locally, or using `docker` and the `Makefile` to run individual components.
@@ -47,3 +62,20 @@ This will spinup the stack configured for local development (`helm/values.yaml`)
 #### Docker local development
 
 > This is the simples way to develop and debug, but has some differences in local routing strategies
+
+Also mounts `front/` and `back/` directory. It also configures the host route `host.docker.internal:host-gateway` so that containers can interact with each other.
+
+1. Build all images `make full_build`
+2. Start all containers `make start_all` ( or start individual ones `make frontend_run`, `make backend_run`, `make start_redis`)
+
+### Production Setup
+
+You can configure any container registry by updating `Makefile` and `helm/values.yaml` I currently like using the github continer registry, the helm chart is setup to authorize pulling images from a github container registry.
+
+You can build all production images **without** any of the production secrets they are only required for the deployed containers. To build all production images use `make full_build_prod` (TODO).
+
+Now you need to authorize your docker installation to push to your private registry, with github container registry you can use `make authorize_github_push gha_token=<your-token>`.
+
+Now you can push the build production images `make push_prod`.
+
+For deployment create a copy of `helm/values.yaml -> heml/production-values.yaml` the choose secure usernames and password for all the services. Now you can install the helm chart on your cluster.
