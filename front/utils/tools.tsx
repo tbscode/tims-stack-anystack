@@ -36,10 +36,22 @@ interface Environment {
   serverUrl: string;
 }
 
+const getServerUrl = () => {
+  if(process.env.NEXT_PUBLIC_LOCAL_MICROK8S){
+    if(Capacitor.isNativePlatform())
+      return process.env.NEXT_PUBLIC_HOST_MICROK8S_ANDROID!
+    return process.env.NEXT_PUBLIC_HOST_MICROK8S_WEB!
+  }else{
+    if(Capacitor.isNativePlatform())
+      return process.env.NEXT_PUBLIC_HOST_ANDROID!
+    return process.env.NEXT_PUBLIC_HOST_WEB!
+  }
+}
+
 export const getEnv = () => {
   const env : Environment = {
     wsPath: process.env.NEXT_PUBLIC_WS_PATH!,
-    serverUrl: Capacitor.isNativePlatform() ? process.env.NEXT_PUBLIC_HOST_ANDROID! : process.env.NEXT_PUBLIC_HOST_WEB!,
+    serverUrl: getServerUrl(),
   }
   return env
 }
