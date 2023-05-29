@@ -7,6 +7,11 @@ kubernetes_namespace := tiny-django
 backend_pod_name := backend-deployment
 helm_installation_name := tiny-django
 
+# used to configure permission groups for data shared between host and container
+user_id := $(shell id -u)
+group_id := $(shell id -g)
+
+
 backend_migrate_static:
 	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 manage.py makemigrations
 	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 manage.py migrate
@@ -76,6 +81,21 @@ microk8s_setup:
 	microk8s start
 	microk8s enable helm ingress dns registry
 	microk8s kubectl create namespace $(kubernetes_namespace)
+	
+android_start_emulator:
+	emulator -avd Nexus_5X_API_30 -verbose
+
+android_build_install:
+	docker run -v $(root_dir)/front:/front --entrypoint npm -it $(frontend_img_sha) run static
+	docker run -v $(root_dir)/front:/front --entrypoint ./node_modules/.bin/cap -it $(frontend_img_sha) sync
+	docker run -v $(root_dir)/front:/front --entrypoint /bin/sh -it $(frontend_img_sha) -c "chown -R $(user_id):$(group_id) ./android"
+	cd front/android && ./gradlew installDebug
+	adb shell am start -n com.timschupp.timsstack/com.timschupp.timsstack.MainActivity
+	adb logcat -v threadtime com.timschupp.timsstack:*
+	
+android_cap_liveload:
+	cd front && ./node_modules/.bin/cap run android --livereload --external --consolelogs
+
 	
 microk8s_status:
 	microk8s kubectl get all -n $(kubernetes_namespace)
