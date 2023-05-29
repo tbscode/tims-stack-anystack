@@ -4,9 +4,6 @@ metadata:
   name: base-ingress
   namespace: {{ .Values.rootNamespace }}
   annotations:
-    {{- if .Values.useCertManager }}
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    {{- end }}
     {{- if .Values.backend.useSockets }}
     nginx.ingress.kubernetes.io/proxy-connect-timeout: '3600'
     nginx.ingress.kubernetes.io/proxy-read-timeout: '3600'
@@ -37,6 +34,21 @@ spec:
     - http:
     {{- end }}
         paths:
+          # nextjs's public folder also directly routes to frontend manager
+          - path: /_next/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.frontend.serviceName }}
+                port:
+                  number: {{ .Values.frontend.port }}
+          - path: /_nstat/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.frontend.serviceName }}
+                port:
+                  number: {{ .Values.frontend.port }}
           - path: /
             pathType: Prefix
             backend:
