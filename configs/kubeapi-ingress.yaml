@@ -17,7 +17,7 @@ spec:
           service:
             name: kubernetes
             port:
-              number: 44134
+              number: 16443
   tls:
   - hosts:
     - k8s.t1m.me
