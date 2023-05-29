@@ -1,5 +1,5 @@
 useCertManager: false
-rootNamespace: anychat
+rootNamespace: tims-stack-dev
 baseAppUrl: localhost
 registryAuthRequired: false
 production: false
@@ -34,15 +34,15 @@ backend:
     ROOT_URL: 'http://localhost'
     DJANGO_SECRET_KEY: 'SomeSecret'
     DJANGO_ALLOWED_HOSTS: '*'
-    REDIS_URL: 'redis://redis-db-svc.anysearch.svc.cluster.local:6379'
+    REDIS_URL: 'redis://redis-db-svc.tims-stack-dev.svc.cluster.local:6379'
     USE_NEXTJS_PROXY_ROUTES: 'true'
-    NEXTJS_HOST_URL: 'http://frontend-service.anysearch.svc.cluster.local:3000'
+    NEXTJS_HOST_URL: 'http://frontend-service.tims-stack-dev.svc.cluster.local:3000'
     BASE_ADMIN_USERNAME: 'admin'
     BASE_ADMIN_USER_PASSWORD: 'password'
 frontend:
   port: 3000
   serviceName: frontend-service
-  imageURL: localhost:32000/frontend-image-prod:latest
+  imageURL: localhost:32000/frontend-image:latest
   deploymentName: frontend-deployment
   secretName: frontend-secret
   requiresRegistryAuth: false
@@ -55,3 +55,9 @@ frontend:
   env:
     ROOT_URL: 'http://localhost'
     WEBSOCKET_PROTOCOL: 'ws://'
+global:
+  postgresql:
+    auth:
+      username: admin
+      password: password
+      database: db
