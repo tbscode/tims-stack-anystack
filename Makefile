@@ -125,7 +125,7 @@ microk8s_route_backend_local:
 microk8s_setup:
 	microk8s status
 	microk8s start
-	microk8s enable helm ingress dns registry
+	microk8s enable helm ingress dns registry cert-manager
 	microk8s kubectl create namespace $(kubernetes_namespace)
 	
 android_start_emulator:
