@@ -1,5 +1,8 @@
 # Tim's Stack: Dynamic cross plattform web app stack
 
+This is a clean rewrite of a stack that I've evolved over the past 2 years. 
+It is also my entry to the Bunnyshell hackathon, all components used here have free to use licenses.
+
 ## Use Case
 
 This stack is meant for dynamic realtime web apps with mobile clients.
@@ -39,6 +42,36 @@ if it fails it can fallback to a chached version allowing the user to view the f
     - broker for celery
     - db for django channels
     
+## Bunnyshell
+    
+As this repo uses helm charts you will need either a bunnyshell buissness account or a private cluster to connect to your bunnyshell account.
+
+### Setting-up a private microk8s cluster
+
+As AWS Kubernetes or Google cloud kubernetes servers are quite expensive I prefere to setup a small private cluster running on a 15 euro / mo v-server. Using the right provider this is more than sufficient to run multiple development servers or even a low traffic production deployment.
+
+The helmchart ingress is configured to expose the kubectl api server at `k8s.<your-domain>` we will use this route and given credentials to setup our cluster integration in bunnyshell.
+
+1. install microk8s on server
+2. setup dns record `<your-domain> -> server IP` and `k8s.<your-domain> -> server IP`
+3. Install cluster issuer and configure ingress to kubeapi server: `microk8s kubectl apply -f configs/`
+
+...
+
+https://microk8s.io/docs/nfs
+
+...
+
+4. Optain issued client certificates:
+```
+microk8s kubectl get secret server-tls -o jsonpath='{.data.tls\.crt}' | base64 --decode > kubeconfig-tls.cert
+microk8s kubectl get secret server-tls -o jsonpath='{.data.tls\.key}' | base64 --decode > kubeconfig-tls.key
+cat kubeconfig-tls.cert | base64 | tr -d '\n'
+cat kubeconfig-tls.key | base64 | tr -d '\n'
+```
+4. edit server client config on server `sudo vim /var/snap/microk8s/current/credentials/client.config` change `server: *localhost* -> server: k8s.<your-domain>`.
+5. download the client config ( store it securely! )
+    
 ## Usage
     
 This outlines manual usage, for usage with bunnyshell.com check the section above.
@@ -74,8 +107,85 @@ You can configure any container registry by updating `Makefile` and `helm/values
 
 You can build all production images **without** any of the production secrets they are only required for the deployed containers. To build all production images use `make full_build_prod` (TODO).
 
+Add your subdomain to the dns recors of mcirok8s
+/var/snap/microk8s/current/certs/csr.conf.template
+
 Now you need to authorize your docker installation to push to your private registry, with github container registry you can use `make authorize_github_push gha_token=<your-token>`.
 
 Now you can push the build production images `make push_prod`.
 
 For deployment create a copy of `helm/values.yaml -> heml/production-values.yaml` the choose secure usernames and password for all the services. Now you can install the helm chart on your cluster.
+
+## LICENSE
+
+...
+
+## NOTICE
+
+special custom code written by me (@tbscode) all (Apache 2.0 see LINCENSE section):
+
+- `helm/*` helm chart for deploying all servies, flags configured for deploying only parts of the services
+- `Makefile` build and development scripts
+- `.github/workflows/*` github actions for building and pushing container images
+- `front/pages/_app.js` based mobile layout detector & global state manager.
+- `front/utils/tools.tsx` capacitor based env switch and tools for handling streaming requesst to nextjs pages
+- `front/components/connection-banner.jsx` Automatic capacitor based plattform detector, manages fetching user_data or falling back to chached user data for offline usage
+- `back/core/api/user_data.py` Example api handling core user-data
+- `back/core/consumer.py` Simple django-channels consumer to handle client callbacks and update actions
+- `config/*` kubernetes configs for preparing private microk8s cluster + bunnyshell setup
+- `Dockerfile.*` dockerfile for building all services, builds differ in dev (`_dev`) vs prod
+
+These are the main custom components, other things are just general config's / settings and some scripts.
+
+### libaries used
+
+linked libaries backend (`back/requirements.txt`):
+
+- [`django-cors-headers`](https://github.com/adamchainz/django-cors-headers): [MIT License](https://github.com/adamchainz/django-cors-headers/blob/main/LICENSE)
+- [`Python Markdown`](https://github.com/Python-Markdown/markdown): [`BSD-stype`](https://github.com/Python-Markdown/markdown/blob/master/INSTALL.md)
+- [`django-filter`](https://github.com/carltongibson/django-filter): [Modified BSD](https://github.com/carltongibson/django-filter/blob/main/LICENSE)
+- [`Django`](https://github.com/django/django/tree/main): [BSD 3-Clause](https://github.com/django/django/blob/main/LICENSE)
+- [`django-channels`](https://github.com/django/channels/): [BSD 3-Clause](https://github.com/django/channels/blob/main/LICENSE)
+- [`django-channels-redis`](https://github.com/django/channels_redis): [BSD 3-clause](https://github.com/django/channels_redis/blob/main/LICENSE)
+- [`celery`](https://github.com/celery/celery): [BSD 3-clause](https://github.com/celery/celery/blob/main/LICENSE)
+- [`django-celery-results`](https://github.com/celery/django-celery-results): [BSD 3-clause](https://github.com/celery/django-celery-results/blob/main/LICENSE)
+- [`django-celery-beat`](https://github.com/celery/django-celery-beat): [BSD 3-clause](https://github.com/celery/django-celery-beat/blob/main/LICENSE)
+- [`djangorestframework`](https://www.django-rest-framework.org/): [BSD 3-clause](https://github.com/encode/django-rest-framework/blob/master/LICENSE.md)
+- [`djangorestframework-dataclasses`](https://github.com/oxan/djangorestframework-dataclasses): [BSD 3-Clause](https://github.com/oxan/djangorestframework-dataclasses/blob/master/LICENSE)
+- [`drf-spectacular`](https://github.com/tfranzel/drf-spectacular/): [BSD 3-Clause](https://github.com/tfranzel/drf-spectacular/blob/master/LICENSE)
+- [`django_nextjs`](https://github.com/QueraTeam/django-nextjs): [MIT](https://github.com/QueraTeam/django-nextjs/blob/main/LICENSE)
+- [`openai`](https://github.com/openai/openai-python): [MIT](https://github.com/openai/openai-python/blob/main/LICENSE)
+- [`ipython`](https://github.com/ipython/ipython): [BSD 3-Clause](https://github.com/ipython/ipython/blob/main/LICENSE)
+- [`django-jazzmin`](https://github.com/farridav/django-jazzmin): [MIT](https://github.com/farridav/django-jazzmin/blob/master/LICENSE)
+- (only required if connecting to aws postgres db) [`psycopg2-binary`](https://github.com/psycopg/psycopg2): [LGPL](https://github.com/psycopg/psycopg2/blob/master/LICENSE)
+- [`uvicorn`](https://github.com/encode/uvicorn): [BSD 3-clause](https://github.com/encode/uvicorn/blob/master/LICENSE.md)
+- [`whitenoise`](https://github.com/evansd/whitenoise): [MIT](https://github.com/evansd/whitenoise/blob/main/LICENSE)
+- [`jinja2`](https://github.com/pallets/jinja): [BSD 3-clause](https://github.com/pallets/jinja/blob/main/LICENSE.rst)
+
+
+linked libaries frontend (`front/package.json`):
+
+- [`next.js`](https://github.com/vercel/next.js/): [MIT](https://github.com/vercel/next.js/blob/canary/license.md)
+- [`capacitor`](https://github.com/ionic-team/capacitor): [MIT](https://github.com/ionic-team/capacitor/blob/main/LICENSE)
+- Capactior plugins: [`preferences (MIT)`](https://github.com/ionic-team/capacitor-plugins/blob/main/preferences/LICENSE)
+- [`react`](https://github.com/facebook/react): [MIT](https://github.com/facebook/react/blob/main/LICENSE)
+- [`react-dom`](https://github.com/facebook/react/tree/main/packages/react-dom) [MIT (part of react)](https://github.com/facebook/react/blob/main/LICENSE)
+- [`dasyui`](https://github.com/saadeghi/daisyui): [MIT](https://github.com/saadeghi/daisyui/blob/master/LICENSE)
+- [`eslint`](https://eslint.org/): [MIT](https://github.com/eslint/eslint/blob/main/LICENSE)
+- [`eslint-config-next`](https://www.npmjs.com/package/eslint-config-next): [MIT (part of next.js)](https://github.com/vercel/next.js/blob/canary/license.md)
+- [`postcss`](https://github.com/postcss/postcss): [MIT](https://github.com/postcss/postcss/blob/main/LICENSE)
+- [`tailwindcss`](https://github.com/tailwindlabs/tailwindcss): [MIT](https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE)
+- [`typescript`](https://github.com/microsoft/TypeScript): [Apache 2.0](https://github.com/microsoft/TypeScript/blob/main/LICENSE.txt)
+
+development dependancies:
+
+- [`docker`]()
+- [`cmake`]()
+
+runtime dependancies:
+
+- [`python > 3.8`]():
+- [`node.js`]()
+- [`microk8s`]()
+
+docker images:
