@@ -16,8 +16,8 @@ kind: Ingress
 metadata:
   name: kubeapi-ingress
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.org/ssl-passthrough: "true"
     kubernetes.io/ingress.class: public
 spec:
   rules:
@@ -31,3 +31,7 @@ spec:
             name: k8s-api
             port:
               number: 16443
+  tls:
+  - hosts:
+    - {{ .Values.baseAppUrl }}
+  secretName: prod-ingress-tls-secret
