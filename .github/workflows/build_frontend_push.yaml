@@ -22,10 +22,6 @@ permissions:
   packages: write
   id-token: write
 
-concurrency:
-  group: 'pages'
-  cancel-in-progress: true
-
 jobs:
   make_docs:
     runs-on: ubuntu-latest
