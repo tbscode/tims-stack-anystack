@@ -34,5 +34,3 @@ components:
     stop:
       - |
         echo "stop"
-    environment:
-      - 
