@@ -18,7 +18,7 @@ function dispatch_build_push_wait_complete {
       -H "Accept: application/vnd.github+json" \
       -H "Authorization: Bearer $GHA_TOKEN" \
       $WORKFLOW_CALLBACK \
-      -d "{\"ref\": \"$GIT_BRANCH\", \"inputs\": {\"branch\": \"$GIT_BRANCH\", \"git_user\": \"tbscode\", \"unique_id\": \"$UNIQUE_ID\"}}" \
+      -d "{\"ref\": \"$GIT_BRANCH\", \"inputs\": {\"branch\": \"$GIT_BRANCH\", \"git_user\": \"$GIT_USER\", \"unique_id\": \"$UNIQUE_ID\"}}" \
       -w "\n%{http_code}" -s)
     
     sleep 10
