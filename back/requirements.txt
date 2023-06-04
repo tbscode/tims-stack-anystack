@@ -16,11 +16,5 @@ ipython
 django-jazzmin
 psycopg2-binary
 uvicorn[standard]
-pdfkit
-mistune
 whitenoise
-googletrans==3.1.0a0
 jinja2
-google-api-python-client
-tiktoken
-markdown2
