@@ -26,4 +26,5 @@ components:
         # start the backend chart simply by increasing replica count
         echo "start"
     stop:
+      - |
         echo "stop"
