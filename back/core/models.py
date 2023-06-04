@@ -1,6 +1,4 @@
 from django.db import models
-from googletrans import Translator
-from googletrans.constants import LANGUAGES
 from django.utils.translation import pgettext_lazy
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import concurrent.futures
