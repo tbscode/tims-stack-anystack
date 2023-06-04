@@ -77,8 +77,9 @@ backend_push:
 backend_push_prod:
 	docker push $(registry_url)/$(backend_image_name)-prod:latest
 
-backend_push_prod_tag:
+backend_build_push_prod_tag:
 	$(call check_defined, tag, your 'tag' variable is not defined)
+	docker push $(registry_url)/$(backend_image_name)-prod:$(tag)
 	docker push $(registry_url)/$(backend_image_name)-prod:$(tag)
 
 backend_run:
