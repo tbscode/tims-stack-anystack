@@ -1,0 +1,29 @@
+kind: Environment
+name: Express / React / PostgreSQL boilerplate, with Helm and Kubernetes manifests
+type: primary
+environmentVariables:
+  GIT_USER: 'tbscode'
+  HOST_NAME: 't1m.me'
+  MODE: 'remote'
+  GIT_PACKAGES_TOKEN: ''
+components:
+  - 
+    kind: GenericComponent
+    name: backend-image
+    runnerImage: 'myoung34/github-runner'
+    deploy:
+      - |
+        export TAG={{ env.unique }}
+        # Build the backend image
+        make authorize_github_push gha_token=$GIT_PACKAGES_TOKEN
+        make backend_build_push_prod
+    destroy:
+      - |
+        # destroy the backend chart
+        echo "destroy"
+    start:
+      - |
+        # start the backend chart simply by increasing replica count
+        echo "start"
+    stop:
+        echo "stop"
