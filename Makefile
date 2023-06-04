@@ -18,20 +18,25 @@ else
 	github_user := $(GIT_USER)
 endif
 
+ifndef TAG
+	tag := latest
+else
+	tag := $(TAG)
+
 
 ifeq ($(dev_mode),local)
 registry_url := localhost:32000
 frontend_image_name := frontend-image
 backend_image_name := backend-image
-backend_img_sha := $(shell docker images -q $(registry_url)/$(backend_image_name):latest)
-frontend_img_sha := $(shell docker images -q $(registry_url)/$(frontend_image_name):latest)
+backend_img_sha := $(shell docker images -q $(registry_url)/$(backend_image_name):$(tag))
+frontend_img_sha := $(shell docker images -q $(registry_url)/$(frontend_image_name):$(tag))
 else
 registry_url := ghcr.io
 frontend_image_name := $(github_user)/tims-stack-frontend-image
 backend_image_name := $(github_user)/tims-stack-backend-image
 
-frontend_img_sha := $(shell docker images -q $(registry_url)/$(frontend_image_name):latest)
-backend_img_sha := $(shell docker images -q $(registry_url)/$(backend_image_name):latest)
+frontend_img_sha := $(shell docker images -q $(registry_url)/$(frontend_image_name):$(tag))
+backend_img_sha := $(shell docker images -q $(registry_url)/$(backend_image_name):$(tag))
 endif
 
 
@@ -63,25 +68,18 @@ backend_migrate_static:
 	docker run -v $(root_dir)/back:/back -it $(backend_img_sha) python3 manage.py collectstatic --noinput
 
 backend_build:
-	docker build --progress=plain -t $(registry_url)/$(backend_image_name):latest -f Dockerfile.back_dev back
+	docker build --progress=plain -t $(registry_url)/$(backend_image_name):$(tag) -f Dockerfile.back_dev back
 	$(MAKE) backend_migrate_static
 
 # we have to build the local backend first to extract statics
 backend_build_prod:
 	$(MAKE) backend_build
 	$(MAKE) backend_migrate_static
-	docker build --progress=plain -t $(registry_url)/$(backend_image_name)-prod:latest -f Dockerfile.back back
+	docker build --progress=plain -t $(registry_url)/$(backend_image_name)-prod:$(tag) -f Dockerfile.back back
 
 backend_push:
-	docker push $(registry_url)/$(backend_image_name):latest
+	docker push $(registry_url)/$(backend_image_name):$(tag)
 backend_push_prod:
-	docker push $(registry_url)/$(backend_image_name)-prod:latest
-
-backend_build_push_prod_tag:
-	$(call check_defined, tag, your 'tag' variable is not defined)
-	$(MAKE) backend_build
-	$(MAKE) backend_migrate_static
-	docker build --progress=plain -t $(registry_url)/$(backend_image_name)-prod:$(tag) -f Dockerfile.back back
 	docker push $(registry_url)/$(backend_image_name)-prod:$(tag)
 
 backend_run:
@@ -108,15 +106,15 @@ backend_build_push_prod:
 	$(MAKE) backend_push_prod
 	
 frontend_build:
-	docker build --progress=plain -t $(registry_url)/$(frontend_image_name):latest -f Dockerfile.front_dev front
+	docker build --progress=plain -t $(registry_url)/$(frontend_image_name):$(tag) -f Dockerfile.front_dev front
 
 frontend_build_prod:
-	docker build --progress=plain -t $(registry_url)/$(frontend_image_name)-prod:latest -f Dockerfile.front front
+	docker build --progress=plain -t $(registry_url)/$(frontend_image_name)-prod:$(tag) -f Dockerfile.front front
 
 frontend_push:
-	docker push $(registry_url)/$(frontend_image_name):latest
+	docker push $(registry_url)/$(frontend_image_name):$(tag)
 frontend_push_prod:
-	docker push $(registry_url)/$(frontend_image_name)-prod:latest
+	docker push $(registry_url)/$(frontend_image_name)-prod:$(tag)
 frontend_run:
 	docker run --init --add-host=host.docker.internal:host-gateway -p 3000:3000 -v $(root_dir)/front:/front -it $(frontend_img_sha)
 	
