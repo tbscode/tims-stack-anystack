@@ -11,7 +11,12 @@ else
 dev_mode := local
 endif
 
-github_user := tbscode
+
+ifndef GIT_USER
+	github_user := tbscode
+else
+	github_user := $(GIT_USER)
+endif
 
 
 ifeq ($(dev_mode),local)
@@ -22,8 +27,8 @@ backend_img_sha := $(shell docker images -q $(registry_url)/$(backend_image_name
 frontend_img_sha := $(shell docker images -q $(registry_url)/$(frontend_image_name):latest)
 else
 registry_url := ghcr.io
-frontend_image_name := tbscode/tims-stack-frontend-image
-backend_image_name := tbscode/tims-stack-backend-image
+frontend_image_name := $(github_user)/tims-stack-frontend-image
+backend_image_name := $(github_user)/tims-stack-backend-image
 
 frontend_img_sha := $(shell docker images -q $(registry_url)/$(frontend_image_name):latest)
 backend_img_sha := $(shell docker images -q $(registry_url)/$(backend_image_name):latest)
@@ -68,9 +73,14 @@ backend_build_prod:
 	docker build --progress=plain -t $(registry_url)/$(backend_image_name)-prod:latest -f Dockerfile.back back
 
 backend_push:
-	docker push localhost:32000/backend-image:latest
+	docker push $(registry_url)/$(backend_image_name):latest
 backend_push_prod:
-	docker push localhost:32000/backend-image-prod:latest
+	docker push $(registry_url)/$(backend_image_name)-prod:latest
+
+backend_push_prod_tag:
+	$(call check_defined, tag, your 'tag' variable is not defined)
+	docker push $(registry_url)/$(backend_image_name)-prod:$(tag)
+
 backend_run:
 	echo "Running backend $(backend_img_sha)"
 	docker run --init --add-host=host.docker.internal:host-gateway -p 8000:8000 -v $(root_dir)/back:/back -it $(backend_img_sha)
@@ -78,6 +88,12 @@ backend_run:
 test:
 	@echo $(dev_mode)
 	@echo $(backend_img_sha)
+	
+
+modify_helm_values:
+	$(call check_defined, eval_str, your 'eval_str' variable is not defined)
+	$(call check_defined, out_file, your 'out_file' variable is not defined)
+	yq eval '$(eval_str)' ./helm/values.yaml > config_modified.yaml && mv config_modified.yaml $(out_file)
 
 
 backend_build_push:
