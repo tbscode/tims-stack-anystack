@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
         with:
-          branch: ${{ github.event.inputs.branch }}
+          ref: ${{ github.event.inputs.branch }}
           token: ${{ secrets.REPO_PAT }}
           submodules: recursive
       - name: Build and push backend prod image
