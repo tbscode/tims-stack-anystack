@@ -1,3 +1,4 @@
+{{- if .Values.backend.deploy }}
 {{- if .Values.production }}
 apiVersion: apps/v1
 kind: Deployment
@@ -69,4 +70,5 @@ spec:
       envFrom:
         - secretRef:
             name: {{ .Values.backend.secretName }}
+{{- end }}
 {{- end }}
