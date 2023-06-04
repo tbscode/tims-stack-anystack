@@ -6,11 +6,14 @@ environmentVariables:
   HOST_NAME: 't1m.me'
   MODE: 'remote'
   GIT_PACKAGES_TOKEN: ''
+  BASE_REPO: ''
 components:
   - 
     kind: GenericComponent
     name: frontend-image
     runnerImage: 'ubuntu'
+    gitBranch: main
+    gitRepo: '{{ env.vars.BASE_REPO }}'
     deploy:
       - |
         echo "Deployed"
@@ -29,11 +32,13 @@ components:
     kind: GenericComponent
     name: backend-image
     runnerImage: 'ubuntu'
+    gitBranch: main
+    gitRepo: '{{ env.vars.BASE_REPO }}'
     deploy:
       - |
         export TAG={{ env.unique }}
         # Build the backend image
-        make authorize_github_push gha_token=$GIT_PACKAGES_TOKEN
+        make authorize_github_push gha_token={{ env.vars.GIT_PACKAGES_TOKEN }}
         make backend_build_push_prod
     destroy:
       - |
