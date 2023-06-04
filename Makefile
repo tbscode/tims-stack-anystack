@@ -22,6 +22,7 @@ ifndef TAG
 	tag := latest
 else
 	tag := $(TAG)
+endif
 
 
 ifeq ($(dev_mode),local)
