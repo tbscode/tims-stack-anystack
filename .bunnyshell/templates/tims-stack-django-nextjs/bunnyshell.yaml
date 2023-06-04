@@ -13,7 +13,7 @@ components:
     name: frontend-image
     runnerImage: 'ubuntu'
     gitBranch: main
-    gitRepo: 'https://github.com/user-1024/tims-stack-anystack/'
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
       - |
         echo "Deployed"
@@ -33,7 +33,7 @@ components:
     name: backend-image
     runnerImage: 'ubuntu'
     gitBranch: main
-    gitRepo: 'https://github.com/user-1024/tims-stack-anystack/'
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
       - |
         export TAG={{ env.unique }}
