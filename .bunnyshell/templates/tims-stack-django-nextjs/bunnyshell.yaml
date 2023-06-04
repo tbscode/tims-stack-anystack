@@ -19,6 +19,8 @@ components:
         echo "Deploing"
       - |
         export TAG={{ env.unique }}
+        export GIT_USER={{ env.vars.GIT_USER }}
+        export MODE={{ env.vars.MODE }}
         make authorize_github_push gha_token={{ env.vars.GIT_PACKAGES_TOKEN }}
         make backend_build_push_prod
     destroy:
@@ -32,3 +34,5 @@ components:
     stop:
       - |
         echo "stop"
+    environment:
+      - 
