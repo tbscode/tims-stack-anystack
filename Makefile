@@ -134,6 +134,11 @@ full_build_deploy:
 	$(MAKE) backend_build_push
 	$(MAKE) frontend_build_push
 	
+remote_trigger_git_action_wait_complete:
+	$(call check_defined, branch, yout 'branch' variable is not defined)
+	$(call check_defined, token, yout 'token' variable is not defined)
+	GIT_USER=$(github_user) GIT_BRANCH=$(branch) GHA_TOKEN=$(token) UNIQUE_ID=$(tag) bash ./_scripts/trigger_gh_action_wait_for_completion.sh
+	
 microk8s_attach_backend:
 	microk8s kubectl exec --stdin --tty $(backend_pod_name) -n $(kubernetes_namespace) -- sh
 	
