@@ -39,9 +39,8 @@ jobs:
       - name: Build and push backend prod image
         shell: 'script -q -e -c "bash {0}"'
         run: |
-          make backend_build_prod
           make authorize_github_push gha_token=$GIT_PACKAGES_TOKEN
-          make backend_push_prod_tag tag=$UNIQUE_ID
+          make backend_build_push_prod_tag tag=$UNIQUE_ID
         env:
           MODE: 'remote'
           GIT_USER: ${{ github.event.inputs.git_user }}
