@@ -11,12 +11,16 @@ components:
   - 
     kind: Helm
     name: frontend-image
-    runnerImage: 'dtzar/helm-kubectl:3.8.2'
+    runnerImage: 'ubuntu'
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
       - |
-        echo "Deployed"
+        echo "Deploing"
+      - |
+        export TAG={{ env.unique }}
+        make authorize_github_push gha_token={{ env.vars.GIT_PACKAGES_TOKEN }}
+        make backend_build_push_prod
     destroy:
       - |
         # destroy the backend chart
