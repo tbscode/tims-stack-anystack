@@ -50,7 +50,6 @@ function dispatch_build_push_wait_complete {
           exit 0
         else
           echo "Workflow '$WORKFLOW_FILE' completed with an error."
-          EXIT_STATUS=1
           exit 1
         fi
       fi
@@ -60,11 +59,26 @@ function dispatch_build_push_wait_complete {
     done
 }
 
-dispatch_build_push_wait_complete "build_frontend_push.yaml" &
-dispatch_build_push_wait_complete "build_backend_push.yaml" &
+dispatch_build_push_wait_complete "build_frontend_push.yaml" & pid1=$!
+dispatch_build_push_wait_complete "build_backend_push.yaml" & pid2=$!
+
+
+# Wait for the functions to complete and store their exit statuses
+wait $pid1
+status1=$?
+wait $pid2
+status2=$?
 
 # Wait for both functions to complete
 wait
+
+if [ "$status1" -ne 0 ]; then
+  EXIT_STATUS=1
+fi
+
+if [ "$status2" -ne 0 ]; then
+  EXIT_STATUS=1
+fi
 
 if [ "$EXIT_STATUS" -ne 0 ]; then
   echo "One of the functions failed."
