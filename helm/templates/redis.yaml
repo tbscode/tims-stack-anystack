@@ -1,3 +1,4 @@
+{{- if .Values.redis.deploy }}
 {{- if .Values.useRedis }}
 apiVersion: apps/v1
 kind: Deployment
@@ -36,4 +37,5 @@ spec:
       targetPort: {{ .Values.redis.port }}
   selector:
     app: {{ .Values.redis.deploymentName }}
+{{- end }}
 {{- end }}
