@@ -1,4 +1,4 @@
-name: Run tests
+name: Build and push images
 
 on:
   workflow_dispatch:
@@ -42,7 +42,7 @@ jobs:
           make backend_build_prod
           make authorize_github_push gha_token=$GIT_PACKAGES_TOKEN
           make backend_push_prod_tag tag=$UNIQUE_ID gha_token=$GIT_PACKAGES_TOKEN
-        environment:
+        env:
           MODE: 'remote'
           GIT_USER: ${{ github.event.inputs.git_user }}
           COMPOSE_DOCKER_CLI_BUILD: 1
