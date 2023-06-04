@@ -9,6 +9,24 @@ environmentVariables:
 components:
   - 
     kind: GenericComponent
+    name: frontend-image
+    runnerImage: 'ubuntu'
+    deploy:
+      - |
+        echo "Deployed"
+    destroy:
+      - |
+        # destroy the backend chart
+        echo "destroy"
+    start:
+      - |
+        # start the backend chart simply by increasing replica count
+        echo "start"
+    stop:
+      - |
+        echo "stop"
+  - 
+    kind: GenericComponent
     name: backend-image
     runnerImage: 'ubuntu'
     deploy:
