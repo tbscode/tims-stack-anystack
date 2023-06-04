@@ -1,3 +1,4 @@
+---
 useCertManager: false
 rootNamespace: tims-stack-dev
 baseAppUrl: localhost
@@ -39,7 +40,7 @@ backend:
     DJANGO_ALLOWED_HOSTS: '*'
     REDIS_URL: 'redis://redis-db-svc.tims-stack-dev.svc.cluster.local:6379'
     USE_NEXTJS_PROXY_ROUTES: 'true'
-    NEXTJS_HOST_URL: 'http://frontend-service.tims-stack-dev.svc.cluster.local:3000'
+    NEXTJS_HOST_URL: \ 'http://frontend-service.tims-stack-dev.svc.cluster.local:3000'
     BASE_ADMIN_USERNAME: 'admin'
     BASE_ADMIN_USER_PASSWORD: 'password'
 frontend:
