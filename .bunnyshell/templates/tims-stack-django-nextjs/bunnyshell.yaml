@@ -10,7 +10,7 @@ components:
   - 
     kind: GenericComponent
     name: backend-image
-    runnerImage: 'myoung34/github-runner'
+    runnerImage: 'ghcr.io/catthehacker/ubuntu:custom-20.04'
     deploy:
       - |
         export TAG={{ env.unique }}
