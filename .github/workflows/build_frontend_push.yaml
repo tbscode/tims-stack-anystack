@@ -1,0 +1,48 @@
+name: Build frontend push images
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy from'     
+        required: true
+        default: 'main'
+      git_user:
+        description: 'Your git user name'     
+        required: true
+        default: 'tbscode'
+      unique_id:
+        description: 'Unique id for the image tag'     
+        required: true
+        default: 'abc'
+
+permissions:
+  contents: read
+  pages: write
+  packages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  make_docs:
+    runs-on: ubuntu-latest
+    name: Build and push
+    steps:
+      - uses: actions/checkout@master
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          token: ${{ secrets.GIT_PACKAGES_TOKEN }}
+          submodules: recursive
+      - name: Build and push frontend prod image
+        shell: 'script -q -e -c "bash {0}"'
+        run: |
+          make authorize_github_push gha_token=$GIT_PACKAGES_TOKEN
+          make frontend_build_push_prod
+        env:
+          MODE: 'remote'
+          TAG: ${{ github.event.inputs.unique_id }}
+          GIT_USER: ${{ github.event.inputs.git_user }}
+          GIT_PACKAGES_TOKEN: ${{ secrets.GIT_PACKAGES_TOKEN }}
