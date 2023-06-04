@@ -10,7 +10,7 @@ environmentVariables:
 components:
   - 
     kind: Helm
-    name: build push images
+    name: build-push-images
     runnerImage: 'frolvlad/alpine-bash'
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
@@ -21,12 +21,10 @@ components:
         make remote_trigger_git_action_wait_complete branch=main token={{ env.GIT_PACKAGES_TOKEN }}
     destroy:
       - |
-        # destroy the backend chart
-        echo "destroy"
+        echo "deleting previously build images"
     start:
       - |
-        # start the backend chart simply by increasing replica count
-        echo "start"
+        echo "noting todo on restart images are still build"
     stop:
       - |
-        echo "stop"
+        echo "noting todo on stop images are still build"
