@@ -9,37 +9,14 @@ environmentVariables:
   BASE_REPO: ''
 components:
   - 
-    kind: GenericComponent
+    kind: Helm
     name: frontend-image
-    runnerImage: 'ubuntu'
+    runnerImage: 'dtzar/helm-kubectl:3.8.2'
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
       - |
         echo "Deployed"
-    destroy:
-      - |
-        # destroy the backend chart
-        echo "destroy"
-    start:
-      - |
-        # start the backend chart simply by increasing replica count
-        echo "start"
-    stop:
-      - |
-        echo "stop"
-  - 
-    kind: GenericComponent
-    name: backend-image
-    runnerImage: 'ubuntu'
-    gitBranch: main
-    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
-    deploy:
-      - |
-        export TAG={{ env.unique }}
-        # Build the backend image
-        make authorize_github_push gha_token={{ env.vars.GIT_PACKAGES_TOKEN }}
-        make backend_build_push_prod
     destroy:
       - |
         # destroy the backend chart
