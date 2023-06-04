@@ -11,7 +11,7 @@ components:
   - 
     kind: Helm
     name: build-push-images
-    runnerImage: 'frolvlad/alpine-bash'
+    runnerImage: 'ghcr.io/catthehacker/ubuntu:custom-20.04'
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
