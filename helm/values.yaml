@@ -6,15 +6,18 @@ production: false
 development: true
 useRedis: false
 certmanager:
+  deploy: false
   secretKeyName: letsencrypt-prod
   email: 'benjamin.tim@gmx.de'
   apiServer: 'https://acme-v02.api.letsencrypt.org/directory'
   name: some
 redis:
+  deploy: false
   port: 6379
   deploymentName: redis-db
   serviceName: redis-db-svc
 backend:
+  deploy: false
   port: 8000
   replicas: 1
   serviceName: backend-service
@@ -40,6 +43,7 @@ backend:
     BASE_ADMIN_USERNAME: 'admin'
     BASE_ADMIN_USER_PASSWORD: 'password'
 frontend:
+  deploy: false
   port: 3000
   serviceName: frontend-service
   imageURL: localhost:32000/frontend-image:latest
