@@ -79,7 +79,9 @@ backend_push_prod:
 
 backend_build_push_prod_tag:
 	$(call check_defined, tag, your 'tag' variable is not defined)
-	docker push $(registry_url)/$(backend_image_name)-prod:$(tag)
+	$(MAKE) backend_build
+	$(MAKE) backend_migrate_static
+	docker build --progress=plain -t $(registry_url)/$(backend_image_name)-prod:$(tag) -f Dockerfile.back back
 	docker push $(registry_url)/$(backend_image_name)-prod:$(tag)
 
 backend_run:
