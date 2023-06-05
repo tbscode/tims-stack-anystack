@@ -92,10 +92,9 @@ test:
 	@echo $(backend_img_sha)
 	
 
-modify_helm_values:
+modify_values:
 	$(call check_defined, eval_str, your 'eval_str' variable is not defined)
-	$(call check_defined, out_file, your 'out_file' variable is not defined)
-	yq eval '$(eval_str)' ./helm/values.yaml > config_modified.yaml && mv config_modified.yaml $(out_file)
+	yq -i eval '$(eval_str)' ./helm/values.yaml
 
 
 backend_build_push:
