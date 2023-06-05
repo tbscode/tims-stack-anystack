@@ -25,7 +25,8 @@ components:
         export BACKEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-backend-image-prod:$TAG"
         export FRONTEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-frontend-image-prod:$TAG"
       - |
-        export GH_CR_AUTH=$(echo -n "tbscode:$1" | base64)
+        export GIT_USER={{ env.vars.GIT_USER }}
+        export GH_CR_AUTH=$(echo -n "$GIT_USER:$1" | base64)
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
           .registryAuthRequired = true

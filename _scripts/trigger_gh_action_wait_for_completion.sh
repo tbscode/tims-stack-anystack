@@ -69,9 +69,6 @@ status1=$?
 wait $pid2
 status2=$?
 
-# Wait for both functions to complete
-wait
-
 if [ "$status1" -ne 0 ]; then
   EXIT_STATUS=1
 fi
