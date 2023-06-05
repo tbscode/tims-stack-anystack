@@ -1,6 +1,7 @@
 #!/bin/bash
 
 EXIT_STATUS=0
+MAXIMUM_WAIT_TIME=400
 
 function dispatch_build_push_wait_complete {
     # Trigger the workflow
@@ -31,7 +32,7 @@ function dispatch_build_push_wait_complete {
     fi
 
     # Poll the API to check workflow status
-    while true; do
+    while [ $MAXIMUM_WAIT_TIME -gt 0 ]; do
       # Get the latest workflow run
 
         latest_run=$(curl -X GET \
@@ -56,6 +57,7 @@ function dispatch_build_push_wait_complete {
 
       # Sleep for a while before polling again
       sleep 10
+      MAXIMUM_WAIT_TIME=$((MAXIMUM_WAIT_TIME-10))
     done
 }
 
@@ -64,10 +66,8 @@ dispatch_build_push_wait_complete "build_backend_push.yaml" & pid2=$!
 
 
 # Wait for the functions to complete and store their exit statuses
-wait $pid1
+wait
 status1=$?
-wait $pid2
-status2=$?
 
 if [ "$status1" -ne 0 ]; then
   EXIT_STATUS=1
