@@ -12,7 +12,7 @@ components:
   - 
     kind: Helm
     name: image-manager
-    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm:latest'
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
@@ -22,6 +22,15 @@ components:
         export BACKEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-backend-image-prod:$TAG"
         export FRONTEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-frontend-image-prod:$TAG"
         make remote_trigger_git_action_wait_complete branch=main token={{ env.vars.GIT_PACKAGES_TOKEN }}
+      - |
+        export GIT_USER={{ env.vars.GIT_USER }}
+        export GH_CR_AUTH=$(echo -n "$GIT_USER:$1" | base64)
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .registryAuthRequired = true
+          .prod.githubRegAuthToken = "$GH_CR_AUTH"
+        EOF
+        helm upgrade --install github-auth-installation-{{ env.unique }} ./helm/
     destroy:
       - |
         echo "deleting previously build images"
@@ -37,7 +46,7 @@ components:
   - 
     kind: Helm
     name: backend
-    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm:latest'
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
