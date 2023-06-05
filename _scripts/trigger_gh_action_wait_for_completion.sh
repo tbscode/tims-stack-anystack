@@ -1,7 +1,6 @@
 #!/bin/bash
 
 EXIT_STATUS=0
-MAXIMUM_WAIT_TIME=400
 
 function dispatch_build_push_wait_complete {
     # Trigger the workflow
@@ -14,6 +13,8 @@ function dispatch_build_push_wait_complete {
     export WORKFLOW_RUNS="https://api.github.com/repos/$GIT_USER/tims-stack-anystack/actions/workflows/$WORKFLOW_FILE/runs"
     echo $WORKFLOW_CALLBACK
     echo $WORKFLOW_FILE
+
+    MAXIMUM_WAIT_TIME=400
 
     response=$(curl -X POST \
       -H "Accept: application/vnd.github+json" \
