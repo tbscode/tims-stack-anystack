@@ -1,8 +1,10 @@
 ---
 useCertManager: false
+deployIngress: false
 rootNamespace: tims-stack-dev
 baseAppUrl: localhost
 registryAuthRequired: false
+githubRegAuthToken: 'token'
 production: false
 development: true
 useRedis: false
