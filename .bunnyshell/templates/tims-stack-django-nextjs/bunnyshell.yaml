@@ -42,7 +42,6 @@ components:
     exportVariables:
       - BACKEND_IMG_URL
       - FRONTEND_IMG_URL
-components:
   - 
     kind: Helm
     name: backend
