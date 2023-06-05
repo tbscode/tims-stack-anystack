@@ -62,14 +62,14 @@ function dispatch_build_push_wait_complete {
     done
 }
 
-dispatch_build_push_wait_complete "build_frontend_push.yaml" & pid1=$!
-dispatch_build_push_wait_complete "build_backend_push.yaml" & pid2=$!
+dispatch_build_push_wait_complete "build_frontend_push.yaml" &
+dispatch_build_push_wait_complete "build_backend_push.yaml" &
 
 
 # Wait for the functions to complete and store their exit statuses
-wait $pid1
+wait
 status1=$?
-wait $pid2
+wait
 status2=$?
 
 if [ "$status1" -ne 0 ]; then
