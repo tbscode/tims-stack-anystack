@@ -33,7 +33,7 @@ components:
         helm upgrade --install github-auth-installation-{{ env.unique }} ./helm/
     destroy:
       - |
-        echo "deleting previously build images"
+        helm uninstall github-auth-installation-{{ env.unique }}
     start:
       - |
         echo "noting todo on restart images are still build"
