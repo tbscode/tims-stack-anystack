@@ -30,7 +30,7 @@ backend:
   requiresRegistryAuth: false
   imagePullSecretName: backend-image-pull-secret
   useSockets: false
-  mountCodeRoot: true
+  mountCodeRoot: false
   mount:
     pvcName: backend-pvc
     volumeName: backend-dev-volume
@@ -54,7 +54,7 @@ frontend:
   secretName: frontend-secret
   requiresRegistryAuth: false
   imagePullSecretName: frontend-image-pull-secret
-  mountCodeRoot: true
+  mountCodeRoot: false
   mount:
     pvcName: frontend-pvc
     volumeName: frontend-dev-volume
