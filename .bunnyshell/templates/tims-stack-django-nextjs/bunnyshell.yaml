@@ -28,7 +28,8 @@ components:
         sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
         sudo chmod a+x /usr/local/bin/yq
         export GIT_USER={{ env.vars.GIT_USER }}
-        export GH_CR_AUTH=$(echo -n "$GIT_USER:$1" | base64)
+        export GH_CR_AUTH=$(echo -n "$GIT_USER:{{ env.vars.GIT_PACKAGES_TOKEN }}" | base64)
+        echo $GH_CR_AUTH
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
           .registryAuthRequired = true
