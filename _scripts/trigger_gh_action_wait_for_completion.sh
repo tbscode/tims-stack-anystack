@@ -69,7 +69,6 @@ dispatch_build_push_wait_complete "build_backend_push.yaml" &
 # Wait for the functions to complete and store their exit statuses
 wait
 status1=$?
-wait
 status2=$?
 
 if [ "$status1" -ne 0 ]; then
