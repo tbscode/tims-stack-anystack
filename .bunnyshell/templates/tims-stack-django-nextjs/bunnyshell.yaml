@@ -17,6 +17,8 @@ components:
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
       - |
+        echo "starting deployment"
+      - |
         export TAG={{ env.unique }}
         export GIT_USER={{ env.vars.GIT_USER }}
         export BACKEND_IMG_URL=""
