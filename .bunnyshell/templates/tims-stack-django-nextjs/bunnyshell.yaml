@@ -21,9 +21,18 @@ components:
       - |
         export TAG={{ env.unique }}
         export GIT_USER={{ env.vars.GIT_USER }}
-        export BACKEND_IMG_URL=""
-        export FRONTEND_IMG_URL=""
+        export BACKEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-backend-image-prod:$TAG"
+        export FRONTEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-frontend-image-prod:$TAG"
         make remote_trigger_git_action_wait_complete branch=main token={{ env.vars.GIT_PACKAGES_TOKEN }}
+      - |
+        export GIT_USER={{ env.vars.GIT_USER }}
+        export GH_CR_AUTH=$(echo -n "$GIT_USER:$1" | base64)
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .registryAuthRequired = true
+          .prod.githubRegAuthToken = "$GH_CR_AUTH"
+        EOF
+        helm upgrade --install github-auth-installation-{{ env.unique }} ./helm/
     destroy:
       - |
         helm uninstall github-auth-installation-{{ env.unique }}
@@ -36,3 +45,52 @@ components:
     exportVariables:
       - BACKEND_IMG_URL
       - FRONTEND_IMG_URL
+  - 
+    kind: Helm
+    name: backend
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .backend.deploy = true
+          .backend.imageURL = "{{ components.image-manager.exported.BACKEND_IMG_URL }}"
+          .backend.replicas = 2
+          .backend.mountCodeRoot = false
+          .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
+          .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
+          .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
+        EOF
+        helm upgrade --install backend-installation-{{ env.unique }} ./helm/
+    destroy:
+      - |
+        helm uninstall backend-installation-{{ env.unique }}
+    start:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .backend.deploy = true
+          .backend.replicas = 2
+          .backend.mountCodeRoot = false
+          .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
+          .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
+          .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
+        EOF
+        helm upgrade --install backend-installation-{{ env.unique }} ./helm/
+    stop:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .backend.deploy = true
+          .backend.replicas = 0
+          .backend.mountCodeRoot = false
+          .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
+          .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
+          .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
+        EOF
+        helm upgrade --install backend-installation-{{ env.unique }} ./helm/
