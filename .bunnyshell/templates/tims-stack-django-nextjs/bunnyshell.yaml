@@ -12,7 +12,7 @@ components:
   - 
     kind: Helm
     name: image-manager
-    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    runnerImage: 'ghcr.io/catthehacker/ubuntu:custom-20.04'
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
