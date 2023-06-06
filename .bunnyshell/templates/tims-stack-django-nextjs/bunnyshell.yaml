@@ -18,12 +18,6 @@ components:
     deploy:
       - |
         echo "starting deployment"
-      - |
-        export TAG={{ env.unique }}
-        export GIT_USER={{ env.vars.GIT_USER }}
-        export BACKEND_IMG_URL=""
-        export FRONTEND_IMG_URL=""
-        make remote_trigger_git_action_wait_complete branch=main token={{ env.vars.GIT_PACKAGES_TOKEN }}
     destroy:
       - |
         helm uninstall github-auth-installation-{{ env.unique }}
