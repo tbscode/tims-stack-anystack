@@ -27,6 +27,7 @@ components:
       - |
         sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
         sudo chmod a+x /usr/local/bin/yq
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
         export GIT_USER={{ env.vars.GIT_USER }}
         export GH_CR_AUTH=$(echo -n "$GIT_USER:{{ env.vars.GIT_PACKAGES_TOKEN }}" | base64)
         echo $GH_CR_AUTH
