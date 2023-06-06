@@ -12,7 +12,7 @@ components:
   - 
     kind: Helm
     name: image-manager
-    runnerImage: 'ghcr.io/catthehacker/ubuntu:custom-20.04'
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
     deploy:
@@ -25,9 +25,6 @@ components:
         export FRONTEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-frontend-image-prod:$TAG"
         make remote_trigger_git_action_wait_complete branch=main token={{ env.vars.GIT_PACKAGES_TOKEN }}
       - |
-        sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-        sudo chmod a+x /usr/local/bin/yq
-        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
         export GIT_USER={{ env.vars.GIT_USER }}
         export GH_CR_AUTH=$(echo -n "$GIT_USER:{{ env.vars.GIT_PACKAGES_TOKEN }}" | base64)
         echo $GH_CR_AUTH
