@@ -3,6 +3,8 @@
 This is a clean rewrite of a stack that I've evolved over the past 2 years. 
 It is also my entry to the Bunnyshell hackathon, all components used here have free to use licenses.
 
+![stack overview](./_misc/overview_graph.png)
+
 ## Use Case
 
 This stack is meant for dynamic realtime web apps with mobile clients.
@@ -53,24 +55,11 @@ As AWS Kubernetes or Google cloud kubernetes servers are quite expensive I prefe
 The helmchart ingress is configured to expose the kubectl api server at `k8s.<your-domain>` we will use this route and given credentials to setup our cluster integration in bunnyshell.
 
 1. install microk8s on server
-2. setup dns record `<your-domain> -> server IP` and `k8s.<your-domain> -> server IP`
-3. Install cluster issuer and configure ingress to kubeapi server: `microk8s kubectl apply -f configs/`
-
-...
-
-https://microk8s.io/docs/nfs
-
-...
-
-4. Optain issued client certificates:
-```
-microk8s kubectl get secret server-tls -o jsonpath='{.data.tls\.crt}' | base64 --decode > kubeconfig-tls.cert
-microk8s kubectl get secret server-tls -o jsonpath='{.data.tls\.key}' | base64 --decode > kubeconfig-tls.key
-cat kubeconfig-tls.cert | base64 | tr -d '\n'
-cat kubeconfig-tls.key | base64 | tr -d '\n'
-```
-4. edit server client config on server `sudo vim /var/snap/microk8s/current/credentials/client.config` change `server: *localhost* -> server: k8s.<your-domain>`.
-5. download the client config ( store it securely! )
+2. open the port to the kubeapi server and setup dns record `<your-domain> -> server IP` and `k8s.<your-domain> -> server IP`
+3. View microk8s client config and copy values to configure bunnyshell cluster 
+4. Configure required storage classes ( I've not completed this step ) the following is a comment of the bunnyshell support what you'd need to setup for the cluster the be fully compatible
+> TODO insert comment
+5. Install cluster issuer and configure ingress to kubeapi server: `microk8s kubectl apply -f configs/ingress.yaml` ( this is used by this chart to connect a host url set by yourself ). Also configure a wildcard dns recod `*.<your-host>` so that later exposed services can be routed to.
     
 ## Usage
     
@@ -118,7 +107,21 @@ For deployment create a copy of `helm/values.yaml -> heml/production-values.yaml
 
 ## LICENSE
 
-...
+This project is licensed under the Apache License, Version 2.0 (the "License").
+You may not use these files except in compliance with the License.
+A copy of the License is included in the "LICENSE" file of this repository or you can also obtain a copy at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+## AUTHOR
+
+Tim Schupp (@tbscode) is the author of all other code as marked in the NOTICE section. Attribution is always welcome but not required.
 
 ## NOTICE
 
