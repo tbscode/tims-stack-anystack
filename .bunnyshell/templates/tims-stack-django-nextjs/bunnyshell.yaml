@@ -129,10 +129,10 @@ components:
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
           .backend.env.DB_NO_SSL = "true"
           .backend.env.DB_ENGINE: "django.db.backends.postgresql_psycopg2"
-          .backend.env.DB_NAME: '{{ env.vars.POSTGRES_DB }}'
-          .backend.env.DB_USER: 'postgres'
-          .backend.env.DB_PASSWORD: '{{ env.vars.POSTGRES_PASSWORD }}'
-          .backend.env.DB_HOST: '{{ components.helm.postgres.exported.POSTGRES_HOST }}'
+          .backend.env.DB_NAME: "{{ env.vars.POSTGRES_DB }}"
+          .backend.env.DB_USER: "postgres"
+          .backend.env.DB_PASSWORD: "{{ env.vars.POSTGRES_PASSWORD }}"
+          .backend.env.DB_HOST: "{{ components.helm.postgres.exported.POSTGRES_HOST }}"
           .backend.env.DB_PORT: 5432
         EOF
         helm upgrade --install backend-installation-{{ env.unique }} ./helm/
@@ -156,10 +156,10 @@ components:
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
           .backend.env.DB_NO_SSL = "true"
           .backend.env.DB_ENGINE: "django.db.backends.postgresql_psycopg2"
-          .backend.env.DB_NAME: '{{ env.vars.POSTGRES_DB }}'
-          .backend.env.DB_USER: 'postgres'
-          .backend.env.DB_PASSWORD: '{{ env.vars.POSTGRES_PASSWORD }}'
-          .backend.env.DB_HOST: '{{ components.helm.postgres.exported.POSTGRES_HOST }}'
+          .backend.env.DB_NAME: "{{ env.vars.POSTGRES_DB }}"
+          .backend.env.DB_USER: "postgres"
+          .backend.env.DB_PASSWORD: "{{ env.vars.POSTGRES_PASSWORD }}"
+          .backend.env.DB_HOST: "{{ components.helm.postgres.exported.POSTGRES_HOST }}"
           .backend.env.DB_PORT: 5432
         EOF
         helm upgrade --install backend-installation-{{ env.unique }} ./helm/
@@ -180,10 +180,10 @@ components:
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
           .backend.env.DB_NO_SSL = "true"
           .backend.env.DB_ENGINE: "django.db.backends.postgresql_psycopg2"
-          .backend.env.DB_NAME: '{{ env.vars.POSTGRES_DB }}'
-          .backend.env.DB_USER: 'postgres'
-          .backend.env.DB_PASSWORD: '{{ env.vars.POSTGRES_PASSWORD }}'
-          .backend.env.DB_HOST: '{{ components.helm.postgres.exported.POSTGRES_HOST }}'
+          .backend.env.DB_NAME: "{{ env.vars.POSTGRES_DB }}"
+          .backend.env.DB_USER: "postgres"
+          .backend.env.DB_PASSWORD: "{{ env.vars.POSTGRES_PASSWORD }}"
+          .backend.env.DB_HOST: "{{ components.helm.postgres.exported.POSTGRES_HOST }}"
           .backend.env.DB_PORT: 5432
         EOF
         helm upgrade --install backend-installation-{{ env.unique }} ./helm/
