@@ -115,6 +115,7 @@ components:
       - |
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
           .backend.deploy = true
           .backend.imageURL = "{{ components.image-manager.exported.BACKEND_IMG_URL }}"
           .backend.replicas = 2
@@ -133,6 +134,7 @@ components:
       - |
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
           .backend.deploy = true
           .backend.replicas = 2
           .backend.mountCodeRoot = false
@@ -147,6 +149,7 @@ components:
       - |
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
           .backend.deploy = true
           .backend.replicas = 0
           .backend.mountCodeRoot = false
@@ -167,6 +170,7 @@ components:
       - |
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
           .frontend.deploy = true
           .frontend.replicas = 1
           .frontend.requiresRegistryAuth = true
@@ -183,6 +187,7 @@ components:
       - |
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
           .frontend.deploy = true
           .frontend.replicas = 1
           .frontend.requiresRegistryAuth = true
@@ -196,6 +201,7 @@ components:
       - |
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
           .frontend.deploy = true
           .frontend.replicas = 0
           .frontend.requiresRegistryAuth = true
@@ -203,5 +209,44 @@ components:
           .frontend.mountCodeRoot = false
           .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
           .frontend.env.WEBSOCKET_PROTOCOL = "wss://"
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+  - 
+    kind: Helm
+    name: ingress-manager
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .deployIngress = true
+          .baseAppUrl = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .useCertManager = true
+          .backend.useSockets = false
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+    destroy:
+      - |
+        helm uninstall frontend-installation-{{ env.unique }}
+    start:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .deployIngress = true
+          .baseAppUrl = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .useCertManager = true
+          .backend.useSockets = false
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+    stop:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .deployIngress = true
+          .baseAppUrl = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .useCertManager = true
+          .backend.useSockets = false
         EOF
         helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
