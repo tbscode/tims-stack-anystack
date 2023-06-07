@@ -222,7 +222,7 @@ components:
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
           .deployIngress = true
-          .baseAppUrl = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .baseAppUrl = "backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .useCertManager = true
           .backend.useSockets = false
         EOF
@@ -235,7 +235,7 @@ components:
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
           .deployIngress = true
-          .baseAppUrl = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .baseAppUrl = "backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .useCertManager = true
           .backend.useSockets = false
         EOF
@@ -245,7 +245,7 @@ components:
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
           .deployIngress = true
-          .baseAppUrl = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .baseAppUrl = "backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .useCertManager = true
           .backend.useSockets = false
         EOF
