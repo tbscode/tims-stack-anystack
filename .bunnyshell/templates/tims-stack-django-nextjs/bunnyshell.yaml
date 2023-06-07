@@ -132,7 +132,7 @@ components:
           .backend.env.DB_NAME: "{{ env.vars.POSTGRES_DB }}"
           .backend.env.DB_USER: "postgres"
           .backend.env.DB_PASSWORD: "{{ env.vars.POSTGRES_PASSWORD }}"
-          .backend.env.DB_HOST: "{{ components.helm.postgres.exported.POSTGRES_HOST }}"
+          .backend.env.DB_HOST: "{{ components.postgres.exported.POSTGRES_HOST }}"
           .backend.env.DB_PORT: 5432
         EOF
         helm upgrade --install backend-installation-{{ env.unique }} ./helm/
@@ -159,7 +159,7 @@ components:
           .backend.env.DB_NAME: "{{ env.vars.POSTGRES_DB }}"
           .backend.env.DB_USER: "postgres"
           .backend.env.DB_PASSWORD: "{{ env.vars.POSTGRES_PASSWORD }}"
-          .backend.env.DB_HOST: "{{ components.helm.postgres.exported.POSTGRES_HOST }}"
+          .backend.env.DB_HOST: "{{ components.postgres.exported.POSTGRES_HOST }}"
           .backend.env.DB_PORT: 5432
         EOF
         helm upgrade --install backend-installation-{{ env.unique }} ./helm/
@@ -183,7 +183,7 @@ components:
           .backend.env.DB_NAME: "{{ env.vars.POSTGRES_DB }}"
           .backend.env.DB_USER: "postgres"
           .backend.env.DB_PASSWORD: "{{ env.vars.POSTGRES_PASSWORD }}"
-          .backend.env.DB_HOST: "{{ components.helm.postgres.exported.POSTGRES_HOST }}"
+          .backend.env.DB_HOST: "{{ components.postgres.exported.POSTGRES_HOST }}"
           .backend.env.DB_PORT: 5432
         EOF
         helm upgrade --install backend-installation-{{ env.unique }} ./helm/
