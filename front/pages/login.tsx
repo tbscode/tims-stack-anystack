@@ -8,7 +8,7 @@ import { getCookiesAsObject, getEnv } from '@/utils/tools';
 import { ConnectionBanner, connectionStateAndUserData } from "../components/connection-banner";
 
 
-export const NOgetServerSideProps = async ({req} : {req: any}) => {
+export const getServerSideProps = async ({req} : {req: any}) => {
   if (req.method == "POST") {
     const streamPromise = new Promise( ( resolve, reject ) => {
         let body = ''

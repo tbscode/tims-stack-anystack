@@ -7,7 +7,7 @@ import { ConnectionBanner, connectionStateAndUserData } from "../components/conn
 
 
 
-export const NOgetServerSideProps = async ({req} : {req: any}) => {
+export const getServerSideProps = async ({req} : {req: any}) => {
   if (req.method == "POST") {
     const res = await handleStreamedProps({req})
     console.log("RES", res)
