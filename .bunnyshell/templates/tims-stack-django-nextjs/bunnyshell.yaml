@@ -118,6 +118,7 @@ components:
           .backend.deploy = true
           .backend.imageURL = "{{ components.image-manager.exported.BACKEND_IMG_URL }}"
           .backend.replicas = 2
+          .backend.requiresRegistryAuth = true
           .backend.mountCodeRoot = false
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
@@ -135,6 +136,7 @@ components:
           .backend.deploy = true
           .backend.replicas = 2
           .backend.mountCodeRoot = false
+          .backend.requiresRegistryAuth = true
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
@@ -148,6 +150,7 @@ components:
           .backend.deploy = true
           .backend.replicas = 0
           .backend.mountCodeRoot = false
+          .backend.requiresRegistryAuth = true
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
@@ -166,6 +169,7 @@ components:
           .rootNamespace = "{{ env.k8s.namespace }}"
           .frontend.deploy = true
           .frontend.replicas = 1
+          .frontend.requiresRegistryAuth = true
           .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
           .frontend.mountCodeRoot = false
           .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
@@ -181,6 +185,7 @@ components:
           .rootNamespace = "{{ env.k8s.namespace }}"
           .frontend.deploy = true
           .frontend.replicas = 1
+          .frontend.requiresRegistryAuth = true
           .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
           .frontend.mountCodeRoot = false
           .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
@@ -193,6 +198,7 @@ components:
           .rootNamespace = "{{ env.k8s.namespace }}"
           .frontend.deploy = true
           .frontend.replicas = 0
+          .frontend.requiresRegistryAuth = true
           .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
           .frontend.mountCodeRoot = false
           .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
