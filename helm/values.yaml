@@ -1,4 +1,5 @@
 ---
+deployCertManager: false
 useCertManager: false
 deployIngress: false
 rootNamespace: tims-stack-dev
