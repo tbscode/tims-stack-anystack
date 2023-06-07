@@ -226,10 +226,10 @@ components:
           .useCertManager = true
           .backend.useSockets = false
         EOF
-        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+        helm upgrade --install ingress-installation-{{ env.unique }} ./helm/
     destroy:
       - |
-        helm uninstall frontend-installation-{{ env.unique }}
+        helm uninstall ingress-installation-{{ env.unique }}
     start:
       - |
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
@@ -239,7 +239,7 @@ components:
           .useCertManager = true
           .backend.useSockets = false
         EOF
-        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+        helm upgrade --install ingress-installation-{{ env.unique }} ./helm/
     stop:
       - |
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
@@ -249,4 +249,4 @@ components:
           .useCertManager = true
           .backend.useSockets = false
         EOF
-        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+        helm upgrade --install ingress-installation-{{ env.unique }} ./helm/
