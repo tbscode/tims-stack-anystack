@@ -47,6 +47,7 @@ backend:
     BASE_ADMIN_USERNAME: 'admin'
     BASE_ADMIN_USER_PASSWORD: 'password'
 frontend:
+  useSSR: false
   deploy: false
   port: 3000
   serviceName: frontend-service
