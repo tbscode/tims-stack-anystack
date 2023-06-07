@@ -51,6 +51,13 @@ spec:
                 port:
                   number: {{ .Values.frontend.port }}
           {{- if .Values.frontend.useSSR }}
+          - path: /static/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.backend.serviceName }}
+                port:
+                  number: {{ .Values.backend.port }}
           - path: /
             pathType: Prefix
             backend:
