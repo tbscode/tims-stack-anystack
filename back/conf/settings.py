@@ -276,6 +276,7 @@ JAZZMIN_SETTINGS = {
 
 JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": True,
+    "dark_mode_theme": "darkly",
 }
 
 CHANNEL_LAYERS = {
