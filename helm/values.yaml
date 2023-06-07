@@ -41,6 +41,7 @@ backend:
     PRODUCTION: 'true'
     ROOT_URL: 'http://localhost'
     ROOT_HOST: 't1m.me'
+    EXTRA_TRUSTED_ORIGINS: ''
     DJANGO_SECRET_KEY: 'SomeSecret'
     DJANGO_ALLOWED_HOSTS: '*'
     REDIS_URL: 'redis://redis-db-svc.tims-stack-dev.svc.cluster.local:6379'

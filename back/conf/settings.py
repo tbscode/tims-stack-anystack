@@ -57,6 +57,10 @@ CSRF_TRUSTED_ORIGINS = ["https://t1m.me"]
 if os.environ.get("ROOT_HOST", "") != "":
     CSRF_TRUSTED_ORIGINS.append("https://*." + os.environ.get("ROOT_HOST", ""))
     CSRF_TRUSTED_ORIGINS.append("https://" + os.environ.get("ROOT_HOST", ""))
+    
+if os.environ.get("EXTRA_TRUSTED_ORIGINS", "") != "":
+    EXTRA_HOSTS = os.environ.get("EXTRA_TRUSTED_ORIGINS", "").split(",")
+    CSRF_TRUSTED_ORIGINS += EXTRA_HOSTS
 
 DB_ENGINE = os.environ.get("DB_ENGINE", "django.db.backends.sqlite3")
 DATABASES = {

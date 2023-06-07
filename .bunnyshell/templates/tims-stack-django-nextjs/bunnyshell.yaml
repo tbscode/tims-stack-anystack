@@ -121,8 +121,9 @@ components:
           .backend.replicas = 2
           .backend.requiresRegistryAuth = true
           .backend.mountCodeRoot = false
+          .backend.env.EXTRA_TRUSTED_ORIGINS = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
-          .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.ROOT_URL = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
         EOF
@@ -139,6 +140,7 @@ components:
           .backend.replicas = 2
           .backend.mountCodeRoot = false
           .backend.requiresRegistryAuth = true
+          .backend.env.EXTRA_TRUSTED_ORIGINS = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
@@ -154,6 +156,7 @@ components:
           .backend.replicas = 0
           .backend.mountCodeRoot = false
           .backend.requiresRegistryAuth = true
+          .backend.env.EXTRA_TRUSTED_ORIGINS = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
