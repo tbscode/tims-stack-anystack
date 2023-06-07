@@ -8,6 +8,8 @@ environmentVariables:
   GIT_PACKAGES_TOKEN: ''
   GIT_BRANCH: 'main'
   DJANGO_SECRET_KEY: "Some key very much secret haha :)"
+  POSTGRES_PASSWORD: "db_password"
+  POSTGRES_DB: "db_name"
 components:
   - 
     kind: Helm
@@ -24,6 +26,7 @@ components:
         export BACKEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-backend-image-prod:$TAG"
         export FRONTEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-frontend-image-prod:$TAG"
         make remote_trigger_git_action_wait_complete branch=main token={{ env.vars.GIT_PACKAGES_TOKEN }}
+        export ROOT_URL="https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
       - |
         export GIT_USER={{ env.vars.GIT_USER }}
         export GH_CR_AUTH=$(echo -n "$GIT_USER:{{ env.vars.GIT_PACKAGES_TOKEN }}" | base64)
@@ -46,6 +49,62 @@ components:
     exportVariables:
       - BACKEND_IMG_URL
       - FRONTEND_IMG_URL
+      - ROOT_URL
+  -
+    kind: Helm
+    name: postgres
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    deploy:
+      - |
+        cat << EOF > my_values.yaml
+            global:
+                storageClass: bns-network-sc
+            auth:
+                postgresPassword: {{ env.vars.POSTGRES_PASSWORD }}
+                database: {{ env.vars.POSTGRES_DB }}
+        EOF
+      - 'helm repo add bitnami https://charts.bitnami.com/bitnami'
+      - 'helm upgrade --install --namespace {{ env.k8s.namespace }} --post-renderer /bns/helpers/helm/add_labels/kustomize -f my_values.yaml postgres bitnami/postgresql --version 11.9.11'
+      - |
+        POSTGRES_HOST="postgres-postgresql.{{ env.k8s.namespace }}.svc.cluster.local"
+    destroy:
+      - 'helm uninstall postgres --namespace {{ env.k8s.namespace }}'
+    start:
+      - 'kubectl scale --replicas=1 --namespace {{ env.k8s.namespace }} statefulset/postgres-postgresql'
+    stop:
+      - 'kubectl scale --replicas=0 --namespace {{ env.k8s.namespace }} statefulset/postgres-postgresql'
+    exportVariables:
+      - POSTGRES_HOST
+  - 
+    kind: Helm
+    name: redis
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .redis.deploy = true
+        EOF
+        helm upgrade --install redis-installation-{{ env.unique }} ./helm/
+    destroy:
+      - |
+        helm uninstall redis-installation-{{ env.unique }}
+    start:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .redis.deploy = true
+        EOF
+        helm upgrade --install redis-installation-{{ env.unique }} ./helm/
+    stop:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .redis.deploy = false
+        EOF
+        helm upgrade --install redis-installation-{{ env.unique }} ./helm/
   - 
     kind: Helm
     name: backend
@@ -95,3 +154,48 @@ components:
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
         EOF
         helm upgrade --install backend-installation-{{ env.unique }} ./helm/
+  - 
+    kind: Helm
+    name: frontend
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .frontend.deploy = true
+          .frontend.replicas = 1
+          .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
+          .frontend.mountCodeRoot = false
+          .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
+          .frontend.env.WEBSOCKET_PROTOCOL = "wss://"
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+    destroy:
+      - |
+        helm uninstall frontend-installation-{{ env.unique }}
+    start:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .frontend.deploy = true
+          .frontend.replicas = 1
+          .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
+          .frontend.mountCodeRoot = false
+          .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
+          .frontend.env.WEBSOCKET_PROTOCOL = "wss://"
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+    stop:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .frontend.deploy = true
+          .frontend.replicas = 0
+          .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
+          .frontend.mountCodeRoot = false
+          .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
+          .frontend.env.WEBSOCKET_PROTOCOL = "wss://"
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
