@@ -152,6 +152,12 @@ microk8s_setup:
 	
 android_start_emulator:
 	emulator -avd Nexus_5X_API_30 -verbose
+	
+android_full_build_export:
+	# first replace getServersideProps with getServerSidePropsNo, so that we disable loading serverside probs
+	docker run -v $(root_dir)/front:/front --entrypoint npm -it $(frontend_img_sha) run static
+	docker run -v $(root_dir)/front:/front --entrypoint ./node_modules/.bin/cap -it $(frontend_img_sha) sync
+	docker run -v $(root_dir)/front:/front --entrypoint /bin/sh -it $(frontend_img_sha) -c "chown -R $(user_id):$(group_id) ./android"
 
 android_build_install:
 	docker run -v $(root_dir)/front:/front --entrypoint npm -it $(frontend_img_sha) run static
