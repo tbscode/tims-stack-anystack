@@ -88,6 +88,9 @@ REST_FRAMEWORK = {
     }
 }
 
+if os.environ.get("DJANGO_SECRET_KEY", "") != "":
+    SESSION_COOKIE_DOMAIN = os.environ.get("SESSION_COOKIE_DOMAIN", "")
+
 if DEBUG:
     LOGGING = {
     'version': 1,
