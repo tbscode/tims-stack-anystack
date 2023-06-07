@@ -25,8 +25,8 @@ components:
         export GIT_USER={{ env.vars.GIT_USER }}
         export BACKEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-backend-image-prod:$TAG"
         export FRONTEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-frontend-image-prod:$TAG"
-        make remote_trigger_git_action_wait_complete branch=main token={{ env.vars.GIT_PACKAGES_TOKEN }}
         export ROOT_URL="https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+        make remote_trigger_git_action_wait_complete branch=main token={{ env.vars.GIT_PACKAGES_TOKEN }}
       - |
         export GIT_USER={{ env.vars.GIT_USER }}
         export GH_CR_AUTH=$(echo -n "$GIT_USER:{{ env.vars.GIT_PACKAGES_TOKEN }}" | base64)
