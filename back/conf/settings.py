@@ -66,7 +66,7 @@ DATABASES = {
             'PASSWORD': os.environ['DB_PASSWORD'],
             'HOST': os.environ['DB_HOST'],
             'PORT': os.environ['DB_PORT'],
-            'OPTIONS': {'sslmode': 'require'}
+            **{'OPTIONS': {'sslmode': 'require'} if "psycopg2" in os.environ.get("DB_ENGINE", "") else {}}
         } if 'postgresql' in os.environ.get("DB_ENGINE", "") else {})
     }
 }
