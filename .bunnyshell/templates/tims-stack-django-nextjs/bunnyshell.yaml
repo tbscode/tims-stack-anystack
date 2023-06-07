@@ -9,7 +9,7 @@ environmentVariables:
   GIT_BRANCH: 'main'
   DJANGO_SECRET_KEY: "Some key very much secret haha :)"
   POSTGRES_PASSWORD: "db_password"
-  POSTGRES_DB: "db_name"
+  POSTGRES_DB: "postgres"
 components:
   - 
     kind: Helm
@@ -57,14 +57,12 @@ components:
     deploy:
       - |
         cat << EOF > my_values.yaml
-            global:
-                storageClass: bns-network-sc
             auth:
                 postgresPassword: {{ env.vars.POSTGRES_PASSWORD }}
                 database: {{ env.vars.POSTGRES_DB }}
         EOF
       - 'helm repo add bitnami https://charts.bitnami.com/bitnami'
-      - 'helm upgrade --install --namespace {{ env.k8s.namespace }} --post-renderer /bns/helpers/helm/add_labels/kustomize -f my_values.yaml postgres bitnami/postgresql --version 11.9.11'
+      - 'helm upgrade --install --namespace {{ env.k8s.namespace }} -f my_values.yaml postgres bitnami/postgresql --version 11.9.11'
       - |
         POSTGRES_HOST="postgres-postgresql.{{ env.k8s.namespace }}.svc.cluster.local"
     destroy:
@@ -127,6 +125,7 @@ components:
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
           .backend.env.SESSION_COOKIE_DOMAIN = ".{{ env.vars.HOST_NAME }}"
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
+          .backend.env.UNIQUE_ID = "{{ env.unique }}"
           .backend.env.DB_NO_SSL = "true"
           .backend.env.DB_ENGINE = "django.db.backends.postgresql_psycopg2"
           .backend.env.DB_NAME = "{{ env.vars.POSTGRES_DB }}"
@@ -154,6 +153,7 @@ components:
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
+          .backend.env.UNIQUE_ID = "{{ env.unique }}"
           .backend.env.DB_NO_SSL = "true"
           .backend.env.DB_ENGINE = "django.db.backends.postgresql_psycopg2"
           .backend.env.DB_NAME = "{{ env.vars.POSTGRES_DB }}"
@@ -177,6 +177,7 @@ components:
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
           .backend.env.SESSION_COOKIE_DOMAIN = ".{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
+          .backend.env.UNIQUE_ID = "{{ env.unique }}"
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
           .backend.env.DB_NO_SSL = "true"
           .backend.env.DB_ENGINE = "django.db.backends.postgresql_psycopg2"
