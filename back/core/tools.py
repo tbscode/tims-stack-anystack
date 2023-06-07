@@ -12,3 +12,22 @@ def get_or_create_base_admin():
             password=settings.BASE_ADMIN_USER_PASSWORD
         )
     return user
+
+
+def _get_or_create_test_users(name):
+    user = User.objects.filter(username=name)
+    if not user.exists():
+        user = User.objects.create_superuser(
+            username=name,
+            password="Test123!"
+        )
+    return user
+
+def get_or_create_test_users():
+    users = ["testUser1", "testUser2"]
+    out = []
+    for user in users:
+        u = _get_or_create_test_users(user)
+        out.append(u)
+    return out
+
