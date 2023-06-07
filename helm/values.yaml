@@ -38,7 +38,7 @@ backend:
     storage: 5Gi
   env:
     DJANGO_DEBUG: 'true'
-    PRODUCTION: 1
+    PRODUCTION: 'true'
     ROOT_URL: 'http://localhost'
     DJANGO_SECRET_KEY: 'SomeSecret'
     DJANGO_ALLOWED_HOSTS: '*'

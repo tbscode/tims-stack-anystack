@@ -1,6 +1,6 @@
 python3 manage.py migrate
 
-if [ $PRODUCTION -eq 1 ]; then
+if [ $PRODUCTION = "true" ]; then
     python3 manage.py shell --command 'from core.tools import get_or_create_base_admin; get_or_create_base_admin()'
     python3 manage.py shell --command 'from core.tools import get_or_create_test_users; get_or_create_test_users()'
 fi
