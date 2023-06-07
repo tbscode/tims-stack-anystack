@@ -4,6 +4,10 @@ Image builds for this stack make use of `Generic Component`'s so I can build the
 
 Images are pushed to a private github container registry, the cluster is automaticly configured to authorize for pulling these images using a fine-grained github access token.
 
+## Detailed stack overview
+
+For a detailed overview of the stack, [please checkout the root README of the stack repo](https://github.com/tbscode/tims-stack-anystack/blob/main/README.md)
+
 ## Setup:
 
 1. Fork the root repo.
