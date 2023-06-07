@@ -29,7 +29,7 @@ backend:
   deploymentName: backend-deployment
   secretName: backend-secret
   requiresRegistryAuth: false
-  imagePullSecretName: backend-image-pull-secret
+  imagePullSecretName: dockerconfigjson-github-com
   useSockets: false
   mountCodeRoot: false
   mount:
@@ -54,7 +54,7 @@ frontend:
   deploymentName: frontend-deployment
   secretName: frontend-secret
   requiresRegistryAuth: false
-  imagePullSecretName: frontend-image-pull-secret
+  imagePullSecretName: dockerconfigjson-github-com
   mountCodeRoot: false
   mount:
     pvcName: frontend-pvc
