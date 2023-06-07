@@ -125,6 +125,7 @@ components:
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
           .backend.env.ROOT_URL = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
+          .backend.env.SESSION_COOKIE_DOMAIN = ".{{ env.vars.HOST_NAME }}"
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
           .backend.env.DB_NO_SSL = "true"
           .backend.env.DB_ENGINE: "django.db.backends.postgresql_psycopg2"
@@ -149,6 +150,7 @@ components:
           .backend.requiresRegistryAuth = true
           .backend.env.EXTRA_TRUSTED_ORIGINS = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
+          .backend.env.SESSION_COOKIE_DOMAIN = ".{{ env.vars.HOST_NAME }}"
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
@@ -173,6 +175,7 @@ components:
           .backend.env.EXTRA_TRUSTED_ORIGINS = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
           .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
           .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.SESSION_COOKIE_DOMAIN = ".{{ env.vars.HOST_NAME }}"
           .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
           .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
           .backend.env.DB_NO_SSL = "true"
