@@ -53,7 +53,7 @@ components:
   -
     kind: Helm
     name: postgres
-    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    runnerImage: 'dtzar/helm-kubectl:3.8.2'
     deploy:
       - |
         cat << EOF > my_values.yaml
