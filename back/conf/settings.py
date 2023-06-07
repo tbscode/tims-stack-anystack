@@ -54,6 +54,9 @@ OPENAI_KEY = os.environ.get(
 
 
 CSRF_TRUSTED_ORIGINS = ["https://t1m.me"]
+if os.environ.get("ROOT_HOST", "") != "":
+    CSRF_TRUSTED_ORIGINS.append("https://*." + os.environ.get("ROOT_HOST", ""))
+    CSRF_TRUSTED_ORIGINS.append("https://" + os.environ.get("ROOT_HOST", ""))
 
 DB_ENGINE = os.environ.get("DB_ENGINE", "django.db.backends.sqlite3")
 DATABASES = {
