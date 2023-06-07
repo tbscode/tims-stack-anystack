@@ -62,9 +62,3 @@ frontend:
   env:
     ROOT_URL: 'http://localhost'
     WEBSOCKET_PROTOCOL: 'ws://'
-global:
-  postgresql:
-    auth:
-      username: admin
-      password: password
-      database: db
