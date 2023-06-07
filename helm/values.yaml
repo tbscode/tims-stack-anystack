@@ -5,8 +5,8 @@ rootNamespace: tims-stack-dev
 baseAppUrl: localhost
 registryAuthRequired: false
 githubRegAuthToken: 'token'
-production: false
-development: true
+production: true
+development: false
 useRedis: false
 certmanager:
   deploy: false
