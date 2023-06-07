@@ -34,7 +34,7 @@ components:
         cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
           .rootNamespace = "{{ env.k8s.namespace }}"
           .registryAuthRequired = true
-          .prod.githubRegAuthToken = "$GH_CR_AUTH"
+          .githubRegAuthToken = "$GH_CR_AUTH"
         EOF
         helm upgrade --install github-auth-installation-{{ env.unique }} ./helm/
     destroy:
