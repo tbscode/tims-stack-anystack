@@ -1,0 +1,271 @@
+kind: Environment
+name: Express / React / PostgreSQL boilerplate, with Helm and Kubernetes manifests
+type: primary
+environmentVariables:
+  GIT_USER: 'tbscode'
+  HOST_NAME: 't1m.me'
+  MODE: 'remote'
+  GIT_PACKAGES_TOKEN: ''
+  GIT_BRANCH: 'main'
+  DJANGO_SECRET_KEY: "Some key very much secret haha :)"
+  POSTGRES_PASSWORD: "db_password"
+  POSTGRES_DB: "postgres"
+components:
+  - 
+    kind: Helm
+    name: image-manager
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        echo "starting deployment"
+      - |
+        export TAG={{ env.unique }}
+        export GIT_USER={{ env.vars.GIT_USER }}
+        export BACKEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-backend-image-prod-static:$TAG"
+        export FRONTEND_IMG_URL="ghcr.io/$GIT_USER/tims-stack-frontend-image-prod-static:$TAG"
+        export ROOT_URL="https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+    destroy:
+      - |
+        echo "noting todo this is the static build"
+    start:
+      - |
+        echo "noting todo on restart images are still build"
+    stop:
+      - |
+        echo "noting todo on stop images are still build"
+    exportVariables:
+      - BACKEND_IMG_URL
+      - FRONTEND_IMG_URL
+      - ROOT_URL
+  -
+    kind: Helm
+    name: postgres
+    runnerImage: 'dtzar/helm-kubectl:3.8.2'
+    deploy:
+      - |
+        cat << EOF > my_values.yaml
+            auth:
+                postgresPassword: {{ env.vars.POSTGRES_PASSWORD }}
+                database: {{ env.vars.POSTGRES_DB }}
+        EOF
+      - 'helm repo add bitnami https://charts.bitnami.com/bitnami'
+      - 'helm upgrade --install --namespace {{ env.k8s.namespace }} -f my_values.yaml postgres bitnami/postgresql --version 11.9.11'
+      - |
+        POSTGRES_HOST="postgres-postgresql.{{ env.k8s.namespace }}.svc.cluster.local"
+    destroy:
+      - 'helm uninstall postgres --namespace {{ env.k8s.namespace }}'
+    start:
+      - 'kubectl scale --replicas=1 --namespace {{ env.k8s.namespace }} statefulset/postgres-postgresql'
+    stop:
+      - 'kubectl scale --replicas=0 --namespace {{ env.k8s.namespace }} statefulset/postgres-postgresql'
+    exportVariables:
+      - POSTGRES_HOST
+  - 
+    kind: Helm
+    name: redis
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .redis.deploy = true
+        EOF
+        helm upgrade --install redis-installation-{{ env.unique }} ./helm/
+    destroy:
+      - |
+        helm uninstall redis-installation-{{ env.unique }}
+    start:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .redis.deploy = true
+        EOF
+        helm upgrade --install redis-installation-{{ env.unique }} ./helm/
+    stop:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .redis.deploy = false
+        EOF
+        helm upgrade --install redis-installation-{{ env.unique }} ./helm/
+  - 
+    kind: Helm
+    name: backend
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
+          .backend.deploy = true
+          .backend.imageURL = "{{ components.image-manager.exported.BACKEND_IMG_URL }}"
+          .backend.replicas = 2
+          .backend.requiresRegistryAuth = true
+          .backend.mountCodeRoot = false
+          .backend.env.EXTRA_TRUSTED_ORIGINS = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
+          .backend.env.ROOT_URL = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
+          .backend.env.SESSION_COOKIE_DOMAIN = ".{{ env.vars.HOST_NAME }}"
+          .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
+          .backend.env.UNIQUE_ID = "{{ env.unique }}"
+          .backend.env.DB_NO_SSL = "true"
+          .backend.env.DB_ENGINE = "django.db.backends.postgresql_psycopg2"
+          .backend.env.DB_NAME = "{{ env.vars.POSTGRES_DB }}"
+          .backend.env.DB_USER = "postgres"
+          .backend.env.DB_PASSWORD = "{{ env.vars.POSTGRES_PASSWORD }}"
+          .backend.env.DB_HOST = "{{ components.postgres.exported.POSTGRES_HOST }}"
+          .backend.env.DB_PORT = "5432"
+        EOF
+        helm upgrade --install backend-installation-{{ env.unique }} ./helm/
+    destroy:
+      - |
+        helm uninstall backend-installation-{{ env.unique }}
+    start:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
+          .backend.deploy = true
+          .backend.replicas = 2
+          .backend.mountCodeRoot = false
+          .backend.requiresRegistryAuth = true
+          .backend.env.EXTRA_TRUSTED_ORIGINS = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
+          .backend.env.SESSION_COOKIE_DOMAIN = ".{{ env.vars.HOST_NAME }}"
+          .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
+          .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
+          .backend.env.UNIQUE_ID = "{{ env.unique }}"
+          .backend.env.DB_NO_SSL = "true"
+          .backend.env.DB_ENGINE = "django.db.backends.postgresql_psycopg2"
+          .backend.env.DB_NAME = "{{ env.vars.POSTGRES_DB }}"
+          .backend.env.DB_USER = "postgres"
+          .backend.env.DB_PASSWORD = "{{ env.vars.POSTGRES_PASSWORD }}"
+          .backend.env.DB_HOST = "{{ components.postgres.exported.POSTGRES_HOST }}"
+          .backend.env.DB_PORT = "5432"
+        EOF
+        helm upgrade --install backend-installation-{{ env.unique }} ./helm/
+    stop:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
+          .backend.deploy = true
+          .backend.replicas = 0
+          .backend.mountCodeRoot = false
+          .backend.requiresRegistryAuth = true
+          .backend.env.EXTRA_TRUSTED_ORIGINS = "https://backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.DJANGO_SECRET_KEY = "{{ env.vars.DJANGO_SECRET_KEY }}"
+          .backend.env.ROOT_URL = "https://backend-{{ env.base_domain }}.{{ env.vars.HOST_NAME }}"
+          .backend.env.SESSION_COOKIE_DOMAIN = ".{{ env.vars.HOST_NAME }}"
+          .backend.env.NEXTJS_HOST_URL = "http://frontend-service.{{ env.k8s.namespace }}.svc.cluster.local:3000"
+          .backend.env.UNIQUE_ID = "{{ env.unique }}"
+          .backend.env.REDIS_URL = "redis://redis-db-svc.{{ env.k8s.namespace }}.svc.cluster.local:6379"
+          .backend.env.DB_NO_SSL = "true"
+          .backend.env.DB_ENGINE = "django.db.backends.postgresql_psycopg2"
+          .backend.env.DB_NAME = "{{ env.vars.POSTGRES_DB }}"
+          .backend.env.DB_USER = "postgres"
+          .backend.env.DB_PASSWORD = "{{ env.vars.POSTGRES_PASSWORD }}"
+          .backend.env.DB_HOST = "{{ components.postgres.exported.POSTGRES_HOST }}"
+          .backend.env.DB_PORT = "5432"
+        EOF
+        helm upgrade --install backend-installation-{{ env.unique }} ./helm/
+  - 
+    kind: Helm
+    name: frontend
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
+          .frontend.deploy = true
+          .frontend.replicas = 1
+          .frontend.requiresRegistryAuth = true
+          .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
+          .frontend.mountCodeRoot = false
+          .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
+          .frontend.env.WEBSOCKET_PROTOCOL = "wss://"
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+    destroy:
+      - |
+        helm uninstall frontend-installation-{{ env.unique }}
+    start:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
+          .frontend.deploy = true
+          .frontend.replicas = 1
+          .frontend.requiresRegistryAuth = true
+          .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
+          .frontend.mountCodeRoot = false
+          .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
+          .frontend.env.WEBSOCKET_PROTOCOL = "wss://"
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+    stop:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .useCertManager = true
+          .frontend.deploy = true
+          .frontend.replicas = 0
+          .frontend.requiresRegistryAuth = true
+          .frontend.imageURL = "{{ components.image-manager.exported.FRONTEND_IMG_URL }}"
+          .frontend.mountCodeRoot = false
+          .frontend.env.ROOT_URL = "{{ components.image-manager.exported.ROOT_URL }}"
+          .frontend.env.WEBSOCKET_PROTOCOL = "wss://"
+        EOF
+        helm upgrade --install frontend-installation-{{ env.unique }} ./helm/
+  - 
+    kind: Helm
+    name: ingress-manager
+    runnerImage: 'ghcr.io/tbscode/tims-packages_alpine-bash-yq-make-helm-jq:latest'
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    deploy:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .deployIngress = true
+          .baseAppUrl = "backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .useCertManager = true
+          .backend.useSockets = false
+        EOF
+        helm upgrade --install ingress-installation-{{ env.unique }} ./helm/
+    destroy:
+      - |
+        helm uninstall ingress-installation-{{ env.unique }}
+    start:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .deployIngress = true
+          .baseAppUrl = "backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .useCertManager = true
+          .backend.useSockets = false
+        EOF
+        # also modify the ingress class to be 'bns-nginx' so bunnyshell can pick it up
+        yq -i eval '$(eval_str)' ./helm/templates/base-ingress.yaml
+        helm upgrade --install ingress-installation-{{ env.unique }} ./helm/
+    stop:
+      - |
+        cat << EOF | while read eval_command; do make modify_values eval_str="$eval_command"; done
+          .rootNamespace = "{{ env.k8s.namespace }}"
+          .deployIngress = true
+          .baseAppUrl = "backend-{{ env.unique }}.{{ env.vars.HOST_NAME }}"
+          .useCertManager = true
+          .backend.useSockets = false
+        EOF
+        helm upgrade --install ingress-installation-{{ env.unique }} ./helm/
