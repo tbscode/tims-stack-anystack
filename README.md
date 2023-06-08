@@ -48,6 +48,11 @@ if it fails it can fallback to a cached version allowing the user to view the fu
 
 As this repo uses Helm charts, you will need either a Bunnyshell business account or a private cluster to connect to your Bunnyshell account.
 
+### Demo Video
+
+[![Click to play](./_misc/video_indicator.png)](http://www.youtube.com/watch?v=Z8c0EL0vgfo "Tim Stack Showcase Bunnyshell hackathon")
+
+
 ### Bunnyshell Templates
 
 There are two templates here:
