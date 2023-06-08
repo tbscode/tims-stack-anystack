@@ -1,56 +1,51 @@
-# Tims Stack bunnyshell template
+# Tim's Stack Bunnyshell Template
 
-Image builds for this stack make use of `Generic Component`'s so I can build them using the same `Makefile` as for local development.
+This stack template utilizes `Generic Components` for image builds, which enables the usage of the same `Makefile` for local development.
 
-Images are pushed to a private github container registry, the cluster is automaticly configured to authorize for pulling these images using a fine-grained github access token.
+Images are pushed to a private GitHub container registry, and the cluster is automatically configured to authorize pulling these images using a fine-grained GitHub access token.
 
-## Detailed stack overview
-
-For a detailed overview of the stack, [please checkout the root README of the stack repo](https://github.com/tbscode/tims-stack-anystack/blob/main/README.md)
+For a detailed overview of the stack, please review the [root README of the stack repository](https://github.com/tbscode/tims-stack-anystack/blob/main/README.md).
 
 ## Setup:
 
-> NOTE: this setup automaticly triggers the build workflows in your github account and authenticates the kluster to pull your images using your github token, there is an [alternate template](../../../.bunnyshell/templates/tims-stack-django-nextjs-static/README.md) that comes with static prebuild images and should also work on the bunnyshell cluster. This doesn't require to add an github access token to the environment vars.
+> NOTE: This setup automatically triggers the build workflows in your GitHub account and authenticates the cluster to pull your images using your GitHub token. An [alternative template](../../../.bunnyshell/templates/tims-stack-django-nextjs-static/README.md) is available, which includes prebuilt static images that should also work on the Bunnyshell cluster. This does not require adding a GitHub access token to the environment variables.
 
-1. Fork the root repo.
-2. Login to bunnyshell using github
-3. Generate a fine-grained github token with permission to access the repo and write packages. ( `Settings > Developer Settings > Finegrained Access token`)
+1. Fork the root repository.
+2. Log in to Bunnyshell using GitHub.
+3. Generate a fine-grained GitHub token with permissions to access the repository and write packages (`Settings > Developer Settings > Fine-grained Access Token`).
 
 ## Bunnyshell Components
 
-These are the global stack components, not that the individual implementation are also heavily customized for rapid api and consumer development. ( check the repo readme for more info ).
+These are the global stack components. Please note that individual implementations are also heavily customized for rapid API and consumer development. Refer to the repository README for more information.
 
 ### Image Manager (`image-manager`)
 
-Attaches to any github account using a access token ( best: fine-grained github token with access **only** to the forked repo and reading / writing packages ). This token will also automaticly be configured with you cluster to autorize pulling the images from you private github registry.
+This component connects to a GitHub account using an access token (ideally, a fine-grained GitHub token with access **only** to the forked repository and read/write package permissions). This token will also be automatically configured with your cluster to authorize pulling the images from your private GitHub registry.
 
-**Deploying** this container automaticly triggers a github workflow to build your images and then push them to your github registry. The container will wait for the github actions to complete by polling the workflow api's and will raise an error if any build fails.
+**Deploying** this container automatically triggers a GitHub workflow to build your images and push them to your GitHub registry. The container will wait for the GitHub actions to complete by polling the workflow APIs and will raise an error if any build fails.
 
-**Destroying** this images automaticly deletes the images from your registry.
+**Destroying** this container automatically deletes the images from your registry.
 
 ### Database (`postgres`)
 
-Simple postgress db setupup to automaticly connect to from the django backend. The backend will also automaticly populate this with some test users.
+A simple PostgreSQL database is provided to automatically connect to the Django backend. The backend will automatically populate this database with test users.
 
 ### Redis (`redis`)
 
-Simple redis server for celey worker communication and websocket channel communication. This is required for horizontally scaling the backend container without any concurrency issues.
+A simple Redis server is included for Celery worker communication and WebSocket channel communication. This is required for horizontal scaling of backend containers without concurrency issues.
 
 ### Backend (`backend`)
 
-The core of the application: A horizontally scallable django container that manages the whole application state and communication.
+This is the core of the application: a horizontally scalable Django container that manages the entire application state and communication.
 
-Installs part of the helm chart for deploying the backend. Is confired with [components outlined here](TODO).
+This component is part of the Helm chart used for deploying the backend and is configured with [these components](TODO).
 
-All components [use opensource licenses]().
+All components [use open-source licenses]().
 
-**stopping** this will decrese pods to 0. Starting will increse pods to 2 so concurreny of tasks and celery workers can be tested.
+**Stopping** this component will decrease pods to 0, while starting will increase pods to 2, enabling concurrent testing of tasks and Celery workers.
 
 ### Frontend (`frontend`)
 
-Also horizontally scalable react + nextjs + capacitor setup. In web context the backend dynamicly requests rendered pages with preloaded user data.
-While the capacitor integration and some custom script allow to also export this as a static app and build it for android and ios. Other capacitor prugins also allow interacting with native functions. 
+This is a horizontally scalable React, Next.js, and Capacitor setup. In a web context, the backend dynamically requests rendered pages with preloaded user data. Custom scripts and Capacitor integration enable the exporting of this component as a static app and building for Android and iOS. Other Capacitor plugins can also interact with native functions.
 
-There is a bunch of custom implementations for managing application state, chache fallback data and websocket connection, [please check here for further information]()
-
-
+Numerous custom implementations are present for managing application state, cache fallback data, and WebSocket connections. [Please click here for further information]().
