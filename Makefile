@@ -73,7 +73,7 @@ backend_build:
 	$(MAKE) backend_migrate_static
 
 # we have to build the local backend first to extract statics
-backend_build_prod
+backend_build_prod:
 	$(MAKE) backend_build
 	$(MAKE) backend_migrate_static
 	docker build --progress=plain -t $(registry_url)/$(backend_image_name)-prod:$(tag) -f Dockerfile.back back
