@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "static": "next build && next export"
+    "static": "next build && next export",
+    "postinstall": "curl -o node_modules/@capacitor/android/capacitor/src/main/assets/native-bridge.js https://raw.githubusercontent.com/tbscode/tims-capacitor/main/android/capacitor/src/main/assets/native-bridge.js"
   },
   "dependencies": {
     "@capacitor/android": "^5.0.2",
