@@ -73,7 +73,7 @@ backend_build:
 	$(MAKE) backend_migrate_static
 
 # we have to build the local backend first to extract statics
-backend_build_prod:
+backend_build_prod
 	$(MAKE) backend_build
 	$(MAKE) backend_migrate_static
 	docker build --progress=plain -t $(registry_url)/$(backend_image_name)-prod:$(tag) -f Dockerfile.back back
@@ -151,7 +151,7 @@ microk8s_setup:
 	microk8s kubectl create namespace $(kubernetes_namespace)
 	
 android_start_emulator:
-	emulator -avd Nexus_5X_API_30 -verbose
+	emulator -avd Resizable_Experimental_API_33 -verbose
 	
 android_full_build_export:
 	# first replace getServersideProps with getServerSidePropsNo, so that we disable loading serverside probs
