@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { getCookiesAsObject, getEnv } from "@/utils/tools";
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from "@capacitor/core";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { CONNECTION_STATE, USER_DATA } from "@/store/types";
+import { CONNECTION_STATE, USER_DATA, USER_PROFILE } from "@/store/types";
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 export enum BannerState {
     idle = "idle",
@@ -14,6 +15,11 @@ export enum BannerState {
     error = "error",
     loading = "loading",
     unauthenticated = "unauthenticated",
+}
+
+export enum WebsocketMessageEnum {
+  connection_info = "connection_info",
+  reducer_update = "reducer_update",
 }
 
 interface BannerInfo {
@@ -178,6 +184,14 @@ const getConnectionState = (state) => {
   };
 
 export const ConnectionBanner: React.FC = () => {
+    /** 
+     * Takes the application state and determines the banner state,
+     * this heavily relies on the logic of /front/utils/tools.tsx:fetchDataOrLoadCache
+     * if error, offline or loading a banner will be shown with some message
+     * if idle the banner will be hidden
+     * 
+     * when in online state automatically switch to 'idle' after 10 seconds
+     */
     const currentConnectionState = useSelector((state: any) => state.connection )
     const router = useRouter();
     const dispatch = useDispatch();
@@ -188,11 +202,13 @@ export const ConnectionBanner: React.FC = () => {
         const connectionState = connectionStateAndUserData({currentConnectionState}).then((connectionState) => {
           console.log("CONNECTION STATE", connectionState);
           if(connectionState.state === "unauthenticated"){
+            dispatch({type: CONNECTION_STATE, payload: connectionState})
             router.push("/login");
           }else{
             console.log("SETTING PAGE STATE", connectionState);
             dispatch({type: CONNECTION_STATE, payload: connectionState})
             dispatch({type: USER_DATA, payload: connectionState.userData})
+            dispatch({type: USER_PROFILE, payload: connectionState.userData.profile})
           }
       
         })
@@ -202,14 +218,6 @@ export const ConnectionBanner: React.FC = () => {
     useEffect(() => {
       updateConnectionState()
     },[])
-    /** 
-     * Takes the application state and determines the banner state,
-     * this heavily relies on the logic of /front/utils/tools.tsx:fetchDataOrLoadCache
-     * if error, offline or loading a banner will be shown with some message
-     * if idle the banner will be hidden
-     * 
-     * when in online state automatically switch to 'idle' after 10 seconds
-     */
     return <ConnectionBannerDispatch bannerState={getConnectionState(currentConnectionState)} />;
 }
 
@@ -217,7 +225,42 @@ const WebsocketBridge = () => {
   /**
    * Establishes a default websocket bridge between server and client
    */
-  return <></> 
+  const env = getEnv();
+  const dispatch = useDispatch();
+  
+  const [socketUrl, setSocketUrl] = useState(env.wsPath);
+  const [messageHistory, setMessageHistory] = useState([]);
+
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      setMessageHistory((prev) => prev.concat(lastMessage));
+      const message = JSON.parse(lastMessage.data)
+      console.log("MESSAGE RECEIVED", message)
+      if(message.event === "reduction"){
+          dispatch({type: message.payload.action, payload: message.payload.payload})
+      }
+    }
+  }, [lastMessage, setMessageHistory]);
+
+  const handleClickChangeSocketUrl = useCallback(
+    () => setSocketUrl(env.wsPath),
+    []
+  );
+
+  const handleClickSendMessage = useCallback(() => sendMessage('Hello'), []);
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState];
+  console.log("SOCKET LOADED", connectionStatus);
+
+  return <>{connectionStatus}</> 
 }
 
 
@@ -251,8 +294,8 @@ const ConnectionBannerDispatch: React.FC<ConnectionBannerProps> = ({ bannerState
         <span className={currentBannerInfo.textColor}>
           {currentBannerInfo.text}
         </span>
-        <div style={{display: 'none'}}>{
-          (currentBannerState === BannerState.online || currentBannerState == BannerState.idle) && <WebsocketBridge></WebsocketBridge>}
+        <div>
+          {(currentBannerState === BannerState.online || currentBannerState == BannerState.idle) && <WebsocketBridge></WebsocketBridge>}
         </div>
       </div>
     );
