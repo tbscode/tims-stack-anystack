@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google'
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { useRouter } from 'next/router';
+import { CapacitorCookies } from '@capacitor/core';
 
 export async function handleStreamedProps({req}){
     const streamPromise = new Promise( ( resolve, reject ) => {
