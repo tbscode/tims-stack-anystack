@@ -19,6 +19,7 @@ export const MainNavigation = ({children}) => {
   const navItems = [
     {id: "index", text: "Index", href: "/"},
     {id: "profile", text: "Profile", href: "/profile"},
+    {id: "login", text: "Profile", href: "/login"},
   ]
 
   return (<div className="drawer">
