@@ -1,34 +1,25 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+from core.models import ConsumerConnections
 from asgiref.sync import sync_to_async
 
 
 class CoreConsumer(AsyncWebsocketConsumer):
 
-    async def connect(self):
-        print("CONNECT ATTEMPTED")
+    async def connect(self, **kwargs):
 
         if self.scope["user"].is_anonymous:
             # only allow already authenticated users
             await self.close()
         else:
             print("USERNAME", self.scope["user"].username)
+            print("CHANNEL_NAME", self.channel_name)
             user = self.scope["user"]
-
-            # TODO
-
-    async def broadcast_message(self, event):
-        # Sends a message to *all* random call connected users
-        # But it doesn't forward the messsage to the user that has triggered the event
-        # e.g.: update amount random users
-        if self.scope["user"].is_anonymous:
-            # only allow already authenticated users
-            await self.close()
-        else:
-            await self.send(text_data=json.dumps({
-                # as convention 'data' should always contain a 'event'
-                **event['data'],
-            }))
+            connection = await sync_to_async(ConsumerConnections.get_or_create)(user)
+            # we always create the connection group, this is used to broadcast messages to all connected consumers
+            await self.channel_layer.group_add(str(connection.uuid), self.channel_name)
+            await sync_to_async(connection.connect_device)(self.channel_name)
+            await self.accept()
 
     async def receive(self, text_data):
         if self.scope["user"].is_anonymous:
@@ -37,6 +28,19 @@ class CoreConsumer(AsyncWebsocketConsumer):
         else:
             print("RECEIVED MESSAGE", text_data)
             pass  # TODO ...
+        
+    
+    async def broadcast_message(self, event):
+        # Is used to relay message to specific groups, only authenticated users can send anything here!
+        if self.scope["user"].is_anonymous:
+            # only allow already authenticated users
+            await self.close()
+        else:
+            # TODO: handle different 'event' types
+            await self.send(text_data=json.dumps({
+                # as convention 'data' should always contain a 'event'
+                **event['data'],
+            }))
 
     async def disconnect(self, close_code):
 
@@ -45,5 +49,7 @@ class CoreConsumer(AsyncWebsocketConsumer):
             await self.close()
         else:
             user = self.scope["user"]
-
-            # TODO ...
+            
+            connection = await sync_to_async(ConsumerConnections.get_or_create)(user, escalate=True)
+            await sync_to_async(connection.disconnect_device)(self.channel_name)
+            await self.close()
