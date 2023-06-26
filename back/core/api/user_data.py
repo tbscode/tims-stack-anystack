@@ -12,6 +12,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from django.contrib.auth import authenticate, login
 from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async, async_to_sync
+from core.models import UserProfileSerializer
 
 
 from rest_framework.decorators import api_view
@@ -43,8 +44,7 @@ def get_user_data(user):
     return {
         "uuid": str(user.uuid),
         "email": user.email,
-        "profile_image": user.profile.image,
-        "first_name": user.profile.first_name,
+        "profile": UserProfileSerializer(user.profile).data
     }
 
 
