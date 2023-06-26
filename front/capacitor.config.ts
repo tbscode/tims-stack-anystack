@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     //androidScheme: 'https'
-    //hostname: "10.0.2.2:8000"
+    hostname: "10.0.2.2:8000",
     allowNavigation: []
   },
   plugins: {
