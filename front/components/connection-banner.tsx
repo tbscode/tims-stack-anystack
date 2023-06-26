@@ -116,6 +116,7 @@ const getConnectionState = (state) => {
     }
     
     console.log("STATE XY", state);
+    console.log("COOKIES",getCookiesAsObject())
     
     if (state.data === undefined || state.data.uuid === undefined) {
         console.log("COOKIES",getCookiesAsObject())
@@ -226,6 +227,7 @@ const WebsocketBridge = () => {
    * Establishes a default websocket bridge between server and client
    */
   const env = getEnv();
+  
   const dispatch = useDispatch();
   
   const [socketUrl, setSocketUrl] = useState(env.wsPath);
@@ -270,6 +272,8 @@ const ConnectionBannerDispatch: React.FC<ConnectionBannerProps> = ({ bannerState
     const [currentBannerState, setCurrentBannerState] = useState<BannerState>(bannerState);
     const currentBannerInfo = bannerInfoMap[currentBannerState];
 
+    const userData = useSelector((state: any) => state.userData )
+
     const idleTimeout = 2000;
     useEffect(() => {
         // Your side effect logic here
@@ -295,7 +299,7 @@ const ConnectionBannerDispatch: React.FC<ConnectionBannerProps> = ({ bannerState
           {currentBannerInfo.text}
         </span>
         <div>
-          {(currentBannerState === BannerState.online || currentBannerState == BannerState.idle) && <WebsocketBridge></WebsocketBridge>}
+          {((currentBannerState === BannerState.online || currentBannerState == BannerState.idle) && !userData.loading)&& <WebsocketBridge></WebsocketBridge>}
         </div>
       </div>
     );
