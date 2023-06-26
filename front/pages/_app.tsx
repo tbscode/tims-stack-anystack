@@ -34,6 +34,10 @@ function App({ Component, pageProps }: AppProps) {
       })
   }
   
+  useEffect(() => {
+    handleWindowSizeChange();
+  },[])
+  
 
   useEffect(() => {
       window.addEventListener('resize', handleWindowSizeChange);
