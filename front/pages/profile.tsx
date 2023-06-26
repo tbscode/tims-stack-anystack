@@ -111,7 +111,7 @@ export default function Index(): JSX.Element {
   return <DynamicList 
       focused={contentFocused}
       selectorContent={PROFILE_SETTINGS.filter((item) => item.id !== "empty").map((item) => {
-        return <button className="btn gap-2" onClick={() => {
+        return <button key={item.id} className="btn gap-2" onClick={() => {
           setContentFocused(true);
           setSelection(item.id);
         }}>
