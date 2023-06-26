@@ -48,9 +48,21 @@ const getServerUrl = () => {
   }
 }
 
+const getWebsocketUrl = () => {
+  if(process.env.NEXT_PUBLIC_LOCAL_MICROK8S === "true"){
+    if(Capacitor.isNativePlatform())
+      return process.env.NEXT_PUBLIC_WS_PATH_ANDROID!
+    return process.env.NEXT_PUBLIC_WS_PATH!
+  }else{
+    if(Capacitor.isNativePlatform())
+      return process.env.NEXT_PUBLIC_WS_PATH_ANDROID!
+    return process.env.NEXT_PUBLIC_WS_PATH!
+  }
+}
+
 export const getEnv = () => {
   const env : Environment = {
-    wsPath: process.env.NEXT_PUBLIC_WS_PATH!,
+    wsPath: getWebsocketUrl(),
     serverUrl: getServerUrl(),
   }
   console.log("ENV", env);
