@@ -100,7 +100,9 @@ class ConsumerConnections(models.Model):
         
     def disconnect_device(self, channel_name):
         device = self.connections.filter(channel_name=channel_name).first()
-        device.update(active=False, time_left=timezone.now())
+        device.active = False
+        device.time_left = timezone.now()
+        device.save()
         self.connections.remove(device)
         self.save()
         
