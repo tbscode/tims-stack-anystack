@@ -151,7 +151,7 @@ microk8s_setup:
 	microk8s kubectl create namespace $(kubernetes_namespace)
 	
 android_start_emulator:
-	emulator -avd Nexus_5X_API_30 -verbose
+	emulator -avd Resizable_Experimental_API_33 -verbose
 	
 android_full_build_export:
 	# first replace getServersideProps with getServerSidePropsNo, so that we disable loading serverside probs

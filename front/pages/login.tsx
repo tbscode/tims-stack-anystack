@@ -6,9 +6,11 @@ import { Capacitor } from '@capacitor/core';
 import { useState, useEffect } from 'react';
 import { getCookiesAsObject, getEnv } from '@/utils/tools';
 import { ConnectionBanner, connectionStateAndUserData } from "../components/connection-banner";
+import { useSelector, useDispatch } from 'react-redux';
+import { CONNECTION_STATE } from '@/store/types';
+import { BannerState } from '../components/connection-banner';
 
-
-export const getServerSideProps = async ({req} : {req: any}) => {
+export const getServerSidePropsNo = async ({req} : {req: any}) => {
   if (req.method == "POST") {
     const streamPromise = new Promise( ( resolve, reject ) => {
         let body = ''
@@ -27,34 +29,15 @@ export const getServerSideProps = async ({req} : {req: any}) => {
   return { props: {} };
 };
 
-export default function Index({ pageState, setPageState, updateTheme }): JSX.Element {
-  //hello alter
+export default function Index(): JSX.Element {
   const router = useRouter();
+  const dispatch = useDispatch();
   
   const [loginData, setLoginData] = useState({
     username: '',
     password: ''
   })
 
-  // TODO: setup some logig to initalize redux store with data from server
-  const [state, setState] = useState(pageState);
-  console.log("STATE", state);
-  
-  useEffect(() => {
-    const connectionState = connectionStateAndUserData({state}).then((connectionState) => {
-      console.log("CONNECTION STATE", connectionState);
-      if(connectionState.state === "unauthenticated"){
-        //router.push("/login");
-      }else{
-        console.log("SETTING PAGE STATE", connectionState);
-        setPageState(s => ({...s, ...connectionState}));
-        setState(s => ({...s, ...connectionState}));
-        router.push("/");
-      }
-  
-    })
-  }, []);
-  
   const loginRequest = () => {
     fetch(`${getEnv().serverUrl}/api/login`, {
       method: 'POST',
@@ -68,6 +51,12 @@ export default function Index({ pageState, setPageState, updateTheme }): JSX.Ele
       console.log("RES LOGIN", res)
       if(res.ok){
         console.log("REDIRECTING")
+        dispatch({
+          type: CONNECTION_STATE,
+          payload: {
+            state: BannerState.idle
+          }
+        })
         router.push("/")
       }
     })
@@ -82,6 +71,5 @@ export default function Index({ pageState, setPageState, updateTheme }): JSX.Ele
       setLoginData(s => ({...s, password: e.target.value})) 
     }} />
     <button className="btn" onClick={loginRequest}>Login</button>
-    <ConnectionBanner state={state} />
   </>);
 }

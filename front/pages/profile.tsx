@@ -1,3 +1,4 @@
+
 import Image from 'next/image'
 import { useRouter } from 'next/router';
 import { handleStreamedProps, getCookiesAsObject } from "../utils/tools";
@@ -30,13 +31,13 @@ const ProfileSettings = ({}) => {
 
 
 export default function Index(): JSX.Element {
-  const stateData = useSelector((state: any) => state.userData);
-  console.log("USER DATA", stateData);
+  const profile = useSelector((state: any) => state.profile)
+  console.log("PROFILE DATA", profile);
   
   return (<>
       <div className="flex flex-row items-center w-auto m-4 h-full">
         <div className="flex flex-col w-72 bg-primary rounded-xl mr-2 text-wrap h-full p-2">
-
+          
           <button className="btn gap-2" onClick={() => {
             window.location.reload();
           }}>
@@ -45,6 +46,7 @@ export default function Index(): JSX.Element {
           </button>
         </div>
         <div className="flex flex-col flex-grow h-auto bg-secondary h-full rounded-xl p-2">
+          {JSON.stringify(profile)} 
         </div>
       </div>
     </>);
