@@ -3,8 +3,10 @@ import { getCookiesAsObject, getEnv } from "@/utils/tools";
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from "@capacitor/core";
 import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { CONNECTION_STATE, USER_DATA } from "@/store/types";
 
-enum BannerState {
+export enum BannerState {
     idle = "idle",
     online = "online",
     offline = "offline",
@@ -22,12 +24,12 @@ interface BannerInfo {
     visible: boolean;
 }
 
-const bannerInfoMap: Record<BannerState, BannerInfo> = {
+export const bannerInfoMap: Record<BannerState, BannerInfo> = {
     [BannerState.idle]: {
         state: BannerState.idle,
         backgroundColor: "bg-green-500",
         textColor: "text-white",
-        text: "",
+        text: "Idle",
         visible: false,
     },
     [BannerState.online]: {
@@ -106,7 +108,9 @@ const getConnectionState = (state) => {
       // then we are still on serverside
       return connectionState;
     }
-  
+    
+    console.log("STATE XY", state);
+    
     if (state.data === undefined || state.data.uuid === undefined) {
         console.log("COOKIES",getCookiesAsObject())
     try{
@@ -154,16 +158,50 @@ const getConnectionState = (state) => {
         }
       }
     } else {
-      connectionState.userData = state.data;
-      connectionState.state = BannerState.online;
-      connectionState.info = "Online, data loaded";
-      Preferences.set({ key: 'data', value: JSON.stringify(state) });
+      
+      if(!(state.stateData.state === undefined) && (state.stateData.state === BannerState.unauthenticated)){
+        
+        connectionState.userData = state.data;
+        connectionState.state = BannerState.unauthenticated;
+        connectionState.info = `Offline, not logged in ${res.status} ${res.statusText}`;
+      }else{
+        // Then we should be online alreadychat
+        connectionState.userData = state.data;
+        connectionState.state = BannerState.online;
+        connectionState.info = "Online, data loaded";
+        Preferences.set({ key: 'data', value: JSON.stringify(state) });
+      }
+      
     }
   
     return connectionState;
   };
 
-export const ConnectionBanner: React.FC = ({state}) => {
+export const ConnectionBanner: React.FC = () => {
+    const currentConnectionState = useSelector((state: any) => state.connection )
+    const router = useRouter();
+    const dispatch = useDispatch();
+    
+    
+    const updateConnectionState = () => {
+      if(currentConnectionState.state === undefined || currentConnectionState.state !== BannerState.unauthenticated){
+        const connectionState = connectionStateAndUserData({currentConnectionState}).then((connectionState) => {
+          console.log("CONNECTION STATE", connectionState);
+          if(connectionState.state === "unauthenticated"){
+            router.push("/login");
+          }else{
+            console.log("SETTING PAGE STATE", connectionState);
+            dispatch({type: CONNECTION_STATE, payload: connectionState})
+            dispatch({type: USER_DATA, payload: connectionState.userData})
+          }
+      
+        })
+      }
+    }
+    
+    useEffect(() => {
+      updateConnectionState()
+    },[])
     /** 
      * Takes the application state and determines the banner state,
      * this heavily relies on the logic of /front/utils/tools.tsx:fetchDataOrLoadCache
@@ -172,8 +210,17 @@ export const ConnectionBanner: React.FC = ({state}) => {
      * 
      * when in online state automatically switch to 'idle' after 10 seconds
      */
-    return <ConnectionBannerDispatch bannerState={getConnectionState(state)} />;
+    return <ConnectionBannerDispatch bannerState={getConnectionState(currentConnectionState)} />;
 }
+
+const WebsocketBridge = () => {
+  /**
+   * Establishes a default websocket bridge between server and client
+   */
+  return <></> 
+}
+
+
 const ConnectionBannerDispatch: React.FC<ConnectionBannerProps> = ({ bannerState }) => {
     // Add any required side effects based on the bannerState prop
     console.log("BANNERSTATE", bannerState)
@@ -204,6 +251,9 @@ const ConnectionBannerDispatch: React.FC<ConnectionBannerProps> = ({ bannerState
         <span className={currentBannerInfo.textColor}>
           {currentBannerInfo.text}
         </span>
+        <div style={{display: 'none'}}>{
+          (currentBannerState === BannerState.online || currentBannerState == BannerState.idle) && <WebsocketBridge></WebsocketBridge>}
+        </div>
       </div>
     );
 };
