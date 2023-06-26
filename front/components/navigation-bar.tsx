@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export const ChatMessages = ({state}) => {
   return <div className='bg-accent text-accent-content rounded-box flex items-center p-4 shadow-xl'>
     <div className='flex-1'>{JSON.stringify(state)}</div>
@@ -5,11 +7,18 @@ export const ChatMessages = ({state}) => {
   
 }
 
+
+export const ChatsList = ({}) => {
+  const chats = [
+    {uuid: "0", name: "Chat 1"}
+  ]
+  return <div></div>
+}
+
 export const MainNavigation = ({children}) => {
   const navItems = [
-    {id: "about", text: "About", href: "/about"},
-    {id: "settings", text: "Settings", href: "/"},
     {id: "index", text: "Index", href: "/"},
+    {id: "profile", text: "Profile", href: "/profile"},
   ]
 
   return (<div className="drawer">
@@ -26,7 +35,7 @@ export const MainNavigation = ({children}) => {
         <ul className="menu menu-horizontal">
             {navItems.map((item) => (
                 <li key={item.id} className='bg-primary rounded-xl ml-1'>
-                  <a href={item.href}>{item.text}</a>
+                  <Link href={item.href}>{item.text}</Link>
                 </li>
               ))}
         </ul>
@@ -37,9 +46,11 @@ export const MainNavigation = ({children}) => {
   <div className="drawer-side">
     <label htmlFor="my-drawer-3" className="drawer-overlay"></label> 
     <ul className="menu p-4 w-80 bg-base-100 rounded-xl h-96 mt-20 ml-4">
-      <li><a>Sidebar Item 1</a></li>
-      <li><a>Sidebar Item 2</a></li>
-      
+        {navItems.map((item) => (
+            <li key={item.id} className='bg-primary rounded-xl ml-1'>
+              <Link href={item.href}>{item.text}</Link>
+            </li>
+          ))}
     </ul>
     
   </div>
