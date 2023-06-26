@@ -126,7 +126,7 @@ if DEBUG:
 
     CORS_ALLOW_CREDENTIALS = True
     
-    CSRF_TRUSTED_ORIGINS += ["http://localhost","http://localhost:3000", "http://localhost:8000"]
+    CSRF_TRUSTED_ORIGINS += ["http://localhost","http://localhost:3000", "http://localhost:8000", "https://6191-134-61-83-151.ngrok-free.app", "http://10.0.2.2"]
 
 
     CORS_ALLOW_METHODS = [
