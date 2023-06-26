@@ -37,7 +37,7 @@ interface Environment {
 }
 
 const getServerUrl = () => {
-  if(process.env.NEXT_PUBLIC_LOCAL_MICROK8S){
+  if(process.env.NEXT_PUBLIC_LOCAL_MICROK8S === "true"){
     if(Capacitor.isNativePlatform())
       return process.env.NEXT_PUBLIC_HOST_MICROK8S_ANDROID!
     return process.env.NEXT_PUBLIC_HOST_MICROK8S_WEB!
@@ -53,5 +53,6 @@ export const getEnv = () => {
     wsPath: process.env.NEXT_PUBLIC_WS_PATH!,
     serverUrl: getServerUrl(),
   }
+  console.log("ENV", env);
   return env
 }
