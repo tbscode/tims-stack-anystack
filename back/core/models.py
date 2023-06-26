@@ -47,3 +47,18 @@ class UserProfile(models.Model):
 class UserSetting(models.Model):
 
     show_second_name = models.BooleanField(default=False)
+
+class Chat(models.Model):
+    
+    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
+    
+    u1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="u1")
+    u2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="u2")
+    
+class Message(models.Model):
+    
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipient")
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    
+    text = models.TextField()
