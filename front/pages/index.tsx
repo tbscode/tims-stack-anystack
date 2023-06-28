@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { ConnectionBanner, connectionStateAndUserData } from "../components/connection-banner";
 import { MainNavigation, ChatsList, ChatMessages } from "../components/navigation-bar";
 import { useDispatch, useSelector } from 'react-redux';
-import { DynamicSectionHeader, DynamicTwoPageContentDisplay } from "../components/dynamic-two-page-selector";
+import { DynamicSelector,DynamicSectionHeader, DynamicTwoPageContentDisplay } from "../components/dynamic-two-page-selector";
 import { Capacitor } from '@capacitor/core';
 import { FRONTEND_SETTINGS } from "@/store/types";
 import ReactMarkdown from 'react-markdown'
@@ -107,17 +107,9 @@ const ARTICLES = [
   }
 ]
 
-const GettingStartedPage = ({selected}) => {
-  return <div className='flex-grow bg-base-300 rounded-l m-4 mt-2'>
-        <article className="prose p-4 text-neutral-content" style={{display: selected ? "block" : "none"}}>
-          <ReactMarkdown>{gettingsStarted}</ReactMarkdown>
-      </article>
-    </div>
-}
-
 const DynamicMarkdownPage = ({ children, selected }) => {
-  return <div className='flex-grow bg-base-300 rounded-l m-4 mt-2'>
-        <article className="prose p-4 text-neutral-content" style={{display: selected ? "block" : "none"}}>
+  return <div className='flex-grow bg-base-300 rounded-xl m-4 mt-2'>
+        <article className="prose p-4 pr-8 pl-8 text-neutral-content" style={{display: selected ? "block" : "none"}}>
           <ReactMarkdown>{ children }</ReactMarkdown>
       </article>
     </div>
@@ -139,11 +131,6 @@ export default function Index(): JSX.Element {
   const [markdown, setMarkdown] = useState("")
   
   
-  useEffect(() => {
-    if (true){
-      dispatch({type: FRONTEND_SETTINGS, payload: {mainNavigationHidden: contentFocused}})
-    }    
-  }, [contentFocused])
   
   useEffect(() => {
     if (selection !== "empty"){
@@ -158,19 +145,13 @@ export default function Index(): JSX.Element {
   
   return <DynamicTwoPageContentDisplay 
       focused={contentFocused}
-      selectorContent={
-              <div className='flex flex-col items-end fixed'>
-                {INDEX_SECTIONS.filter((item) => item.id !== "empty").map((item) => {
-                  return <label key={item.id} className={`btn normal-case text-lg gap-2 mb-2 -translate-x-4 hover:translate-x-2 ${selection === item.id ? 'translate-x-2 bg-neutral-content text-neutral hover:bg-neutral-content': ''}`} onClick={() => {
-                    setSelection(item.id);
-                    setContentFocused(true);
-                  }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                  {item.text}
-                </label>
-                })}
-            </div>
-        }
+      selectorContent={<DynamicSelector
+          sections={INDEX_SECTIONS} 
+          selection={selection}
+          setSelection={setSelection}
+          setContentFocused={setContentFocused}
+        />}
+        sectionHeaderTitle={INDEX_SECTIONS.filter((item) => item.id === selection)[0]?.text ?? "No Selection"}
         onSectionHeaderBackClick={() => {
           setContentFocused(false);
           //setSelection("empty");
