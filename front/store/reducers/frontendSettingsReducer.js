@@ -2,7 +2,9 @@ import { FRONTEND_SETTINGS } from '../types'
 
 const initialState = {
     loading: true,
-    theme: 'dark'
+    theme: 'dark',
+    mainNavigationHidden: false,
+    mainNavigationTranslucent: false,
 }
 
 export default function(state = initialState, action){
