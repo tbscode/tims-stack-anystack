@@ -29,13 +29,14 @@ export const getServerSidePropsNo = async ({req} : {req: any}) => {
   return { props: {} };
 };
 
-export default function Index(): JSX.Element {
+const LoginHero = () => {
+
   const router = useRouter();
   const dispatch = useDispatch();
   
   const [loginData, setLoginData] = useState({
-    username: '',
-    password: ''
+    username: 'testUser1',
+    password: 'Test123!'
   })
 
   const loginRequest = () => {
@@ -62,14 +63,66 @@ export default function Index(): JSX.Element {
     })
   }
 
+  return <div className="hero min-h-screen bg-base-200">
+  <div className="hero-content flex-col lg:flex-row-reverse">
+    <div className="text-center lg:text-left w-96">
+      <span className='text-7xl font-bold [&::selection]:text-base-content relative col-start-1 row-start-1 bg-[linear-gradient(90deg,hsl(var(--s))_0%,hsl(var(--sf))_9%,hsl(var(--pf))_42%,hsl(var(--p))_47%,hsl(var(--a))_100%)] bg-clip-text [-webkit-text-fill-color:transparent] [&::selection]:bg-blue-700/20 [@supports(color:oklch(0_0_0))]:bg-[linear-gradient(90deg,hsl(var(--s))_4%,color-mix(in_oklch,hsl(var(--sf)),hsl(var(--pf)))_22%,hsl(var(--p))_45%,color-mix(in_oklch,hsl(var(--p)),hsl(var(--a)))_67%,hsl(var(--a))_100.2%)]'>
+        Tim&apos;s Stack
+      </span>
+      <p className="py-6">
+        Tim Schupps submission to the bunnyshell.com hackathon. <br></br>
+        Try it out now! Login data for the test user is filled, just click &apos;login-in&apos;!
+      </p>
+    </div>
+    <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <div className="card-body">
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">Email</span>
+          </label>
+          <input 
+            type="text" 
+            placeholder="email" 
+            className="input input-bordered" 
+            value={loginData.username}
+            onChange={(e) => {
+              setLoginData(s => ({...s, username: e.target.value})) 
+            }}/>
+        </div>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">Password</span>
+          </label>
+          <input 
+            type="password" 
+            placeholder="password" 
+            className="input input-bordered" 
+            value={loginData.password}
+            onChange={(e) => {
+              setLoginData(s => ({...s, password: e.target.value})) 
+            }}/>
+          <label className="label">
+            <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
+          </label>
+        </div>
+        <div className="form-control mt-6">
+          <button className="btn btn-primary" onClick={loginRequest}>Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
 
-  return (<>
+export default function Index(): JSX.Element {
+
+  return <LoginHero />
+  
+  (<>
     <input type="text" placeholder="username" className="input w-full max-w-xs" onChange={(e) => {
-      setLoginData(s => ({...s, username: e.target.value})) 
     }} />
     <input type="password" placeholder="password" className="input w-full max-w-xs" onChange={(e) => {
       setLoginData(s => ({...s, password: e.target.value})) 
     }} />
-    <button className="btn" onClick={loginRequest}>Login</button>
   </>);
 }
