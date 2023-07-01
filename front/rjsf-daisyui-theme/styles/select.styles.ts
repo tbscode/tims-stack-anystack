@@ -2,28 +2,29 @@ import { GroupBase, StylesConfig } from "react-select";
 import { Option } from "../../../interfaces/Option.interface";
 
 export const selectStyles:StylesConfig<Option, boolean, GroupBase<Option>> = {
-    option: (provided, state) => ({
-      ...provided
-    }),
-    control: (provided) => ({
+    option: (provided, state) => ({}),
+    menu: (provided, state) => ({}),
+    menuList: (provided, state) => ({}),
+    menuPortal: (provided, state) => ({
         ...provided,
-        borderRadius: '0.5rem',
-        height: '3rem',
+        // background: "purple",
     }),
-    singleValue: (provided, state) => {
-      const opacity = state.isDisabled ? 0.5 : 1;
-      const transition = 'opacity 300ms';
-  
-      return { ...provided, opacity, transition };
-    },
-    multiValue: (styles, { data }) => ({
-        ...styles,
-        backgroundColor: "#560DF8",
-        color: "white",
+    input : (provided, state) => ({}),
+    control: (provided) => ({}),
+    group: (provided) => ({
+        ...provided,
+        background: "green",
     }),
-    multiValueLabel: (styles, { data }) => ({
-        ...styles,
-        color: "white",
-      }),
+    groupHeading: (provided) => ({
+        ...provided,
+        background: "green",
+    }),
+    indicatorsContainer: (provided) => ({
+    }),
+    singleValue: (provided, state) => ({}),
+    valueContainer: (provided, state) => ({}),
+    multiValue: (provided) => ({}),
+    multiValueLabel: (provided, { data }) => ({}),
+    multiValueRemove: (provided, { data }) => ({}),
   }
   

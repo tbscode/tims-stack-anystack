@@ -1,5 +1,6 @@
 import React from "react";
 import { TitleFieldProps } from "@rjsf/utils";
+import { DynamicMarkdown } from "@/components/dynamic-two-page-selector";
 
 const REQUIRED_FIELD_SYMBOL = "*";
 
@@ -13,7 +14,7 @@ export default function TitleField<T = any, F = any>(
   const { id, title, required } = props;
   return (
     <legend id={id}>
-      {title}
+      <DynamicMarkdown>{title}</DynamicMarkdown>
       {required && <span className="required">{REQUIRED_FIELD_SYMBOL}</span>}
     </legend>
   );

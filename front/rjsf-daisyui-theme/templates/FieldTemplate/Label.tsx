@@ -1,4 +1,5 @@
 import React from "react";
+import { DynamicMarkdown } from "@/components/dynamic-two-page-selector";
 
 const REQUIRED_FIELD_SYMBOL = "*";
 
@@ -20,9 +21,12 @@ export default function Label(props: LabelProps) {
   if (!label) {
     return null;
   }
+  console.log("Label props", label);
   return (
     <label className="justify-start gap-1 label" htmlFor={id}>
-      <span className="label-text">{label}</span>
+      <span className="label-text">
+        <DynamicMarkdown>{label}</DynamicMarkdown>
+      </span>
       {required && <span className="required">{REQUIRED_FIELD_SYMBOL}</span>}
     </label>
   );
