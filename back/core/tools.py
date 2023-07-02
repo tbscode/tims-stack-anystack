@@ -17,7 +17,7 @@ def get_or_create_base_admin():
 def _get_or_create_test_users(name):
     user = User.objects.filter(username=name)
     if not user.exists():
-        user = User.objects.create_superuser(
+        user = User.objects.create(
             username=name,
             password="Test123!"
         )
