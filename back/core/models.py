@@ -8,6 +8,8 @@ import base64
 from uuid import uuid4
 from channels.layers import get_channel_layer
 from rest_framework import serializers
+from model_utils import FieldTracker
+
 import random
 
 
@@ -38,13 +40,21 @@ class User(AbstractUser):
     objects = UserManager()
 
     uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
+    
 
     profile = models.OneToOneField(
         'UserProfile', on_delete=models.CASCADE, related_name="user_profile", null=True)
     settings = models.OneToOneField(
         'UserSetting', on_delete=models.CASCADE, related_name="user_settings", null=True)
 
-
+class ChangeHistory(models.Model):
+    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="change_history_owner", null=True, blank=True)
+    
+    model = models.CharField(max_length=50)
+    change_made = models.DateTimeField(auto_now_add=True)
+    
+    change = models.JSONField(default=dict)
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_profile_user")
@@ -52,22 +62,49 @@ class UserProfile(models.Model):
     second_name = models.CharField(max_length=50)
     image = models.TextField(null=True, blank=True)
     
+    tracker = FieldTracker()
+    last_updated = models.DateTimeField(auto_now_add=True)
+    changes = models.ManyToManyField("ChangeHistory", related_name="user_profile_changes")
+    
     def save(self, *args, **kwargs):
-        print("TBS SAVE CALLED")
+        print("TBS SAVE CALLED", flush=True)
+        changed = self.tracker.changed()
+        changed_data = {key: getattr(self, key) for key in changed}
+        if changed:
+            last_updated = timezone.now()
+            changed_data['last_updated'] = str(last_updated)
+            changed["last_updated"] = str(self.last_updated)
+            self.last_updated = last_updated
+
+        
+        if changed:
+            change = ChangeHistory.objects.create(
+                model="UserProfile",
+                owner=self.user,
+                change=changed
+            )
+            self.changes.add(change)
+
         super(UserProfile, self).save(*args, **kwargs)
-        ConsumerConnections.notify_connections(
-            self.user, 
-            event="reduction",
-            payload={
-                "action": "USER_PROFILE",
-                "payload": UserProfileSerializer(self).data
-            }
-        )
+
+        if changed:
+            ConsumerConnections.notify_connections(
+                self.user, 
+                event="reduction",
+                payload={
+                    "action": "USER_PROFILE",
+                    "payload": changed_data
+                }
+            )
+            
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['first_name', 'second_name', 'image']
+        fields = ['first_name', 'second_name', 'last_updated','image']
+        
+    def validate(self, attrs):
+        return super().validate(attrs)
 
 
 class UserSetting(models.Model):
