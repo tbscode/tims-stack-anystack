@@ -59,12 +59,55 @@ export default function BaseInputTemplate<T = any, F = any>(
       onFocus(id, value),
     [onFocus, id]
   );
+  
+  console.log("SHEMA", schema, id, value, registry, options, inputProps);
 
   return (
     <>
       {(rawErrors?.length > 0) ? <div className="tooltip tooltip-open tooltip-error" data-tip={rawErrors?.join(", ")}>
         <input className="input input bordered hidden"/>
       </div> : <></>}
+      {(('changed' in schema) && schema.changed) ? <div className="indicator w-auto pointer-events-auto">
+        <span className="indicator-item indicator-top indicator-end badge badge-info pr-1 hover:bg-base-100 pointer-events-auto" >
+          revert
+        </span>
+        <span className="indicator-item indicator-top indicator-end badge badge-info pr-2 pl-2 hover:opacity-0 pointer-events-auto" 
+          onMouseEnter={() => {
+           if('updateDisplayPrevious' in registry.rootSchema.tbsExtras) {
+              registry.rootSchema.tbsExtras.updateDisplayPrevious({field: schema.changeFieldRef, display: true})
+           }
+          }}
+          onMouseLeave={() => {
+           if('updateDisplayPrevious' in registry.rootSchema.tbsExtras) {
+              registry.rootSchema.tbsExtras.updateDisplayPrevious({field: schema.changeFieldRef, display: false})
+           }
+          }}
+          onClick={() => {
+            console.log("REVERT CLICKED", registry.rootSchema);
+            if(("tbsExtras" in registry.rootSchema) && ("revertFunc" in registry.rootSchema.tbsExtras)) {
+              console.log("REVERTING", registry.rootSchema.tbsExtras);
+              registry.rootSchema.tbsExtras.revertFunc({field: schema.changeFieldRef})
+            }
+          }}>
+          updated
+        </span>
+          <input className="input input bordered h-0 w-full"/>
+      </div> : <></>}
+      {('previous' in schema) ? 
+        <input
+          key={id}
+          id={id}
+          className="input input-bordered text-info"
+          readOnly={readonly}
+          disabled={disabled}
+          autoFocus={autofocus}
+          value={schema.previous}
+          {...inputProps}
+          list={schema.examples ? `examples_${id}` : undefined}
+          onChange={_onChange}
+          onBlur={_onBlur}
+          onFocus={_onFocus}
+        /> :
         <input
           key={id}
           id={id}
@@ -78,7 +121,7 @@ export default function BaseInputTemplate<T = any, F = any>(
           onChange={_onChange}
           onBlur={_onBlur}
           onFocus={_onFocus}
-        />
+        />}
       {Array.isArray(schema.examples) && (
         <datalist key={`datalist_${id}`} id={`examples_${id}`}>
           {[

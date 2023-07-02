@@ -120,7 +120,7 @@ function ErrorList(props: { errors?: string[] }) {
 
   return (
     <div>
-      <ul className="error-detail bs-callout bs-callout-info">
+      <ul className="error-detail bs-callout bs-callout-info text-xs">
         {errors
           .filter((elem) => !!elem)
           .map((error, index) => {

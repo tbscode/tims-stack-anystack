@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { TitleFieldProps } from "@rjsf/utils";
 import { DynamicMarkdown } from "@/components/dynamic-two-page-selector";
 
@@ -46,11 +46,21 @@ function convertToReadableFormat(datetime) {
 export default function TitleField<T = any, F = any>(
   props: TitleFieldProps<T, F>
 ) {
-  const { id, title, required, schema } = props;
-  console.log("TitleField", schema, title);
+  const { id, title, required, schema, uiSchema } = props;
+  const [time, setTime] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(Date.now()), 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <legend id={id}>
       {'last_updated' in schema && <span className="badge badge-lg">{convertToReadableFormat(schema.last_updated)}</span>}
+      {(('tbsStateOptions' in uiSchema) && ('isFetching' in uiSchema.tbsStateOptions) && uiSchema.tbsStateOptions.isFetching) && <span className="badge badge-lg">saving...</span>}
+      {(('tbsStateOptions' in uiSchema) && ('unsavedChanges' in uiSchema.tbsStateOptions) && uiSchema.tbsStateOptions.unsavedChanges) && <span className="badge badge-lg badge-info">unsaved changes</span>}
       <DynamicMarkdown>{title}</DynamicMarkdown>
       {required && <span className="required">{REQUIRED_FIELD_SYMBOL}</span>}
     </legend>
