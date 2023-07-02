@@ -50,13 +50,7 @@ function CheckboxWidget<T = any, F = any>({
   );
 
   return (<>
-      {schema.description && (
-        <DescriptionFieldTemplate
-          id={id + "__description"}
-          description={schema.description}
-          registry={registry}
-        />
-      )}
+    <DynamicMarkdown>{label}</DynamicMarkdown>
     <div className={`checkbox ${disabled || readonly ? "disabled" : ""}`}>
       <div className="flex flex-row">
         <input
@@ -71,7 +65,13 @@ function CheckboxWidget<T = any, F = any>({
           onBlur={handleBlur}
           onFocus={handleFocus}
         />
-        <DynamicMarkdown >{label}</DynamicMarkdown>
+      {schema.description && (
+        <DescriptionFieldTemplate
+          id={id + "__description"}
+          description={schema.description}
+          registry={registry}
+        />
+      )}
       </div>
     </div>
   </>);

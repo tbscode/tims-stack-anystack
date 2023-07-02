@@ -62,20 +62,23 @@ export default function BaseInputTemplate<T = any, F = any>(
 
   return (
     <>
-      <input
-        key={id}
-        id={id}
-        className="input input-bordered"
-        readOnly={readonly}
-        disabled={disabled}
-        autoFocus={autofocus}
-        value={inputValue}
-        {...inputProps}
-        list={schema.examples ? `examples_${id}` : undefined}
-        onChange={_onChange}
-        onBlur={_onBlur}
-        onFocus={_onFocus}
-      />
+      {(rawErrors?.length > 0) ? <div className="tooltip tooltip-open tooltip-error" data-tip={rawErrors?.join(", ")}>
+        <input className="input input bordered hidden"/>
+      </div> : <></>}
+        <input
+          key={id}
+          id={id}
+          className="input input-bordered"
+          readOnly={readonly}
+          disabled={disabled}
+          autoFocus={autofocus}
+          value={inputValue}
+          {...inputProps}
+          list={schema.examples ? `examples_${id}` : undefined}
+          onChange={_onChange}
+          onBlur={_onBlur}
+          onFocus={_onFocus}
+        />
       {Array.isArray(schema.examples) && (
         <datalist key={`datalist_${id}`} id={`examples_${id}`}>
           {[

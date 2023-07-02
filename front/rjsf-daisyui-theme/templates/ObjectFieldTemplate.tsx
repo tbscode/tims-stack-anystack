@@ -53,6 +53,7 @@ export default function ObjectFieldTemplate<T = any, F = any>(
           title={options.title || title}
           required={required}
           uiSchema={uiSchema}
+          schema={schema}
           registry={registry}
         />
       )}

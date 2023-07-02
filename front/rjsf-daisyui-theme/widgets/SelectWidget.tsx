@@ -106,7 +106,7 @@ function SelectWidget<T = any, F = any>({
         container: (state) => "rounded-xl mt-1",
         input: (state) => focused ? "bg-base-300 p-2 text-base-content text-xl input input-ghost grow": "h-0",
         menu: (state) => focused ? "bg-base-200 p-2 rounded-xl mt-1 shadow-2xl" : "h-0 hidden",
-        control: (state) => state.isFocused ? "flex flex-row bg-base-300 p-2 rounded-xl mt-1" : "flex flex-row p-2 rounded-xl mt-1 bg-base-200",
+        control: (state) => state.isFocused ? "flex flex-row bg-base-300 p-2 rounded-xl mt-1" : "flex flex-row p-2 rounded-xl mt-1 bg-base-200 hover:bg-base-300",
         multiValueLabel: (state) => "",
         indicatorsContainer: (state) => focused ? "bg-base-100 p-2 rounded-xl h-fit absolute right-0 top-0 mr-3 mt-4 flex": "hidden",
         dropdownIndicator: (state) => menuIsOpen ? "rotate-180" :"",
