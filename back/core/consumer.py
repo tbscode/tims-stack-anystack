@@ -12,8 +12,8 @@ class CoreConsumer(AsyncWebsocketConsumer):
             # only allow already authenticated users
             await self.close()
         else:
-            print("USERNAME", self.scope["user"].username)
-            print("CHANNEL_NAME", self.channel_name)
+            print("USERNAME", self.scope["user"].username, flush=True)
+            print("CHANNEL_NAME", self.channel_name, flush=True)
             user = self.scope["user"]
             connection = await sync_to_async(ConsumerConnections.get_or_create)(user)
             # we always create the connection group, this is used to broadcast messages to all connected consumers
@@ -31,6 +31,7 @@ class CoreConsumer(AsyncWebsocketConsumer):
         
     
     async def broadcast_message(self, event):
+        print("BROADCASET", event, flush=True)
         # Is used to relay message to specific groups, only authenticated users can send anything here!
         if self.scope["user"].is_anonymous:
             # only allow already authenticated users
