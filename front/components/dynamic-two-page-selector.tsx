@@ -2,6 +2,14 @@ import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback,useEffect, useState } from 'react';
 import { FRONTEND_SETTINGS } from '../store/types';
+import ReactMarkdown from 'react-markdown'
+
+export const DynamicMarkdown = ({children}) => {
+  return <article className={`prose text-neutral-content w-96 min-w-full`} >
+    <ReactMarkdown>{ children }</ReactMarkdown>
+  </article>
+}
+
 
 export const DynamicSectionHeader = ({
     onBackClick, 
