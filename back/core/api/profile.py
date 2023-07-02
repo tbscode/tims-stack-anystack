@@ -1,6 +1,17 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework import serializers
+from rest_framework import response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from core.models import UserProfile, UserProfileSerializer
+
+NOT_USER_EDITABLE = ["last_updated"]
+
+def check_unallowed_args(kwargs):
+    res = []
+    for item in NOT_USER_EDITABLE:
+        if item in kwargs:
+            res.append(item)
+    return res
 
 class UpdateProfileViewset(viewsets.ModelViewSet):
     """
@@ -17,6 +28,12 @@ class UpdateProfileViewset(viewsets.ModelViewSet):
                 self.kwargs["pk"] = self.request.user.id
         
         return super().get_object()
+    
+    def update(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            unallowed_args = check_unallowed_args(request.data)
+            return response.Response({arg: "Not User editable" for arg in unallowed_args},status=status.HTTP_400_BAD_REQUEST)
+        return super().update(request, *args, **kwargs)
     
     def get_permissions(self):
         if self.action == 'list':
