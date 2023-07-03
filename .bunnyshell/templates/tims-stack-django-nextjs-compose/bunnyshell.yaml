@@ -40,9 +40,9 @@ components:
         - "6379:6379"
     hosts:
       -
-        hostname: 'rds-{{ env.base_domain }}'
+        hostname: 'rds-{{ env.unique }}-{{ env.base_domain }}'
         path: /
-        servicePort: 6379
+        servicePort: 8000
   -
     kind: Application
     name: app
@@ -63,7 +63,7 @@ components:
         EXTRA_TRUSTED_ORIGINS: 'https://{{ components.redis.ingress.hosts[0] }},https://{{ components.front.ingress.hosts[0] }},https://app-{{ env.base_domain }},https://*.bunnyenv.com'
         DJANGO_SECRET_KEY: 'SomeSecret'
         DJANGO_ALLOWED_HOSTS: '*'
-        REDIS_URL: 'rediss://{{ components.redis.ingress.hosts[0] }}'
+        REDIS_URL: 'redis://redis.env-{{ env.unique }}.svc.cluster.local:6379'
         USE_NEXTJS_PROXY_ROUTES: 'true'
         NEXTJS_HOST_URL: 'https://front-{{ env.base_domain }}'
         BASE_ADMIN_USERNAME: 'admin'
