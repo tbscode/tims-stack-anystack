@@ -64,7 +64,7 @@ class UserProfile(models.Model):
     
     tracker = FieldTracker()
     last_updated = models.DateTimeField(auto_now_add=True)
-    changes = models.ManyToManyField("ChangeHistory", related_name="user_profile_changes")
+    changes = models.ManyToManyField("ChangeHistory", related_name="user_profile_changes", null=True, blank=True)
     
     def save(self, *args, **kwargs):
         print("TBS SAVE CALLED", flush=True)
@@ -77,7 +77,9 @@ class UserProfile(models.Model):
             self.last_updated = last_updated
 
         
-        if changed:
+        if changed and (self._state.adding is False):
+            # The 'user' or primary key change should not be tracked this basicly happens in model creation
+            # this is because ManyToMany field may only be populated after ForeignKeys ...
             change = ChangeHistory.objects.create(
                 model="UserProfile",
                 owner=self.user,
@@ -101,7 +103,7 @@ class UserProfile(models.Model):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['first_name', 'second_name', 'last_updated','image']
+        fields = ['first_name', 'second_name', 'last_updated']
         
     def validate(self, attrs):
         return super().validate(attrs)
