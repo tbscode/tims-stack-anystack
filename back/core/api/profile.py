@@ -18,7 +18,7 @@ class UpdateProfileViewset(viewsets.ModelViewSet):
     Simple Viewset for modifying user profiles
     """
     serializer_class = UserProfileSerializer
-    permission_classes = [UserProfile]
+    permission_classes = [IsAuthenticated]
     
     def get_object(self):
         if not self.request.user.is_staff:
@@ -37,9 +37,9 @@ class UpdateProfileViewset(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action == 'list':
-            permission_classes = [IsAuthenticated]
-        else:
             permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
     
     def get_queryset(self):
