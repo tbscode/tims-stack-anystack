@@ -8,6 +8,7 @@ import { MainNavigation } from '@/components/navigation-bar';
 import { useDispatch } from 'react-redux';
 import { DEVICE_STATE } from '@/store/types';
 import { BannerState } from '@/components/connection-banner';
+import { CONNECTION_STATE, USER_DATA, USER_PROFILE } from "@/store/types";
 
 import { useState, useEffect } from 'react';
 
@@ -20,6 +21,19 @@ function App({ Component, pageProps }: AppProps) {
 
   const router = useRouter();
   const dispatch = useDispatch();
+  
+  console.log("PAGE PROPS", pageProps);
+  
+  useEffect(() => {
+    if('data' in pageProps){
+      if('profile' in pageProps.data){
+        dispatch({type: USER_PROFILE, payload: pageProps.data.profile})
+        delete pageProps.data.profile
+        dispatch({type: USER_DATA, payload: pageProps.data})
+      }
+    }
+  }, []);
+  
 
   function handleWindowSizeChange() {
       const width = window.innerWidth;
