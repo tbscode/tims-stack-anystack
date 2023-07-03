@@ -53,6 +53,28 @@ components:
         servicePort: 6379
   -
     kind: Application
+    name: android
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    gitApplicationPath: '/'
+    dockerCompose:
+      build:
+        context: ./front
+        dockerfile: ../Dockerfile.android
+        args:
+          WS_PATH: 'wss://app-{{ env.base_domain }}/api/core/ws'
+          WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}/api/core/ws'
+          HOST_WEB: 'https://app-{{ env.base_domain }}'
+          HOST_ANDROID: 'https://app-{{ env.base_domain }}'
+      ports:
+        - "8001:8001"
+    hosts:
+      -
+        hostname: 'android-{{ env.base_domain }}'
+        path: /app.apk
+        servicePort: 8001
+  -
+    kind: Application
     name: app
     gitBranch: main
     gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
