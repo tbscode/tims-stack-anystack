@@ -49,6 +49,11 @@ components:
       environment:
         ROOT_URL: 'http://localhost'
         WEBSOCKET_PROTOCOL: 'ws://'
+    hosts:
+      -
+        hostname: 'front-{{ env.base_domain }}'
+        path: /
+        servicePort: 3000
   -
     kind: Application
     name: redis
@@ -56,3 +61,8 @@ components:
       image: redis:5
       ports:
         - "6379:6379"
+    hosts:
+      -
+        hostname: 'rds-{{ env.base_domain }}'
+        path: /
+        servicePort: 6379
