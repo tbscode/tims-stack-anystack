@@ -48,7 +48,7 @@ const UI_SCHEMA = {
   }
 }
 
-export const getServerSidePropsNo = async ({req} : {req: any}) => {
+export const getServerSideProps = async ({req} : {req: any}) => {
   if (req.method == "POST") {
     const res = await handleStreamedProps({req})
     console.log("RES", res)

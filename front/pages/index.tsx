@@ -11,9 +11,7 @@ import { FRONTEND_SETTINGS } from "@/store/types";
 import ReactMarkdown from 'react-markdown'
 
 
-
-
-export const getServerSidePropsNo = async ({req} : {req: any}) => {
+export const getServerSideProps = async ({req} : {req: any}) => {
   if (req.method == "POST") {
     const res = await handleStreamedProps({req})
     console.log("RES", res)
@@ -125,7 +123,6 @@ const NoSelectionPage = ({selected}) => {
 export default function Index(): JSX.Element {
   const dispatch = useDispatch();
   const stateData = useSelector((state: any) => state.userData);
-  console.log("USER DATA", stateData);
   const [contentFocused, setContentFocused] = useState(false);
   const [selection, setSelection] = useState("empty")
   const [markdown, setMarkdown] = useState("")

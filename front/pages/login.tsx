@@ -4,29 +4,19 @@ import { Inter } from 'next/font/google'
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { useState, useEffect } from 'react';
-import { getCookiesAsObject, getEnv } from '@/utils/tools';
+import { handleStreamedProps, getCookiesAsObject, getEnv } from '@/utils/tools';
 import { ConnectionBanner, connectionStateAndUserData } from "../components/connection-banner";
 import { useSelector, useDispatch } from 'react-redux';
-import { CONNECTION_STATE } from '@/store/types';
+import { CONNECTION_STATE, USER_DATA, USER_PROFILE } from "@/store/types";
 import { BannerState } from '../components/connection-banner';
 
-export const getServerSidePropsNo = async ({req} : {req: any}) => {
+export const getServerSideProps = async ({req} : {req: any}) => {
   if (req.method == "POST") {
-    const streamPromise = new Promise( ( resolve, reject ) => {
-        let body = ''
-        req.on('data', (chunk : any) => {
-          body += chunk
-        })
-        req.on('end', () => {
-          console.log(body);
-          resolve(body)
-        });
-    } );
-    const res = await streamPromise;
-    if (typeof res !== "string") throw new Error("Not a string")
-    return { props: { data: JSON.parse(res) } };
+    const res = await handleStreamedProps({req})
+    console.log("RES", res)
+    return { props: { data: JSON.parse(res), dataLog: {pulled: true} } };
   }
-  return { props: {} };
+  return { props: { dataLog: {pulled: false}} };
 };
 
 const LoginHero = () => {
@@ -58,7 +48,12 @@ const LoginHero = () => {
             state: BannerState.idle
           }
         })
-        router.push("/")
+        res.json().then((data) => {
+          dispatch({type: USER_PROFILE, payload: data.profile})
+          delete data.profile
+          dispatch({type: USER_DATA, payload: data})
+          router.push("/")
+        })
       }
     })
   }
