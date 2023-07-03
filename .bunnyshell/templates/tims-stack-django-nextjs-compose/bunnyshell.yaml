@@ -19,6 +19,10 @@ components:
       environment:
         ROOT_URL: 'http://localhost'
         WEBSOCKET_PROTOCOL: 'ws://'
+        WS_PATH: 'wss://app-{{ env.base_domain }}.bunnyenv.com/api/core/ws'
+        WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}.bunnyenv.com/api/core/ws'
+        HOST_WEB: '/'
+        HOST_ANDROID: 'https://app-{{ env.base_domain }}.bunnyenv.com'
     hosts:
       -
         hostname: 'front-{{ env.base_domain }}'
