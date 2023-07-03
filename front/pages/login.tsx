@@ -117,12 +117,4 @@ const LoginHero = () => {
 export default function Index(): JSX.Element {
 
   return <LoginHero />
-  
-  (<>
-    <input type="text" placeholder="username" className="input w-full max-w-xs" onChange={(e) => {
-    }} />
-    <input type="password" placeholder="password" className="input w-full max-w-xs" onChange={(e) => {
-      setLoginData(s => ({...s, password: e.target.value})) 
-    }} />
-  </>);
 }

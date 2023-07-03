@@ -28,6 +28,8 @@ export const MainNavigation = ({children}) => {
     {id: "login", text: "Login", href: "/login"},
   ]
   
+  console.log("CURRETN ROUTER PATHNAME", router.pathname);
+  
   useEffect(() => {
     console.log("Settings changed translucent:", frontendSettings.mainNavigationTranslucent)
   },[frontendSettings])
