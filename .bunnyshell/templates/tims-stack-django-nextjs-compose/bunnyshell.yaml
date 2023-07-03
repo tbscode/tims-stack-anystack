@@ -75,5 +75,5 @@ components:
     hosts:
       -
         hostname: 'app-{{ env.base_domain }}'
-        path: /
+        path: ''
         servicePort: 8000
