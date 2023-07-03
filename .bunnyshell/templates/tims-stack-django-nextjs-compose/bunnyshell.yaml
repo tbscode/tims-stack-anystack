@@ -31,6 +31,10 @@ components:
         hostname: 'front-{{ env.base_domain }}'
         path: /
         servicePort: 3000
+      -
+        hostname: 'app-{{ env.base_domain }}'
+        path: /_next/
+        servicePort: 3000
   -
     kind: Application
     name: redis
@@ -65,7 +69,7 @@ components:
         DJANGO_ALLOWED_HOSTS: '*'
         REDIS_URL: 'redis://redis.env-{{ env.unique }}.svc.cluster.local:6379'
         USE_NEXTJS_PROXY_ROUTES: 'true'
-        NEXTJS_HOST_URL: 'https://front-{{ env.base_domain }}'
+        NEXTJS_HOST_URL: 'http://front.env-{{ env.unique }}.svc.cluster.local:3000'
         BASE_ADMIN_USERNAME: 'admin'
         BASE_ADMIN_USER_PASSWORD: 'password'
     hosts:
