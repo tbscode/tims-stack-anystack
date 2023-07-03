@@ -128,6 +128,8 @@ if DEBUG:
     
     CSRF_TRUSTED_ORIGINS += ["http://localhost","http://localhost:3000", "http://localhost:8000", "https://6191-134-61-83-151.ngrok-free.app", "http://10.0.2.2"]
 
+    SESSION_COOKIE_SECURE= False #default use just to override your prod setting
+    SESSION_COOKIE_DOMAIN= None  #default  use just to override your prod setting
 
     CORS_ALLOW_METHODS = [
         "DELETE",
