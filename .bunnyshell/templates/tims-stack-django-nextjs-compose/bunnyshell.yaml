@@ -19,10 +19,10 @@ components:
       environment:
         ROOT_URL: 'http://localhost'
         WEBSOCKET_PROTOCOL: 'ws://'
-        WS_PATH: 'wss://app-{{ env.base_domain }}.bunnyenv.com/api/core/ws'
-        WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}.bunnyenv.com/api/core/ws'
-        HOST_WEB: 'https://app-{{ env.base_domain }}.bunnyenv.com'
-        HOST_ANDROID: 'https://app-{{ env.base_domain }}.bunnyenv.com'
+        WS_PATH: 'wss://app-{{ env.base_domain }}/api/core/ws'
+        WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}/api/core/ws'
+        HOST_WEB: 'https://app-{{ env.base_domain }}'
+        HOST_ANDROID: 'https://app-{{ env.base_domain }}'
     hosts:
       -
         hostname: 'front-{{ env.base_domain }}'
@@ -56,13 +56,13 @@ components:
         DJANGO_DEBUG: 'true'
         PRODUCTION: 'true'
         ROOT_URL: 'http://localhost'
-        ROOT_HOST: 'app-{{ env.base_domain }}.bunnyenv.com'
-        EXTRA_TRUSTED_ORIGINS: 'https://{{ components.redis.ingress.hosts[0] }},https://{{ components.front.ingress.hosts[0] }},https://app-{{ env.base_domain }}.bunnyenv.com,https://*.bunnyenv.com'
+        ROOT_HOST: 'app-{{ env.base_domain }}'
+        EXTRA_TRUSTED_ORIGINS: 'https://{{ components.redis.ingress.hosts[0] }},https://{{ components.front.ingress.hosts[0] }},https://app-{{ env.base_domain }},https://*.bunnyenv.com'
         DJANGO_SECRET_KEY: 'SomeSecret'
         DJANGO_ALLOWED_HOSTS: '*'
         REDIS_URL: 'https://{{ components.redis.ingress.hosts[0] }}'
         USE_NEXTJS_PROXY_ROUTES: 'true'
-        NEXTJS_HOST_URL: 'https://front-{{ env.base_domain }}.bunnyenv.com'
+        NEXTJS_HOST_URL: 'https://front-{{ env.base_domain }}'
         BASE_ADMIN_USERNAME: 'admin'
         BASE_ADMIN_USER_PASSWORD: 'password'
     hosts:
