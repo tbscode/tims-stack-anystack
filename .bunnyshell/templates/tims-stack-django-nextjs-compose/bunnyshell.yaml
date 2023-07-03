@@ -21,7 +21,7 @@ components:
         WEBSOCKET_PROTOCOL: 'ws://'
         WS_PATH: 'wss://app-{{ env.base_domain }}.bunnyenv.com/api/core/ws'
         WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}.bunnyenv.com/api/core/ws'
-        HOST_WEB: '/'
+        HOST_WEB: 'https://app-{{ env.base_domain }}.bunnyenv.com'
         HOST_ANDROID: 'https://app-{{ env.base_domain }}.bunnyenv.com'
     hosts:
       -
@@ -62,7 +62,7 @@ components:
         DJANGO_ALLOWED_HOSTS: '*'
         REDIS_URL: 'https://{{ components.redis.ingress.hosts[0] }}'
         USE_NEXTJS_PROXY_ROUTES: 'true'
-        NEXTJS_HOST_URL: 'https://{{ components.front.ingress.hosts[0] }}'
+        NEXTJS_HOST_URL: 'https://front-{{ env.base_domain }}.bunnyenv.com'
         BASE_ADMIN_USERNAME: 'admin'
         BASE_ADMIN_USER_PASSWORD: 'password'
     hosts:
