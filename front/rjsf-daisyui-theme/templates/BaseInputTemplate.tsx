@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { getInputProps, WidgetProps } from "@rjsf/utils";
 
 /** The `BaseInputTemplate` is the template to use to render the basic `<input>` component for the `core` theme.
@@ -12,7 +12,7 @@ export default function BaseInputTemplate<T = any, F = any>(
 ) {
   const {
     id,
-    value,
+    value: inValue,
     readonly,
     disabled,
     autofocus,
@@ -36,6 +36,16 @@ export default function BaseInputTemplate<T = any, F = any>(
     throw new Error(`no id for props ${JSON.stringify(props)}`);
   }
   const inputProps = { ...rest, ...getInputProps<T, F>(schema, type, options) };
+  const [previous, setPrevious] = React.useState(schema?.previous);
+  const [value, setValue] = React.useState(inValue);
+  
+  useEffect(() => {
+    setPrevious(schema?.previous);
+  }, [schema]);
+  
+  useEffect(() => {
+    setValue(inValue)
+  }, [inValue]);
 
   let inputValue;
   if (inputProps.type === "number" || inputProps.type === "integer") {
@@ -60,7 +70,8 @@ export default function BaseInputTemplate<T = any, F = any>(
     [onFocus, id]
   );
   
-  console.log("SHEMA", schema, id, value, registry, options, inputProps);
+  console.log("SHEMA DISPLAY", schema?.previous);
+  console.log("UPDATE CHANGED", schema?.changeFieldRef);
 
   return (
     <>
@@ -74,41 +85,51 @@ export default function BaseInputTemplate<T = any, F = any>(
         <span className="indicator-item indicator-top indicator-end badge badge-info pr-2 pl-2 hover:opacity-0 pointer-events-auto" 
           onMouseEnter={() => {
            if('updateDisplayPrevious' in registry.rootSchema.tbsExtras) {
-              registry.rootSchema.tbsExtras.updateDisplayPrevious({field: schema.changeFieldRef, display: true})
+            console.log("MOUSE ENTERED", registry.rootSchema);
+              registry.rootSchema.tbsExtras.updateDisplayPrevious({
+                field: schema.changeFieldRef, 
+                display: true,
+                setPrevious: setPrevious
+              })
            }
           }}
           onMouseLeave={() => {
            if('updateDisplayPrevious' in registry.rootSchema.tbsExtras) {
-              registry.rootSchema.tbsExtras.updateDisplayPrevious({field: schema.changeFieldRef, display: false})
+              registry.rootSchema.tbsExtras.updateDisplayPrevious({
+                field: schema.changeFieldRef, 
+                display: false,
+                setPrevious: setPrevious
+              })
            }
           }}
           onClick={() => {
             console.log("REVERT CLICKED", registry.rootSchema);
-            if(("tbsExtras" in registry.rootSchema) && ("revertFunc" in registry.rootSchema.tbsExtras)) {
+            if(("tbsExtras" in registry.rootSchema) && ("revertField" in registry.rootSchema.tbsExtras)) {
               console.log("REVERTING", registry.rootSchema.tbsExtras);
-              registry.rootSchema.tbsExtras.revertFunc({field: schema.changeFieldRef})
+              registry.rootSchema.tbsExtras.revertField({
+                field: schema.changeFieldRef,
+                setValue: setValue,
+              })
             }
           }}>
           updated
         </span>
           <input className="input input bordered h-0 w-full"/>
       </div> : <></>}
-      {('previous' in schema) ? 
-        <input
+      {schema?.previous ? <input
           key={id}
           id={id}
           className="input input-bordered text-info"
           readOnly={readonly}
           disabled={disabled}
           autoFocus={autofocus}
-          value={schema.previous}
+          value={schema?.previous}
           {...inputProps}
           list={schema.examples ? `examples_${id}` : undefined}
           onChange={_onChange}
           onBlur={_onBlur}
           onFocus={_onFocus}
-        /> :
-        <input
+        /> : <input
           key={id}
           id={id}
           className="input input-bordered"

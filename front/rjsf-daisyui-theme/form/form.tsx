@@ -8,8 +8,8 @@ let trackUpdateTime = false
 const ThemedForm = withTheme(rjsfDaisyUiTheme); 
 
 interface ReqiredCallbacks {
-    revertField: ({field}: {field: string}) => void,
-    updateDisplayPrevious: ({ field, display }: {field: string, display: boolean}) => void
+    revertField: ({field, setValue}: {field: string, setValue: any}) => void,
+    updateDisplayPrevious: ({ field, display, setPrevious }: {field: string, display: boolean, setPrevious: any}) => void
 }
 
 interface HistoryMangerI {
@@ -35,11 +35,15 @@ const injectDataSchema = (props: InjectDataSchemaProps) => {
         properties[key].default = data[key]
         console.log("KEY", key, historyManager.prevValues, historyManager.changedFields)
         if(key in historyManager.prevValues)
-            properties[key].previous = historyManager.prevValues[key]
+          properties[key].previous = historyManager.prevValues[key]
+        else if('previous' in properties[key])
+          delete properties[key].previous
+
         if(historyManager.changedFields.includes(key))
-            properties[key].changed = true
-        if(historyManager.changedFields.includes(key) || (key in historyManager.prevValues))
-            properties[key].changeFieldRef = key
+          properties[key].changed = true
+        else
+          properties[key].changed = false
+        properties[key].changeFieldRef = key
     });
     if('last_updated' in properties)
         delete properties.last_updated;
@@ -110,6 +114,7 @@ export const DynamicForm = (props: DynamicFormParams) => {
   });
 
   const timeOutId = useRef<number | null>(null);
+
   useEffect(() => {
     setData(baseData);
   }, [baseData]);
@@ -160,37 +165,43 @@ export const DynamicForm = (props: DynamicFormParams) => {
     })
     setData(updatedProfile);
     setTimestamps(updatedTimestamps);
-    setChangedFields(updatedChangedFields.concat(changedFields));
+    const newChangeFields = updatedChangedFields.concat(changedFields)
+    console.log("UPDATE CHANGE FIELD", newChangeFields)
+    setChangedFields(newChangeFields);
     setUiSchemaParams({...uiSchema, unsavedChanges: true});
 
     const newTimer = setTimeout(() => { submitData(formData); }, submitTimeout)
     timeOutId.current = newTimer
   };
   
-  const updateDisplayPrevious = (
-    {field, display}: {field: string, display: boolean}) => {
+  const updateDisplayPrevious = ({field, display, setPrevious}: {field: string, display: boolean, setPrevious: any}) => {
     const newPreDisp = display ? [field].concat(displayPrevious) : displayPrevious.filter((item) => item !== field);
     console.log("UPDATE DISPLAY", field, display, newPreDisp, getPrevValues({fields: newPreDisp}));
     setDisplayPrevious(newPreDisp);
+    const prev = display ? getPrevValues({fields: [field]})[field] : null;
+    setPrevious(prev);
   };
   
-  const revertField = ({field}: {field: string}) => {
+  const revertField = ({field, setValue}: {field: string, setValue: any}) => {
       setTimestamps({...timestamps, [field]: 'last_updated' in baseData ? baseData.last_updated : data.last_updated});
 
       const updatedChangeFields = changedFields.filter((item) => item != field);
       if(updatedChangeFields.length == 0){
         setUiSchemaParams({...uiSchema, unsavedChanges: false});
       }
+      console.log("REVERTING TO", field,baseData[field], data[field])
 
       setChangedFields(updatedChangeFields);
       setErrors({...errors, [field]: undefined});
+      setDisplayPrevious(displayPrevious.filter((item) => item !== field));
       setData({...data, [field]: baseData[field]});
+      setValue(baseData[field]);
   }
-  
+ 
   const currentSchema = injectDataSchema({ schema, data, callbacks: { revertField, updateDisplayPrevious }, historyManager: { changedFields: changedFields, prevValues: getPrevValues({fields: displayPrevious}) }});
   const currentUiSchema = injectUiSchema(uiSchemaParams, uiSchema);
   
-  console.log("DISPLAY PREV", displayPrevious)
+  console.log("DISPLAY PREV", displayPrevious, currentSchema?.properties, currentSchema?.historyManager)
   
   return <div 
           className='p-4 pr-8 pl-8' 
