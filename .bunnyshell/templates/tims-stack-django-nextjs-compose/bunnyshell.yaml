@@ -42,7 +42,7 @@ components:
       -
         hostname: 'rds-{{ env.unique }}-{{ env.base_domain }}'
         path: /
-        servicePort: 8000
+        servicePort: 6379
   -
     kind: Application
     name: app
