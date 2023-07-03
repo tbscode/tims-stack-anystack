@@ -121,6 +121,10 @@ export const DynamicForm = (props: DynamicFormParams) => {
 
   const submitData = (formData: any) => {
     setUiSchemaParams({...uiSchemaParams, isFetching: true});
+    if('loading' in formData)
+      delete formData.loading;
+    if('last_updated' in formData)
+      delete formData.last_updated;
     handleSubmit(formData).then((res) => {
         res.json().then((parsed: any) => {
             if(res.ok){
