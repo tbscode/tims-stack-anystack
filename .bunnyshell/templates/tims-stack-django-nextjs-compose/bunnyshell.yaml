@@ -53,7 +53,7 @@ components:
         PRODUCTION: 'true'
         ROOT_URL: 'http://localhost'
         ROOT_HOST: 'app-{{ env.base_domain }}.bunnyenv.com'
-        EXTRA_TRUSTED_ORIGINS: 'https://{{ components.redis.ingress.hosts[0] }},https://{{ components.front.ingress.hosts[0] }},https://app-{{ env.base_domain }}.bunnyenv.com'
+        EXTRA_TRUSTED_ORIGINS: 'https://{{ components.redis.ingress.hosts[0] }},https://{{ components.front.ingress.hosts[0] }},https://app-{{ env.base_domain }}.bunnyenv.com,https://*.bunnyenv.com'
         DJANGO_SECRET_KEY: 'SomeSecret'
         DJANGO_ALLOWED_HOSTS: '*'
         REDIS_URL: 'https://{{ components.redis.ingress.hosts[0] }}'
