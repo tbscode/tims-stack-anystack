@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, createRef } from "react";
+import validator from '@rjsf/validator-ajv8';
 import { rjsfDaisyUiTheme } from '../rjsfDaisyUiTheme';
 import { withTheme } from '@rjsf/core';
+import { get } from "http";
 let trackUpdateTime = false
 
 const ThemedForm = withTheme(rjsfDaisyUiTheme); 
@@ -25,20 +27,24 @@ interface InjectDataSchemaProps {
 const injectDataSchema = (props: InjectDataSchemaProps) => {
     const {schema, data, callbacks, historyManager} = props;
 
-    Object.keys(schema.properties).forEach((key) => {
+    let properties = schema.properties
+    Object.keys(properties).forEach((key) => {
         if(key === 'last_updated')
-           delete schema.properties[key] 
-        console.assert(key in data, `key ${key} not in data`)
-        schema.properties[key].default = data[key]
+            return;
+        if(!(key in data)) return;
+        properties[key].default = data[key]
+        console.log("KEY", key, historyManager.prevValues, historyManager.changedFields)
         if(key in historyManager.prevValues)
-            schema.properties[key].previous = historyManager.prevValues[key]
-        else if(key in historyManager.changedFields)
-            schema.properties[key].changed = true
-        else return;
-        schema.properties[key].changeFieldRef = key
+            properties[key].previous = historyManager.prevValues[key]
+        if(historyManager.changedFields.includes(key))
+            properties[key].changed = true
+        if(historyManager.changedFields.includes(key) || (key in historyManager.prevValues))
+            properties[key].changeFieldRef = key
     });
+    if('last_updated' in properties)
+        delete properties.last_updated;
 
-    return {...schema, last_updated: data.last_updated, tbsExtras: callbacks}
+    return {...schema, properties: properties, last_updated: data.last_updated, tbsExtras: callbacks}
 };
 
 interface UiStatesI {
@@ -78,7 +84,7 @@ interface DynamicFormParams {
     handleSubmit: (formData: { [key: string]: any }) => Promise<any>, // Fetch promise
 }
 
-export const TimsDynamicForm = (props: DynamicFormParams) => {
+export const DynamicForm = (props: DynamicFormParams) => {
 
   const { 
     schema, 
@@ -104,6 +110,9 @@ export const TimsDynamicForm = (props: DynamicFormParams) => {
   });
 
   const timeOutId = useRef<number | null>(null);
+  useEffect(() => {
+    setData(baseData);
+  }, [baseData]);
 
   const submitData = (formData: any) => {
     setUiSchemaParams({...uiSchemaParams, isFetching: true});
@@ -115,9 +124,9 @@ export const TimsDynamicForm = (props: DynamicFormParams) => {
               setUiSchemaParams({...uiSchema, isFetching: false, unsavedChanges: false});
               setErrors({});
             } else if (res.status === 400) {
-              Object.keys(data).forEach(function(key, index) { data[key] = { __errors: data[key] }});
+              Object.keys(parsed).forEach(function(key, index) { parsed[key] = { __errors: parsed[key] }});
               setUiSchemaParams({...uiSchema, isFetching: false, unsavedChanges: true});
-              setErrors(data);
+              setErrors(parsed);
             }
         });
     }).catch((err) => {/** Todo: alternate error display */})
@@ -128,6 +137,7 @@ export const TimsDynamicForm = (props: DynamicFormParams) => {
     fields.forEach((field) => {
       prevValues[field] = baseData[field]; 
     });
+    console.log("PREV EXTRA", fields, prevValues);
     return prevValues;
   }
   
@@ -159,11 +169,9 @@ export const TimsDynamicForm = (props: DynamicFormParams) => {
   
   const updateDisplayPrevious = (
     {field, display}: {field: string, display: boolean}) => {
-      if(display){
-        setDisplayPrevious([field].concat(displayPrevious)); 
-      }else {
-        setDisplayPrevious(displayPrevious.filter((item) => item != field));
-      }
+    const newPreDisp = display ? [field].concat(displayPrevious) : displayPrevious.filter((item) => item !== field);
+    console.log("UPDATE DISPLAY", field, display, newPreDisp, getPrevValues({fields: newPreDisp}));
+    setDisplayPrevious(newPreDisp);
   };
   
   const revertField = ({field}: {field: string}) => {
@@ -179,14 +187,14 @@ export const TimsDynamicForm = (props: DynamicFormParams) => {
       setData({...data, [field]: baseData[field]});
   }
   
-  const prevValues = getPrevValues({fields: displayPrevious});
-  
-  const currentSchema = injectDataSchema({ schema, data, callbacks: { revertField, updateDisplayPrevious }, historyManager: { changedFields, prevValues }});
+  const currentSchema = injectDataSchema({ schema, data, callbacks: { revertField, updateDisplayPrevious }, historyManager: { changedFields: changedFields, prevValues: getPrevValues({fields: displayPrevious}) }});
   const currentUiSchema = injectUiSchema(uiSchemaParams, uiSchema);
   
+  console.log("DISPLAY PREV", displayPrevious)
+  
   return <div 
-              className='p-4 pr-8 pl-8' 
-          style={hidden ? {} : {visibility: 'hidden', height: '0px'}}>
+          className='p-4 pr-8 pl-8' 
+          style={hidden ? {visibility: 'hidden', height: '0px'}: {}}>
       <ThemedForm
         schema={currentSchema}
         extraErrors={errors}
