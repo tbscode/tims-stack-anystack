@@ -15,5 +15,7 @@ def index(request, path):
 
 def render_nextjs_page(data, path=""):
     url = settings.NEXTJS_HOST_URL
-    resp = requests.post(f"{url}/{path}", json=data)
+    url = f"{url}/{path}"
+    print(f"TBS Routing to {url}")
+    resp = requests.post(url, json=data)
     return HttpResponse(resp.text)
