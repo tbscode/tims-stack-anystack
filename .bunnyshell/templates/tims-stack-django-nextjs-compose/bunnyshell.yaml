@@ -32,8 +32,12 @@ components:
         path: /
         servicePort: 3000
       -
-        hostname: 'app-{{ env.base_domain }}'
+        hostname: 'app-{{ env.base_domain }}/_next/'
         path: /_next/
+        servicePort: 3000
+      -
+        hostname: 'app-{{ env.base_domain }}/_nstat/'
+        path: /_nstat/
         servicePort: 3000
   -
     kind: Application
@@ -75,5 +79,13 @@ components:
     hosts:
       -
         hostname: 'app-{{ env.base_domain }}'
-        path: ''
+        path: /
+        servicePort: 8000
+      -
+        hostname: 'front-{{ env.base_domain }}/api/'
+        path: /api/
+        servicePort: 8000
+      -
+        hostname: 'front-{{ env.base_domain }}/media/'
+        path: /media/
         servicePort: 8000
