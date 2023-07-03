@@ -14,6 +14,11 @@ components:
       build:
         context: ./front
         dockerfile: ../Dockerfile.front
+        args:
+          WS_PATH: 'wss://app-{{ env.base_domain }}/api/core/ws'
+          WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}/api/core/ws'
+          HOST_WEB: 'https://app-{{ env.base_domain }}'
+          HOST_ANDROID: 'https://app-{{ env.base_domain }}'
       ports:
         - "3000:3000"
       environment:
