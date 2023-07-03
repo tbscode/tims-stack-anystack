@@ -32,7 +32,8 @@ class UpdateProfileViewset(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         if not request.user.is_staff:
             unallowed_args = check_unallowed_args(request.data)
-            return response.Response({arg: "Not User editable" for arg in unallowed_args},status=status.HTTP_400_BAD_REQUEST)
+            if len(unallowed_args) > 0:
+                return response.Response({arg: "Not User editable" for arg in unallowed_args},status=status.HTTP_400_BAD_REQUEST)
         return super().update(request, *args, **kwargs)
     
     def get_permissions(self):
