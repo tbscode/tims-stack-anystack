@@ -17,8 +17,6 @@ components:
       ports:
         - "3000:3000"
       environment:
-        ROOT_URL: 'http://localhost'
-        WEBSOCKET_PROTOCOL: 'ws://'
         WS_PATH: 'wss://app-{{ env.base_domain }}/api/core/ws'
         WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}/api/core/ws'
         HOST_WEB: 'https://app-{{ env.base_domain }}'
@@ -60,7 +58,7 @@ components:
         EXTRA_TRUSTED_ORIGINS: 'https://{{ components.redis.ingress.hosts[0] }},https://{{ components.front.ingress.hosts[0] }},https://app-{{ env.base_domain }},https://*.bunnyenv.com'
         DJANGO_SECRET_KEY: 'SomeSecret'
         DJANGO_ALLOWED_HOSTS: '*'
-        REDIS_URL: 'https://{{ components.redis.ingress.hosts[0] }}'
+        REDIS_URL: 'rediss://{{ components.redis.ingress.hosts[0] }}'
         USE_NEXTJS_PROXY_ROUTES: 'true'
         NEXTJS_HOST_URL: 'https://front-{{ env.base_domain }}'
         BASE_ADMIN_USERNAME: 'admin'
