@@ -1,0 +1,31 @@
+FROM node:16-alpine
+
+ARG WS_PATH
+ENV WS_PATH $WS_PATH
+
+ARG WS_PATH_ANDROID
+ENV WS_PATH_ANDROID $WS_PATH_ANDROID
+
+ARG HOST_WEB
+ENV HOST_WEB $HOST_WEB
+
+ARG HOST_ANDROID
+ENV HOST_ANDROID $HOST_ANDROID
+
+WORKDIR /front
+COPY . .
+
+RUN apk add curl
+
+RUN npm install --save-dev
+RUN cd ./pages/ && grep -rl getServerSideProps . | xargs sed -i 's/getServerSideProps/DONTgetServerSideProps/g'
+RUN npm run static
+RUN ./node_modules/.bin/cap sync
+
+RUN cp ./android/app/build/outputs/apk/debug/app-debug.apk app.apk
+
+RUN npm install -g http-server
+
+EXPOSE 8001
+
+ENTRYPOINT [ "http-server", "-p", "8001", "." ]
