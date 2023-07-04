@@ -208,7 +208,7 @@ export const DynamicForm = (props: DynamicFormParams) => {
   console.log("DISPLAY PREV", displayPrevious, currentSchema?.properties, currentSchema?.historyManager)
   
   return <div 
-          className='p-4 pr-8 pl-8' 
+          className='p-4' 
           style={hidden ? {visibility: 'hidden', height: '0px'}: {}}>
       <ThemedForm
         schema={currentSchema}
