@@ -8,6 +8,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      width: {
+        '180': '45rem',
+      },
       backgroundImage: {
         'gradient-radial':
           'radial-gradient(var(--tw-gradient-stops))',
