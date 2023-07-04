@@ -15,12 +15,19 @@ ENV HOST_ANDROID $HOST_ANDROID
 WORKDIR /front
 
 COPY . .
+RUN mv .env.production .env
 
 RUN apk add curl
 
 RUN npm install --save-dev
 # We disable serverside props for all pages, so that we can build a static version of the app
 RUN cd ./pages/ && grep -rl getServerSideProps . | xargs sed -i 's/getServerSideProps/DONTgetServerSideProps/g'
+
+# In the capacitor config we replace the default android url '10.0.2.2:8000'
+RUN sed -i "s/10.0.2.2:8000/$HOST_ANDROID/g" ./capacitor.config.ts
+# enable android scheme https TODO: just update the config too use env vars
+RUN sed -i "s/\/\/androidScheme/androidScheme/g" ./capacitor.config.ts
+
 RUN npm run static
 RUN ./node_modules/.bin/cap sync
 
@@ -41,7 +48,9 @@ WORKDIR /build
 
 RUN npm install -g http-server
 
-COPY --from=android-image ./android_build/android/app/build/outputs/ .
+COPY --from=android-image /android_build/android/app/build/outputs/ .
+COPY --from=android-image /android_build/capacitor.config.ts .
+COPY --from=android-image /android_build/.env .
 
 EXPOSE 8001
 
