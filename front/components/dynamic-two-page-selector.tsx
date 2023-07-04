@@ -40,9 +40,12 @@ export const DynamicSectionHeader = ({
 
 
 export const NoSelectionPage = ({selected}) => {
-  return <article className="prose p-2 text-neutral grow" style={{display: selected ? "block" : "none"}}>
-        <h1> Select any of the readmes on the left!</h1>
+  return <>
+      <div className="w-auto navbar mr-3 ml-3 mt-3 rounded-xl"></div>
+      <article className="prose p-2 text-neutral grow" style={{display: selected ? "block" : "none"}}>
+        <h1> Select any of the elements on the left!</h1>
       </article>
+    </>
 }
 
 export const DynamicChat = ({selected, userData,chat, messages}) => {
@@ -237,7 +240,7 @@ export const DynamicTwoPageContentDisplay = ({
     dispatch({type: FRONTEND_SETTINGS, payload: {mainNavigationHidden: true}})
   }
   
-  const selectionHeader = (focused && useDynamicSectionHeader) ? <DynamicSectionHeader title={sectionHeaderTitle} onBackClick={onSectionHeaderBackClick} displayed={!landscapeView} navbarMargin={navbarMarginContent}/> : <></>;
+  const selectionHeader = useDynamicSectionHeader ? <DynamicSectionHeader title={sectionHeaderTitle} onBackClick={onSectionHeaderBackClick} displayed={!landscapeView && focused} navbarMargin={navbarMarginContent}/> : <></>;
   
   if(typeof document !== 'undefined'){
     const elem = document.getElementById("selectionContent")
