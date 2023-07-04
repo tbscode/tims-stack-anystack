@@ -1,7 +1,7 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/router';
-import { handleStreamedProps, getCookiesAsObject } from "../utils/tools";
+import { handleStreamedProps, getCookiesAsObject, getEnv } from "../utils/tools";
 import React, { useState, useEffect, useRef, createRef } from "react";
 import { ConnectionBanner, connectionStateAndUserData } from "../components/connection-banner";
 import { MainNavigation, ChatsList, ChatMessages } from "../components/navigation-bar";
@@ -105,7 +105,7 @@ const FrontendSettingsPage = ({selected, profile}) => {
       <select className="select w-full max-w-xs" onChange={(e) => {
         dispatch({type: FRONTEND_SETTINGS, payload: {theme: e.target.value}})
       }}>
-        {ALL_THEMES.map((i, theme) => {
+        {ALL_THEMES.map((theme, i) => {
           return <option key={i} selected={theme == frontendSettings.theme}>{theme}</option>
         })}
       </select>
@@ -163,15 +163,16 @@ export default function Index(): JSX.Element {
             hideSubmitButton={true}
             autoSubmit={true}
             submitTimeout={2000}
-            handleSubmit={(formData) => fetch('/api/profile/', {
+            handleSubmit={(formData) => fetch(`${getEnv().serverUrl}/api/profile/`, {
               method: 'PUT',
               headers: {
               'X-CSRFToken': getCookiesAsObject().csrftoken,
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              Accept: 'application/json, text/html, */*'
               },
               body: JSON.stringify(formData)})}
             />
-          {/**<FrontendSettingsPage selected={selection === "frontend"} profile={profile}/>**/}
+          {<FrontendSettingsPage selected={selection === "frontend"} profile={profile}/>}
           <NoSelectionPage selected={selection === "empty"}/>
         </>}   />
 }
