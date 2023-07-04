@@ -5,6 +5,8 @@ const initialState = {
     theme: 'dark',
     mainNavigationHidden: false,
     mainNavigationTranslucent: false,
+    mainNavigationbarLinksCollapsible: false,
+    mainNavigationbarMarginContainer: false
 }
 
 export default function(state = initialState, action){
