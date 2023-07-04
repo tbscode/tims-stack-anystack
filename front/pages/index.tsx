@@ -106,8 +106,8 @@ const ARTICLES = [
 ]
 
 const DynamicMarkdownPage = ({ children, selected }) => {
-  return <div className='flex-grow bg-base-300 rounded-xl m-4 mt-2'>
-        <article className="prose p-4 pr-8 pl-8 text-neutral-content" style={{display: selected ? "block" : "none"}}>
+  return <div className='flex-grow rounded-xl m-4 mt-2'  style={{display: selected ? "block" : "none"}}>
+        <article className="prose bg-base-300 rounded-xl p-4 pr-8 pl-8 text-neutral-content h-fit">
           <ReactMarkdown>{ children }</ReactMarkdown>
       </article>
     </div>
