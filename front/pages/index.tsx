@@ -147,8 +147,11 @@ export default function Index(): JSX.Element {
           selection={selection}
           setSelection={setSelection}
           setContentFocused={setContentFocused}
+          navbarMargin={true}
         />}
+        useDynamicSectionHeader={true}
         sectionHeaderTitle={INDEX_SECTIONS.filter((item) => item.id === selection)[0]?.text ?? "No Selection"}
+        navbarMarginContent={true}
         onSectionHeaderBackClick={() => {
           setContentFocused(false);
           //setSelection("empty");
