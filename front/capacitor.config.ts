@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'front',
   webDir: 'out',
   server: {
-    //androidScheme: 'https'
+    //androidScheme: 'https',
     hostname: "10.0.2.2:8000",
     allowNavigation: []
   },
