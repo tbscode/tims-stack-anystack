@@ -4,8 +4,8 @@ import { useCallback,useEffect, useState } from 'react';
 import { FRONTEND_SETTINGS } from '../store/types';
 import ReactMarkdown from 'react-markdown'
 
-export const DynamicMarkdown = ({children}) => {
-  return <article className={`prose text-neutral-content w-96 min-w-full`} >
+export const DynamicMarkdown = ({children, ...props}) => {
+  return <article className={`prose text-neutral-content min-w-full max-w-full`} >
     <ReactMarkdown>{ children }</ReactMarkdown>
   </article>
 }
@@ -14,12 +14,13 @@ export const DynamicMarkdown = ({children}) => {
 export const DynamicSectionHeader = ({
     onBackClick, 
     displayed,
-    title
+    title,
+    navbarMargin
   }) => {
 
   return <>
-    <div className="w-auto navbar mr-3 ml-3 mt-3 rounded-xl" style={{display: !displayed ? 'none' : 'flex'}}>
-    </div>
+    {navbarMargin && <div className="w-auto navbar mr-3 ml-3 mt-3 rounded-xl">
+    </div>}
     <div className="w-auto navbar bg-base-200 mr-3 ml-3 mt-3 rounded-xl w-96 transform-none	fixed" style={{display: !displayed ? 'none' : 'flex'}}>
         <div className="flex-none lg:hidden">
           <label htmlFor="my-drawer-3" className="btn btn-square btn-ghost">
@@ -37,8 +38,81 @@ export const DynamicSectionHeader = ({
     </>
 }
 
-export const DynamicSelector = ({ sections, selection, setSelection, setContentFocused }) => {
+
+export const NoSelectionPage = ({selected}) => {
+  return <article className="prose p-2 text-neutral grow" style={{display: selected ? "block" : "none"}}>
+        <h1> Select any of the readmes on the left!</h1>
+      </article>
+}
+
+export const DynamicChat = ({selected, userData,chat, messages}) => {
+  if(!selected) return (<></>)
+  return <div className={`w-full max-w-full h-full flex flex-col pb-4 pt-2 ${selected ? '' : 'hidden'}`}>
+      <div className='flex flex-row items-center bg-base-300 h-20 w-180 rounded-xl p-2 pr-4 mb-1 max-w-full'>
+          <div className="flex flex-grow bg-base-100 h-full mr-4 rounded-xl justify-center content-center items-center">
+            <div className='text-xl prose'>
+              <h2>{chat.partner.first_name}</h2>
+            </div>
+          </div>
+          <div className="avatar online placeholder">
+            <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
+              <span>{chat.partner.first_name.substring(0,2)}</span>
+            </div>
+          </div> 
+      </div>
+      <div className='flex flex-col grow p-1 rounded-xl overflow-y-auto max-h-full'>
+        <div className='flex flex-col w-full'>{
+        messages.map((message) => {
+          console.log("message", message,message.sender, userData.uuid);
+          return <div className='w-full relative'>
+            <div className={`bg-base-300 w-5/6 h-fit min-w-fit overflow-x-scroll rounded-xl p-2 mt-2 ${message.sender === userData.uuid ? 'float-right' : ''}`}>
+              <DynamicMarkdown>{message.text}</DynamicMarkdown>
+          </div>
+        </div>
+        })}
+        </div>
+      </div>
+      <div className='bg-base-300 bottom-0 h-fit rounded-xl mt-1 p-2'>
+        <div className='flex flex-row items-center'>
+          <textarea placeholder="Type a Message ..." className="textarea textarea-bordered textarea-lg flex flex-grow p-1 pl-2 h-24" ></textarea>
+          <div className='w-32 flex justify-center'>
+              <button className='btn btn-xl'>Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+}
+
+export const DynamicChatSelector = ({ sections, selection, setSelection, setContentFocused, navbarMargin }) => {
+  const frontendSettings = useSelector(state => state.frontendSettings);
+  return <>
+      <div className='flex flex-col items-end fixed'>
+    {navbarMargin && <div className='w-auto navbar mr-3 ml-3 mt-3 rounded-xl'></div>}
+                {sections.filter((item) => item.id !== "empty").map((item) => {
+                  return <label key={item.id} className={`btn normal-case text-lg gap-2 mb-2 -translate-x-4 hover:translate-x-2 h-auto bg-base-200 p-2 pl-6 pr-6 ${selection === item.id ? 'translate-x-2 bg-neutral-content text-neutral hover:bg-neutral-content': ''}`} onClick={() => {
+                    setSelection(item.id);
+                    setContentFocused(true);
+                  }}>
+                  <div className="avatar online placeholder">
+                    <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
+                      <span>{item.partner.first_name.substring(0,2)}</span>
+                    </div>
+                  </div> 
+                  <div className='text-left w-32 ml-6'>
+                    {item.partner.first_name}
+                    <div className='text-xs'>
+                      Chilling
+                    </div>
+                  </div>
+                </label>
+                })}
+            </div></>
+
+};
+
+export const DynamicSelector = ({ sections, selection, setSelection, setContentFocused, navbarMargin }) => {
   return <div className='flex flex-col items-end fixed'>
+    {navbarMargin && <div className='w-auto navbar mr-3 ml-3 mt-3 rounded-xl'></div>}
                 {sections.filter((item) => item.id !== "empty").map((item) => {
                   return <label key={item.id} className={`btn normal-case text-lg gap-2 mb-2 -translate-x-4 hover:translate-x-2 ${selection === item.id ? 'translate-x-2 bg-neutral-content text-neutral hover:bg-neutral-content': ''}`} onClick={() => {
                     setSelection(item.id);
@@ -57,7 +131,9 @@ export const DynamicTwoPageContentDisplay = ({
     selectionContent,
     sectionHeaderTitle,
     onSectionHeaderBackClick,
-    onBackTransitionEnd
+    onBackTransitionEnd,
+    useDynamicSectionHeader,
+    navbarMarginContent,
   }) => {
   /**
    * Dynamic listing component using dasyui
@@ -122,6 +198,16 @@ export const DynamicTwoPageContentDisplay = ({
     }
 
   }, [mainContentTransitioning])
+  
+  useEffect(() => {
+    if(!navbarMarginContent && !frontendSettings.mainNavigationbarLinksCollapsible){
+      dispatch({type: FRONTEND_SETTINGS, payload: {mainNavigationbarLinksCollapsible: true}})
+    }
+
+    if(navbarMarginContent && frontendSettings.mainNavigationbarLinksCollapsible){
+      dispatch({type: FRONTEND_SETTINGS, payload: {mainNavigationbarLinksCollapsible: false}})
+    }
+  }, [])
 
   
   useEffect(() => {
@@ -151,14 +237,22 @@ export const DynamicTwoPageContentDisplay = ({
     dispatch({type: FRONTEND_SETTINGS, payload: {mainNavigationHidden: true}})
   }
   
-  const selectionHeader = focused ? <DynamicSectionHeader title={sectionHeaderTitle} onBackClick={onSectionHeaderBackClick} displayed={!landscapeView}/> : <></>;
+  const selectionHeader = (focused && useDynamicSectionHeader) ? <DynamicSectionHeader title={sectionHeaderTitle} onBackClick={onSectionHeaderBackClick} displayed={!landscapeView} navbarMargin={navbarMarginContent}/> : <></>;
+  
+  if(typeof document !== 'undefined'){
+    const elem = document.getElementById("selectionContent")
+    if(elem){
+      elem.scrollTop = 0;
+      console.log("SCROLLING TO BOTTOM", elem.scrollHeight, elem?.scrollTop);
+    }
+  }
 
   return landscapeView ? (
-    <div className="flex flex-row w-auto">
+    <div className="flex flex-row w-auto h-full">
       <div className="flex flex-col w-4/12 bg-neutral-focous rounded-xl mr-2 text-wrap h-auto p-2 items-end">
         {selectorContent}
       </div>
-      <div className="flex flex-col w-fit h-auto bg-neutral-focous h-auto rounded-xl">
+      <div className="flex flex-col h-full bg-neutral-focous h-auto rounded-xl mb-8">
         {selectionHeader}
         {selectionContent}
       </div>
@@ -168,10 +262,24 @@ export const DynamicTwoPageContentDisplay = ({
         <div className={`flex flex-col duration-500 w-full fixed bg-neutral-focous rounded-xl mr-2 text-wrap h-auto p-2 items-end ${!focused ? 'transition transform': 'transition transform -translate-x-full'}`}>
           {selectorContent}
         </div>
-        <div id="selectionContent" className={`flex flex-col duration-500 w-full h-auto h-auto rounded-xl ${!mainContentTransitionFinished ? `transition transform` : ``}  ${!focused ? `translate-x-full`: ``}`}>
+        <div id="selectionContent" className={`flex flex-col duration-500 w-full h-full h-auto rounded-xl ${!mainContentTransitionFinished ? `transition transform` : ``}  ${!focused ? `translate-x-full`: ``}`}>
           {selectionHeader}
           {selectionContent}
         </div>
     </>
     )
 }
+
+/**
+ * 
+ *     <div className="flex flex-row w-auto">
+      <div className="flex flex-col w-4/12 bg-neutral-focous rounded-xl mr-2 text-wrap h-auto p-2 items-end">
+        {selectorContent}
+      </div>
+      <div className="flex flex-col w-fit h-auto bg-neutral-focous h-auto rounded-xl">
+        {selectionHeader}
+        {selectionContent}
+      </div>
+    </div>
+
+ */
