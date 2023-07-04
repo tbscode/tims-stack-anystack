@@ -12,6 +12,9 @@ ENV HOST_WEB $HOST_WEB
 ARG HOST_ANDROID
 ENV HOST_ANDROID $HOST_ANDROID
 
+ARG HOST_NAME
+ENV HOST_NAME $HOST_NAME
+
 WORKDIR /front
 
 COPY . .
@@ -24,7 +27,7 @@ RUN npm install --save-dev
 RUN cd ./pages/ && grep -rl getServerSideProps . | xargs sed -i 's/getServerSideProps/DONTgetServerSideProps/g'
 
 # In the capacitor config we replace the default android url '10.0.2.2:8000'
-RUN sed -i "s~10.0.2.2:8000~$HOST_ANDROID~g" ./capacitor.config.ts
+RUN sed -i "s~10.0.2.2:8000~$HOST_NAME~g" ./capacitor.config.ts
 # enable android scheme https TODO: just update the config too use env vars
 RUN sed -i "s~//androidScheme~androidScheme~g" ./capacitor.config.ts
 

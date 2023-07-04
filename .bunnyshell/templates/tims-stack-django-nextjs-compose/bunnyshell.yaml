@@ -66,6 +66,7 @@ components:
           WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}/api/core/ws'
           HOST_WEB: 'https://app-{{ env.base_domain }}'
           HOST_ANDROID: 'https://app-{{ env.base_domain }}'
+          HOST_NAME: 'app-{{ env.base_domain }}'
       ports:
         - "8001:8001"
     hosts:
