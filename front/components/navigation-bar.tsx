@@ -87,13 +87,9 @@ export const MainNavigation = ({children}) => {
             </div>}
             <div className={`flex flex-row transition-all h-fit duration-500 overflow-hidden z-20 ${(navbarLinksCollapsed && frontendSettings.mainNavigationbarLinksCollapsible) ? 'w-0 h-fit': 'w-180'}`}>
               {navItems.map((item) => (
-                <div key={item.id} className={`${currentPage.id !== item.id ? 'bg-base-300' : 'bg-neutral-content text-neutral'} rounded-xl ml-4 hover:animate-bounce-xs p-3`}>
-                  <Link href={item.href}>
-                    <article className={`prose`}>
-                      <h3 className={`${currentPage.id !== item.id ? '': 'text-neutral'}`}>{item.text}</h3>
-                    </article>
+                  <Link key={item.id} href={item.href} className={`${currentPage.id !== item.id ? 'bg-base-300 text-neutral-content' : 'bg-neutral-content text-neutral'} rounded-xl ml-4 hover:bg-neutral-content hover:text-base-300 p-3`}>
+                    <h3 className={`text-xl font-bold ${currentPage.id !== item.id ? '': 'text-neutral'}`}>{item.text}</h3>
                   </Link>
-                </div>
               ))}
             </div>
         </div>
