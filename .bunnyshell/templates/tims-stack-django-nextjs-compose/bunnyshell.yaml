@@ -71,7 +71,7 @@ components:
     hosts:
       -
         hostname: 'android-{{ env.base_domain }}'
-        path: /app.apk
+        path: /
         servicePort: 8001
   -
     kind: Application
