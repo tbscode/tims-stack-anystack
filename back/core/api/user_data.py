@@ -1,7 +1,8 @@
 from rest_framework_dataclasses.serializers import DataclassSerializer
+from rest_framework.request import Request
 from typing import Literal, Optional, List, Dict
 from datetime import datetime
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, inline_serializer
 from dataclasses import dataclass
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +14,7 @@ from django.contrib.auth import authenticate, login
 from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async, async_to_sync
 from core.models import UserProfileSerializer
+from core import api
 
 
 from rest_framework.decorators import api_view
@@ -40,13 +42,41 @@ def get_user_data(user):
     All the relevant user data for one user 
     TODO paginate everything!
     """
-
     return {
         "uuid": str(user.uuid),
         "email": user.email,
-        "profile": UserProfileSerializer(user.profile).data
+        "profile": UserProfileSerializer(user.profile).data,
+    }
+    
+def get_user_data_context(user, request):
+    """
+    All the relevant user data for one user 
+    TODO paginate everything!
+    """
+    chats_paginated = api.ChatsModelViewSet.emulate(request).list()
+    chats = chats_paginated["results"]
+    
+    message_viewset = api.MessagesModelViewSet.emulate(request)
+    messages = {chat['uuid']: message_viewset.list(chat_uuid=chat['uuid']) for chat in chats} 
+
+    #message_viewset = MessagesModelViewSet()
+    #message_viewset.initialize_request(request)
+    
+    return {
+        "uuid": str(user.uuid),
+        "email": user.email,
+        "chats": chats_paginated,
+        "messages": messages,
+        "profile": UserProfileSerializer(user.profile).data,
     }
 
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def request_user_data_context(request):
+
+    response = Response(get_user_data_context(request.user, request=request), status=status.HTTP_200_OK, content_type="application/json")
+    return response
 
 @extend_schema(
     auth=["SessionAuthentication"],
