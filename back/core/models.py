@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import pgettext_lazy
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
@@ -181,10 +182,79 @@ class Chat(models.Model):
     u1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="u1")
     u2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="u2")
     
+    created = models.DateTimeField(auto_now_add=True)
+    
+    messages = models.ManyToManyField("Message", related_name="chat_messages", null=True, blank=True)
+    
+    def get_partner(self, user):
+        return self.u1 if self.u2 == user else self.u2
+    
+    def is_participant(self, user):
+        return self.u1 == user or self.u2 == user
+
+    @classmethod
+    def get_chats(cls, user):
+        return Chat.objects.filter(Q(u1=user) | Q(u2=user))
+    
+    @classmethod
+    def get_chat(cls, users):
+        chat = Chat.objects.filter(u1__in=users, u2__in=users)
+        if chat.exists():
+            return chat.first()
+        return None
+
+    @classmethod
+    def get_or_create_chat(cls, user1, user2):
+        chat = cls.get_chat([user1, user2])
+        if chat:
+            return chat
+        else:
+            return cls.objects.create(u1=user1, u2=user2)
+
 class Message(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    
+    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
     
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipient")
-    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
     
     text = models.TextField()
+    
+    read = models.BooleanField(default=False)
+    
+    created = models.DateTimeField(auto_now_add=True)
+    
+class ChatSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Chat
+        fields = ['uuid', 'u1', 'u2', 'created']
+        
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        if 'request' in self.context:
+            user = self.context['request'].user
+            representation['partner'] = str(instance.get_partner(user).uuid)
+            del representation['u1']
+            del representation['u2']
+        else:
+            representation['u1'] = str(instance.u1.uuid)
+            representation['u2'] = str(instance.u2.uuid)
+        
+        return representation
+    
+class MessageSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Message
+        fields = ['uuid', 'sender', 'recipient', 'created', 'text']
+        
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['sender'] = str(instance.sender.uuid)
+        representation['recipient'] = str(instance.recipient.uuid)
+        
+        return representation
+    
