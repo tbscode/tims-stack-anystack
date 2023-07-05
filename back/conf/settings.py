@@ -77,6 +77,7 @@ DATABASES = {
         } if 'postgresql' in os.environ.get("DB_ENGINE", "") else {})
     }
 }
+
 REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
@@ -85,7 +86,9 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '1000/day',
         'user': '2000/day'
-    }
+    },
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50
 }
 
 if os.environ.get("DJANGO_SECRET_KEY", "") != "":
