@@ -1,15 +1,8 @@
 from rest_framework import serializers, viewsets, status
+from rest_framework import response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from core.models import Chat, ChatSerializer
-from rest_framework.pagination import PageNumberPagination
-from core.api.viewsets import UserStaffRestricedModelViewsetMixin
-
-
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 5
-    page_size_query_param = 'page_size'
-    max_page_size = 10
-
+from core.api.viewsets import UserStaffRestricedModelViewsetMixin, DetailedPaginationMixin
 
 class ChatsModelViewSet(viewsets.ModelViewSet, UserStaffRestricedModelViewsetMixin):
     """
@@ -19,7 +12,7 @@ class ChatsModelViewSet(viewsets.ModelViewSet, UserStaffRestricedModelViewsetMix
     not_user_editable = ChatSerializer.Meta.fields # For users all fields are ready only on this one!
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
-    pagination_class = StandardResultsSetPagination
+    pagination_class = DetailedPaginationMixin
     queryset = Chat.objects.all()
 
     def get_queryset(self):
