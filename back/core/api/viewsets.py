@@ -1,6 +1,29 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import response
+from rest_framework.pagination import PageNumberPagination
+from typing import OrderedDict
+
+
+class AugmentedPagination(PageNumberPagination):
+    page_size = 40
+    max_page_size = 40
+    
+    def get_paginated_response(self, data):
+        return response.Response(OrderedDict([
+            ('count', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data), # The  following are extras added by me:
+            ('page_size', self.page_size),
+            ('next_page', self.page.next_page_number() if self.page.has_next() else None),
+            ('previous_page', self.page.previous_page_number() if self.page.has_previous() else None),
+            ('last_page', self.page.paginator.num_pages),
+            ('first_page', 1),
+        ]))
+
+class DetailedPaginationMixin(AugmentedPagination):
+    pass
 
 class UserStaffRestricedModelViewsetMixin:
     
