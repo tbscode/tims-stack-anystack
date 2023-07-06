@@ -41,4 +41,4 @@ def login_user(request):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     login(request, user)
-    return Response(get_user_data(user),status=status.HTTP_200_OK)
+    return Response(get_user_data(user, request),status=status.HTTP_200_OK)
