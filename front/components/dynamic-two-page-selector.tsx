@@ -19,7 +19,7 @@ export const DynamicSectionHeader = ({
   }) => {
 
   return <>
-    {navbarMargin && <div className="w-auto navbar mr-3 ml-3 mt-3 rounded-xl">
+    {(navbarMargin && displayed) && <div className="w-auto navbar mr-3 ml-3 mt-3 rounded-xl">
     </div>}
     <div className="w-auto navbar bg-base-200 mr-3 ml-3 mt-3 rounded-xl w-96 transform-none	fixed" style={{display: !displayed ? 'none' : 'flex'}}>
         <div className="flex-none lg:hidden">
@@ -40,18 +40,19 @@ export const DynamicSectionHeader = ({
 
 
 export const NoSelectionPage = ({selected}) => {
-  return <>
+  return selected ? <>
       <div className="w-auto navbar mr-3 ml-3 mt-3 rounded-xl"></div>
       <article className="prose p-2 text-neutral grow" style={{display: selected ? "block" : "none"}}>
         <h1> Select any of the elements on the left!</h1>
       </article>
-    </>
+    </>: <></>
 }
 
 export const DynamicChat = ({selected, userData,chat, messages}) => {
+  console.log("TBS CHAT", chat, messages);
   if(!selected) return (<></>)
-  return <div className={`w-full max-w-full h-full flex flex-col pb-4 pt-2 ${selected ? '' : 'hidden'}`}>
-      <div className='flex flex-row items-center bg-base-300 h-20 w-180 rounded-xl p-2 pr-4 mb-1 max-w-full'>
+  return <div className={`w-200 max-w-full h-full flex flex-col pb-4 pt-2 ${selected ? '' : 'hidden'}`}>
+      <div className='flex flex-row items-center bg-base-300 h-20 w-full rounded-xl p-2 pr-4 mb-1 max-w-full'>
           <div className="flex flex-grow bg-base-100 h-full mr-4 rounded-xl justify-center content-center items-center">
             <div className='text-xl prose'>
               <h2>{chat.partner.first_name}</h2>
@@ -64,11 +65,15 @@ export const DynamicChat = ({selected, userData,chat, messages}) => {
           </div> 
       </div>
       <div className='flex flex-col grow p-1 rounded-xl overflow-y-auto max-h-full'>
-        <div className='flex flex-col w-full'>{
-        messages.map((message) => {
+        <div className='flex flex-col w-full'>
+          {chat?.next && <div className='w-full flex content-center justify-center'>
+            <button className='btn btn-xs'>
+              Load more 
+            </button>
+          </div>}{messages.results.map((message) => {
           console.log("message", message,message.sender, userData.uuid);
           return <div className='w-full relative'>
-            <div className={`bg-base-300 w-5/6 h-fit min-w-fit overflow-x-scroll rounded-xl p-2 mt-2 ${message.sender === userData.uuid ? 'float-right' : ''}`}>
+            <div className={`bg-base-300 w-5/6 h-fit min-w-fit overflow-x-auto rounded-xl p-2 mt-2 ${message.sender === userData.uuid ? 'float-right' : ''}`}>
               <DynamicMarkdown>{message.text}</DynamicMarkdown>
           </div>
         </div>
@@ -88,12 +93,15 @@ export const DynamicChat = ({selected, userData,chat, messages}) => {
 
 export const DynamicChatSelector = ({ sections, selection, setSelection, setContentFocused, navbarMargin }) => {
   const frontendSettings = useSelector(state => state.frontendSettings);
+  
+  console.log("CHAT SELECTOR", sections, selection)
   return <>
-      <div className='flex flex-col items-end fixed'>
+      <div className='flex flex-col items-end fixed max-h-full w-full relative'>
     {navbarMargin && <div className='w-auto navbar mr-3 ml-3 mt-3 rounded-xl'></div>}
-                {sections.filter((item) => item.id !== "empty").map((item) => {
-                  return <label key={item.id} className={`btn normal-case text-lg gap-2 mb-2 -translate-x-4 hover:translate-x-2 h-auto bg-base-200 p-2 pl-6 pr-6 ${selection === item.id ? 'translate-x-2 bg-neutral-content text-neutral hover:bg-neutral-content': ''}`} onClick={() => {
-                    setSelection(item.id);
+      <div className='flex flex-row items-end flex-wrap w-full max-w-full overflow-y-auto'>
+                {sections.filter((item) => item.uuid !== "empty").map((item) => {
+                  return <label key={item.uuid} className={`btn normal-case text-lg gap-2 mb-4 mr-4 -translate-x-4 hover:translate-x-2 h-auto bg-base-200 p-2 pl-6 pr-6 w-fit ${selection === item.id ? 'translate-x-2 bg-neutral-content text-neutral hover:bg-neutral-content': ''}`} onClick={() => {
+                    setSelection(item.uuid);
                     setContentFocused(true);
                   }}>
                   <div className="avatar online placeholder">
@@ -101,14 +109,14 @@ export const DynamicChatSelector = ({ sections, selection, setSelection, setCont
                       <span>{item.partner.first_name.substring(0,2)}</span>
                     </div>
                   </div> 
-                  <div className='text-left w-32 ml-6'>
+                  <div className='text-left w-20 ml-6'>
                     {item.partner.first_name}
                     <div className='text-xs'>
                       Chilling
                     </div>
                   </div>
                 </label>
-                })}
+                })}</div>
             </div></>
 
 };
@@ -251,11 +259,11 @@ export const DynamicTwoPageContentDisplay = ({
   }
 
   return landscapeView ? (
-    <div className="flex flex-row w-auto h-full">
+    <div className="flex flex-row w-auto h-full max-h-full">
       <div className="flex flex-col w-4/12 bg-neutral-focous rounded-xl mr-2 text-wrap h-auto p-2 items-end">
         {selectorContent}
       </div>
-      <div className="flex flex-col h-full bg-neutral-focous h-auto rounded-xl mb-8">
+      <div className="flex flex-col h-full bg-neutral-focous h-auto rounded-xl">
         {selectionHeader}
         {selectionContent}
       </div>
