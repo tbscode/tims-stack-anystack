@@ -12,8 +12,12 @@ import { useDispatch } from "react-redux";
 import { DEVICE_STATE } from "@/store/types";
 import { BannerState } from "@/components/connection-banner";
 import { CONNECTION_STATE, USER_DATA, USER_PROFILE } from "@/store/types";
+import { updateBaseData } from "@/utils/tools";
 
 import { useState, useEffect } from "react";
+import Router from 'next/router';
+
+
 
 const NO_NAVIGATION_ROUTES = ["/login"];
 
@@ -21,20 +25,43 @@ function App({ Component, pageProps }: AppProps) {
   const deviceState = useSelector((state: any) => state.device);
   const width = useSelector((state: any) => state.device.width);
   const frontendSettings = useSelector((state: any) => state.frontendSettings);
+  const [isLoading, setIsLoading] = useState(false);
+  const [firstRender, setFirstRender] = useState(true);
 
   const router = useRouter();
   const dispatch = useDispatch();
+  
 
   console.log("PAGE PROPS", pageProps);
 
   useEffect(() => {
     if ("data" in pageProps) {
       if ("profile" in pageProps.data) {
-        dispatch({ type: USER_PROFILE, payload: pageProps.data.profile });
-        delete pageProps.data.profile;
-        dispatch({ type: USER_DATA, payload: pageProps.data });
+        // also automaticly means that we are online and rot required to conncet, dispath connection to be online!
+        console.log("PROFILE", pageProps.data.profile);
+        dispatch(updateBaseData(pageProps.data));
+        dispatch({type: CONNECTION_STATE, payload: {state: BannerState.online}});
       }
     }
+    setFirstRender(false)
+  }, []);
+  
+  useEffect(() => {
+    const routeEventStart = () => {
+      setIsLoading(false);
+    };
+    const routeEventEnd = () => {
+      setIsLoading(true);
+    };
+
+    Router.events.on('routeChangeStart', routeEventStart);
+    Router.events.on('routeChangeComplete', routeEventEnd);
+    Router.events.on('routeChangeError', routeEventEnd);
+    return () => {
+      Router.events.off('routeChangeStart', routeEventStart);
+      Router.events.off('routeChangeComplete', routeEventEnd);
+      Router.events.off('routeChangeError', routeEventEnd);
+    };
   }, []);
 
   function handleWindowSizeChange() {
@@ -71,7 +98,7 @@ function App({ Component, pageProps }: AppProps) {
             <Component />
           </MainNavigation>
         )}
-        <ConnectionBanner />
+        {!firstRender && <ConnectionBanner />}
       </div>
     </Provider>
   );
