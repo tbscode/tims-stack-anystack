@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google'
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { useState, useEffect } from 'react';
-import { handleStreamedProps, getCookiesAsObject, getEnv } from '@/utils/tools';
+import { handleStreamedProps, getCookiesAsObject, getEnv, updateBaseData } from '@/utils/tools';
 import { ConnectionBanner, connectionStateAndUserData } from "../components/connection-banner";
 import { useSelector, useDispatch } from 'react-redux';
 import { CONNECTION_STATE, USER_DATA, USER_PROFILE } from "@/store/types";
@@ -49,9 +49,7 @@ const LoginHero = () => {
           }
         })
         res.json().then((data) => {
-          dispatch({type: USER_PROFILE, payload: data.profile})
-          delete data.profile
-          dispatch({type: USER_DATA, payload: data})
+          dispatch(updateBaseData(data))
           router.push("/")
         })
       }
