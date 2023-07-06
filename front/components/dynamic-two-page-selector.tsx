@@ -101,12 +101,11 @@ export const DynamicChat = ({ selected, userData, chat, messages }) => {
               <button className="btn btn-xs">Load more</button>
             </div>
           )}
-          {messages.results.map((message) => {
+          {messages.results.map((message, i) => {
             console.log("message", message, message.sender, userData.uuid);
             return (
-              <div className="w-full relative">
-                <div
-                  className={`bg-base-300 w-5/6 h-fit min-w-fit overflow-x-auto rounded-xl p-2 mt-2 ${
+              <div key={i} className="w-full relative">
+                <div className={`bg-base-300 w-5/6 h-fit min-w-fit overflow-x-auto rounded-xl p-2 mt-2 ${
                     message.sender === userData.uuid ? "float-right" : ""
                   }`}
                 >
