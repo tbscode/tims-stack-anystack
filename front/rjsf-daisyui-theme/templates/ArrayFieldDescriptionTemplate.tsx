@@ -11,7 +11,7 @@ import {
  * @param props - The `ArrayFieldDescriptionProps` for the component
  */
 export default function ArrayFieldDescriptionTemplate<T = any, F = any>(
-  props: ArrayFieldDescriptionProps
+  props: ArrayFieldDescriptionProps,
 ) {
   const { idSchema, description, registry, uiSchema } = props;
   if (!description) {

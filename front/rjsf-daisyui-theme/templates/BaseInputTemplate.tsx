@@ -8,7 +8,7 @@ import { getInputProps, WidgetProps } from "@rjsf/utils";
  * @param props - The `WidgetProps` for this template
  */
 export default function BaseInputTemplate<T = any, F = any>(
-  props: WidgetProps<T, F>
+  props: WidgetProps<T, F>,
 ) {
   const {
     id,
@@ -38,13 +38,13 @@ export default function BaseInputTemplate<T = any, F = any>(
   const inputProps = { ...rest, ...getInputProps<T, F>(schema, type, options) };
   const [previous, setPrevious] = React.useState(schema?.previous);
   const [value, setValue] = React.useState(inValue);
-  
+
   useEffect(() => {
     setPrevious(schema?.previous);
   }, [schema]);
-  
+
   useEffect(() => {
-    setValue(inValue)
+    setValue(inValue);
   }, [inValue]);
 
   let inputValue;
@@ -57,66 +57,83 @@ export default function BaseInputTemplate<T = any, F = any>(
   const _onChange = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) =>
       onChange(value === "" ? options.emptyValue : value),
-    [onChange, options]
+    [onChange, options],
   );
   const _onBlur = useCallback(
     ({ target: { value } }: React.FocusEvent<HTMLInputElement>) =>
       onBlur(id, value),
-    [onBlur, id]
+    [onBlur, id],
   );
   const _onFocus = useCallback(
     ({ target: { value } }: React.FocusEvent<HTMLInputElement>) =>
       onFocus(id, value),
-    [onFocus, id]
+    [onFocus, id],
   );
-  
+
   console.log("SHEMA DISPLAY", schema?.previous);
   console.log("UPDATE CHANGED", schema?.changeFieldRef);
 
   return (
     <>
-      {(rawErrors?.length > 0) ? <div className="tooltip tooltip-open tooltip-error" data-tip={rawErrors?.join(", ")}>
-        <input className="input input bordered hidden"/>
-      </div> : <></>}
-      {(('changed' in schema) && schema.changed) ? <div className="indicator w-auto pointer-events-auto">
-        <span className="indicator-item indicator-top indicator-end badge badge-info pr-1 hover:bg-base-100 pointer-events-auto" >
-          revert
-        </span>
-        <span className="indicator-item indicator-top indicator-end badge badge-info pr-2 pl-2 hover:opacity-0 pointer-events-auto" 
-          onMouseEnter={() => {
-           if('updateDisplayPrevious' in registry.rootSchema.tbsExtras) {
-            console.log("MOUSE ENTERED", registry.rootSchema);
-              registry.rootSchema.tbsExtras.updateDisplayPrevious({
-                field: schema.changeFieldRef, 
-                display: true,
-                setPrevious: setPrevious
-              })
-           }
-          }}
-          onMouseLeave={() => {
-           if('updateDisplayPrevious' in registry.rootSchema.tbsExtras) {
-              registry.rootSchema.tbsExtras.updateDisplayPrevious({
-                field: schema.changeFieldRef, 
-                display: false,
-                setPrevious: setPrevious
-              })
-           }
-          }}
-          onClick={() => {
-            console.log("REVERT CLICKED", registry.rootSchema);
-            if(("tbsExtras" in registry.rootSchema) && ("revertField" in registry.rootSchema.tbsExtras)) {
-              console.log("REVERTING", registry.rootSchema.tbsExtras);
-              registry.rootSchema.tbsExtras.revertField({
-                field: schema.changeFieldRef,
-                setValue: setValue,
-              })
-            }
-          }}>
-          updated
-        </span>
-          <input className="input input bordered h-0 w-full"/>
-      </div> : <></>}
-      {schema?.previous ? <input
+      {rawErrors?.length > 0 ? (
+        <div
+          className="tooltip tooltip-open tooltip-error"
+          data-tip={rawErrors?.join(", ")}
+        >
+          <input className="input input bordered hidden" />
+        </div>
+      ) : (
+        <></>
+      )}
+      {"changed" in schema && schema.changed ? (
+        <div className="indicator w-auto pointer-events-auto">
+          <span className="indicator-item indicator-top indicator-end badge badge-info pr-1 hover:bg-base-100 pointer-events-auto">
+            revert
+          </span>
+          <span
+            className="indicator-item indicator-top indicator-end badge badge-info pr-2 pl-2 hover:opacity-0 pointer-events-auto"
+            onMouseEnter={() => {
+              if ("updateDisplayPrevious" in registry.rootSchema.tbsExtras) {
+                console.log("MOUSE ENTERED", registry.rootSchema);
+                registry.rootSchema.tbsExtras.updateDisplayPrevious({
+                  field: schema.changeFieldRef,
+                  display: true,
+                  setPrevious: setPrevious,
+                });
+              }
+            }}
+            onMouseLeave={() => {
+              if ("updateDisplayPrevious" in registry.rootSchema.tbsExtras) {
+                registry.rootSchema.tbsExtras.updateDisplayPrevious({
+                  field: schema.changeFieldRef,
+                  display: false,
+                  setPrevious: setPrevious,
+                });
+              }
+            }}
+            onClick={() => {
+              console.log("REVERT CLICKED", registry.rootSchema);
+              if (
+                "tbsExtras" in registry.rootSchema &&
+                "revertField" in registry.rootSchema.tbsExtras
+              ) {
+                console.log("REVERTING", registry.rootSchema.tbsExtras);
+                registry.rootSchema.tbsExtras.revertField({
+                  field: schema.changeFieldRef,
+                  setValue: setValue,
+                });
+              }
+            }}
+          >
+            updated
+          </span>
+          <input className="input input bordered h-0 w-full" />
+        </div>
+      ) : (
+        <></>
+      )}
+      {schema?.previous ? (
+        <input
           key={id}
           id={id}
           className="input input-bordered text-info"
@@ -129,7 +146,9 @@ export default function BaseInputTemplate<T = any, F = any>(
           onChange={_onChange}
           onBlur={_onBlur}
           onFocus={_onFocus}
-        /> : <input
+        />
+      ) : (
+        <input
           key={id}
           id={id}
           className="input input-bordered"
@@ -142,12 +161,13 @@ export default function BaseInputTemplate<T = any, F = any>(
           onChange={_onChange}
           onBlur={_onBlur}
           onFocus={_onFocus}
-        />}
+        />
+      )}
       {Array.isArray(schema.examples) && (
         <datalist key={`datalist_${id}`} id={`examples_${id}`}>
           {[
             ...new Set(
-              schema.examples.concat(schema.default ? [schema.default] : [])
+              schema.examples.concat(schema.default ? [schema.default] : []),
             ),
           ].map((example: any) => (
             <option key={example} value={example} />

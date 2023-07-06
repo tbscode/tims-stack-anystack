@@ -26,7 +26,7 @@ export type WrapIfAdditionalProps<T = any, F = any> = {
  * @param props - The `WrapIfAdditionalProps` for this component
  */
 export default function WrapIfAdditional<T = any, F = any>(
-  props: WrapIfAdditionalProps<T, F>
+  props: WrapIfAdditionalProps<T, F>,
 ) {
   const {
     id,

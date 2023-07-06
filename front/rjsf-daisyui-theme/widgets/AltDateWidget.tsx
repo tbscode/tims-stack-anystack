@@ -23,7 +23,7 @@ function readyForChange(state: DateObject) {
 function dateElementProps(
   state: DateObject,
   time: boolean,
-  yearsRange: [number, number] = [1900, new Date().getFullYear() + 2]
+  yearsRange: [number, number] = [1900, new Date().getFullYear() + 2],
 ) {
   const { year, month, day, hour, minute, second } = state;
   const data = [
@@ -39,7 +39,7 @@ function dateElementProps(
     data.push(
       { type: "hour", range: [0, 23], value: hour },
       { type: "minute", range: [0, 59], value: minute },
-      { type: "second", range: [0, 59], value: second }
+      { type: "second", range: [0, 59], value: second },
     );
   }
   return data;
@@ -116,7 +116,7 @@ function AltDateWidget<T = any, F = any>({
     (state: DateObject, action: Partial<DateObject>) => {
       return { ...state, ...action };
     },
-    parseDateString(value, time)
+    parseDateString(value, time),
   );
 
   useEffect(() => {
@@ -136,7 +136,7 @@ function AltDateWidget<T = any, F = any>({
     (property: keyof DateObject, value: string) => {
       setState({ [property]: value });
     },
-    []
+    [],
   );
 
   const handleSetNow = useCallback(
@@ -148,7 +148,7 @@ function AltDateWidget<T = any, F = any>({
       const nowDateObj = parseDateString(new Date().toJSON(), time);
       setState(nowDateObj);
     },
-    [disabled, readonly, time]
+    [disabled, readonly, time],
   );
 
   const handleClear = useCallback(
@@ -160,7 +160,7 @@ function AltDateWidget<T = any, F = any>({
       setState(parseDateString("", time));
       onChange(undefined);
     },
-    [disabled, readonly, time, onChange]
+    [disabled, readonly, time, onChange],
   );
 
   return (
@@ -168,7 +168,7 @@ function AltDateWidget<T = any, F = any>({
       {dateElementProps(
         state,
         time,
-        options.yearsRange as [number, number] | undefined
+        options.yearsRange as [number, number] | undefined,
       ).map((elemProps, i) => (
         <li key={i}>
           <DateElement

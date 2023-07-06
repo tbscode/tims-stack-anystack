@@ -62,7 +62,7 @@ function NumberField<T = any, F = any>(props: FieldProps<T, F>) {
 
       onChange(processed as unknown as T);
     },
-    [onChange]
+    [onChange],
   );
 
   if (typeof lastValue === "string" && typeof value === "number") {

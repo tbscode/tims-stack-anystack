@@ -7,7 +7,7 @@ import { UnsupportedFieldProps } from "@rjsf/utils";
  * @param props - The `FieldProps` for this template
  */
 function UnsupportedField<T = any, F = any>(
-  props: UnsupportedFieldProps<T, F>
+  props: UnsupportedFieldProps<T, F>,
 ) {
   const { schema, idSchema, reason } = props;
   return (

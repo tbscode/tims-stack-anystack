@@ -10,7 +10,7 @@ export default function TextWidget<T = any, F = any>(props: WidgetProps<T, F>) {
   const BaseInputTemplate = getTemplate<"BaseInputTemplate", T, F>(
     "BaseInputTemplate",
     registry,
-    options
+    options,
   );
   return <BaseInputTemplate {...props} />;
 }

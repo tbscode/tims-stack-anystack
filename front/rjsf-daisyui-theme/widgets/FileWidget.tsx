@@ -98,7 +98,7 @@ function FileWidget<T, F>({
   const extractedFilesInfo = useMemo(
     () =>
       Array.isArray(value) ? extractFileInfo(value) : extractFileInfo([value]),
-    [value]
+    [value],
   );
   const [filesInfo, setFilesInfo] =
     useState<FileInfoType[]>(extractedFilesInfo);
@@ -118,7 +118,7 @@ function FileWidget<T, F>({
         }
       });
     },
-    [multiple, onChange]
+    [multiple, onChange],
   );
 
   return (

@@ -7,13 +7,13 @@ import { getTemplate, WidgetProps } from "@rjsf/utils";
  * @param props - The `WidgetProps` for this component
  */
 export default function ColorWidget<T = any, F = any>(
-  props: WidgetProps<T, F>
+  props: WidgetProps<T, F>,
 ) {
   const { disabled, readonly, options, registry } = props;
   const BaseInputTemplate = getTemplate<"BaseInputTemplate", T, F>(
     "BaseInputTemplate",
     registry,
-    options
+    options,
   );
   return (
     <BaseInputTemplate

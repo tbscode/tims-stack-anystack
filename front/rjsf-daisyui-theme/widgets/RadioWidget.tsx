@@ -26,16 +26,21 @@ function RadioWidget<T = any, F = any>({
 
   const handleBlur = useCallback(
     (event: FocusEvent<HTMLInputElement>) => onBlur(id, event.target.value),
-    [onBlur, id]
+    [onBlur, id],
   );
 
   const handleFocus = useCallback(
     (event: FocusEvent<HTMLInputElement>) => onFocus(id, event.target.value),
-    [onFocus, id]
+    [onFocus, id],
   );
 
   return (
-    <div className={`flex field-radio-group ${inline ? 'flex-row gap-2' : 'flex-col'}`} id={id}>
+    <div
+      className={`flex field-radio-group ${
+        inline ? "flex-row gap-2" : "flex-col"
+      }`}
+      id={id}
+    >
       {Array.isArray(enumOptions) &&
         enumOptions.map((option, i) => {
           const checked = option.value === value;
@@ -67,10 +72,13 @@ function RadioWidget<T = any, F = any>({
           );
 
           return (
-            <label key={i} className={`label justify-start gap-2 ${disabledCls}`}>
+            <label
+              key={i}
+              className={`label justify-start gap-2 ${disabledCls}`}
+            >
               {radio}
             </label>
-          )
+          );
         })}
     </div>
   );

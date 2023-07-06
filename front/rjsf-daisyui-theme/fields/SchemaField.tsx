@@ -42,7 +42,7 @@ function getFieldComponent<T, F>(
   schema: RJSFSchema,
   uiOptions: UIOptionsType<T, F>,
   idSchema: IdSchema<T>,
-  registry: Registry<T, F>
+  registry: Registry<T, F>,
 ) {
   const field = uiOptions.field;
   const { fields } = registry;
@@ -163,7 +163,7 @@ function SchemaFieldRender<T, F>(props: FieldProps<T, F>) {
   const FieldTemplate = getTemplate<"FieldTemplate", T, F>(
     "FieldTemplate",
     registry,
-    uiOptions
+    uiOptions,
   );
   const DescriptionFieldTemplate = getTemplate<
     "DescriptionFieldTemplate",
@@ -177,22 +177,22 @@ function SchemaFieldRender<T, F>(props: FieldProps<T, F>) {
       _idSchema.$id,
       formData,
       idPrefix,
-      idSeparator
+      idSeparator,
     ),
-    _idSchema
+    _idSchema,
   ) as IdSchema<T>;
   const FieldComponent = getFieldComponent(
     schema,
     uiOptions,
     idSchema,
-    registry
+    registry,
   );
   const disabled = Boolean(props.disabled || uiOptions.disabled);
   const readonly = Boolean(
     props.readonly ||
       uiOptions.readonly ||
       props.schema.readOnly ||
-      schema.readOnly
+      schema.readOnly,
   );
   const uiSchemaHideError = uiOptions.hideError;
   // Set hideError to the value provided in the uiSchema, otherwise stick with the prop to propagate to children
@@ -258,7 +258,7 @@ function SchemaFieldRender<T, F>(props: FieldProps<T, F>) {
   if (uiSchema?.classNames) {
     if (process.env.NODE_ENV !== "production") {
       console.warn(
-        "'uiSchema.classNames' is deprecated and may be removed in a major release; Use 'ui:classNames' instead."
+        "'uiSchema.classNames' is deprecated and may be removed in a major release; Use 'ui:classNames' instead.",
       );
     }
     classNames.push(uiSchema.classNames);
@@ -331,8 +331,8 @@ function SchemaFieldRender<T, F>(props: FieldProps<T, F>) {
               options={schema.anyOf.map((_schema: RJSFSchemaDefinition) =>
                 schemaUtils.retrieveSchema(
                   isObject(_schema) ? _schema : {},
-                  formData
-                )
+                  formData,
+                ),
               )}
               baseType={schema.type}
               registry={registry}
@@ -360,8 +360,8 @@ function SchemaFieldRender<T, F>(props: FieldProps<T, F>) {
               options={schema.oneOf.map((_schema: RJSFSchemaDefinition) =>
                 schemaUtils.retrieveSchema(
                   isObject(_schema) ? _schema : {},
-                  formData
-                )
+                  formData,
+                ),
               )}
               baseType={schema.type}
               registry={registry}

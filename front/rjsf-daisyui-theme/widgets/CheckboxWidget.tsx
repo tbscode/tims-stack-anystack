@@ -34,47 +34,49 @@ function CheckboxWidget<T = any, F = any>({
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) =>
       onChange(event.target.checked),
-    [onChange]
+    [onChange],
   );
 
   const handleBlur = useCallback(
     (event: React.FocusEvent<HTMLInputElement>) =>
       onBlur(id, event.target.checked),
-    [onBlur, id]
+    [onBlur, id],
   );
 
   const handleFocus = useCallback(
     (event: React.FocusEvent<HTMLInputElement>) =>
       onFocus(id, event.target.checked),
-    [onFocus, id]
+    [onFocus, id],
   );
 
-  return (<>
-    <DynamicMarkdown>{label}</DynamicMarkdown>
-    <div className={`checkbox ${disabled || readonly ? "disabled" : ""}`}>
-      <div className="flex flex-row">
-        <input
-          type="checkbox"
-          className="checkbox"
-          id={id}
-          checked={typeof value === "undefined" ? false : value}
-          required={required}
-          disabled={disabled || readonly}
-          autoFocus={autofocus}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-        />
-      {schema.description && (
-        <DescriptionFieldTemplate
-          id={id + "__description"}
-          description={schema.description}
-          registry={registry}
-        />
-      )}
+  return (
+    <>
+      <DynamicMarkdown>{label}</DynamicMarkdown>
+      <div className={`checkbox ${disabled || readonly ? "disabled" : ""}`}>
+        <div className="flex flex-row">
+          <input
+            type="checkbox"
+            className="checkbox"
+            id={id}
+            checked={typeof value === "undefined" ? false : value}
+            required={required}
+            disabled={disabled || readonly}
+            autoFocus={autofocus}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
+          />
+          {schema.description && (
+            <DescriptionFieldTemplate
+              id={id + "__description"}
+              description={schema.description}
+              registry={registry}
+            />
+          )}
+        </div>
       </div>
-    </div>
-  </>);
+    </>
+  );
 }
 
 export default CheckboxWidget;

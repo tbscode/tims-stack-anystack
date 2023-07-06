@@ -81,7 +81,7 @@ class ObjectField<T = any, F = any> extends Component<
           errorSchema && {
             ...errorSchema,
             [name]: newErrorSchema,
-          }
+          },
       );
     };
   };
@@ -153,7 +153,7 @@ class ObjectField<T = any, F = any> extends Component<
           errorSchema && {
             ...errorSchema,
             [value]: newErrorSchema,
-          }
+          },
       );
     };
   };
@@ -199,7 +199,7 @@ class ObjectField<T = any, F = any> extends Component<
       const { schemaUtils } = registry;
       const refSchema = schemaUtils.retrieveSchema(
         { $ref: schema.additionalProperties[REF_KEY] },
-        formData
+        formData,
       );
 
       type = refSchema.type;
@@ -260,7 +260,7 @@ class ObjectField<T = any, F = any> extends Component<
     const Template = getTemplate<"ObjectFieldTemplate", T, F>(
       "ObjectFieldTemplate",
       registry,
-      uiOptions
+      uiOptions,
     );
 
     const templateProps = {
@@ -296,7 +296,7 @@ class ObjectField<T = any, F = any> extends Component<
               onKeyChange={this.onKeyChange(name)}
               onChange={this.onPropertyChange(
                 name,
-                addedByAdditionalProperties
+                addedByAdditionalProperties,
               )}
               onBlur={onBlur}
               onFocus={onFocus}

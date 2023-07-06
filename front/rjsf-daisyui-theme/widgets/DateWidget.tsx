@@ -6,14 +6,12 @@ import { getTemplate, localToUTC, utcToLocal, WidgetProps } from "@rjsf/utils";
  *
  * @param props - The `WidgetProps` for this component
  */
-export default function DateWidget<T = any, F = any>(
-  props: WidgetProps<T, F>
-) {
+export default function DateWidget<T = any, F = any>(props: WidgetProps<T, F>) {
   const { onChange, value, options, registry } = props;
   const BaseInputTemplate = getTemplate<"BaseInputTemplate", T, F>(
     "BaseInputTemplate",
     registry,
-    options
+    options,
   );
   return (
     <BaseInputTemplate

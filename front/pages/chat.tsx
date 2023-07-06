@@ -1,24 +1,39 @@
-
-import Image from 'next/image'
-import { useRouter } from 'next/router';
-import { handleStreamedProps, getCookiesAsObject, getEnv } from "../utils/tools";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import {
+  handleStreamedProps,
+  getCookiesAsObject,
+  getEnv,
+} from "../utils/tools";
 import React, { useState, useEffect, useRef, createRef } from "react";
-import { ConnectionBanner, connectionStateAndUserData } from "../components/connection-banner";
-import { MainNavigation, ChatsList, ChatMessages } from "../components/navigation-bar";
-import { useDispatch, useSelector } from 'react-redux';
-import { FRONTEND_SETTINGS, SLECTED_CHAT } from '../store/types';
-import { DynamicChatSelector, DynamicChat, DynamicTwoPageContentDisplay, NoSelectionPage } from "../components/dynamic-two-page-selector";
-import Form from '@rjsf/core';
-import { RJSFSchema } from '@rjsf/utils';
-import { withTheme } from '@rjsf/core';
-import { rjsfDaisyUiTheme } from '../rjsf-daisyui-theme/rjsfDaisyUiTheme';
-import { globalAgent } from 'https';
-import { clear } from 'console';
-import { init } from 'next/dist/compiled/@vercel/og/satori';
-import { DynamicForm } from '@/rjsf-daisyui-theme/form/form';
+import {
+  ConnectionBanner,
+  connectionStateAndUserData,
+} from "../components/connection-banner";
+import {
+  MainNavigation,
+  ChatsList,
+  ChatMessages,
+} from "../components/navigation-bar";
+import { useDispatch, useSelector } from "react-redux";
+import { FRONTEND_SETTINGS, SLECTED_CHAT } from "../store/types";
+import {
+  DynamicChatSelector,
+  DynamicChat,
+  DynamicTwoPageContentDisplay,
+  NoSelectionPage,
+} from "../components/dynamic-two-page-selector";
+import Form from "@rjsf/core";
+import { RJSFSchema } from "@rjsf/utils";
+import { withTheme } from "@rjsf/core";
+import { rjsfDaisyUiTheme } from "../rjsf-daisyui-theme/rjsfDaisyUiTheme";
+import { globalAgent } from "https";
+import { clear } from "console";
+import { init } from "next/dist/compiled/@vercel/og/satori";
+import { DynamicForm } from "@/rjsf-daisyui-theme/form/form";
 
 export default function Chat(): JSX.Element {
-  const [selection, setSelection] = useState("empty")
+  const [selection, setSelection] = useState("empty");
 
   const dispatch = useDispatch();
 
@@ -28,17 +43,17 @@ export default function Chat(): JSX.Element {
   const allMessagesSel = useSelector((state: any) => state.messages);
 
   const [selectedChatInfo, setSelectedChatInfo] = useState({});
-  
+
   let selectedChat = useSelector((state: any) => state.selectedChat);
 
   const [contentFocused, setContentFocused] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isChatSelected, setIsChatSelected] = useState(false);
-  
+
   useEffect(() => {
     // TODO: maybe do something if the current selected chat change otherwise ignore
   }, [allMessagesSel]);
-  
+
   useEffect(() => {
     setSelectedChatInfo(selectedChat.chat);
     setMessages(selectedChat.messages);
@@ -48,39 +63,58 @@ export default function Chat(): JSX.Element {
   useEffect(() => {
     setIsChatSelected(false);
   }, []);
-  
-  const updateSelection = (uuid) => {
 
-    setSelection(uuid); 
-    if(uuid !== "empty") {
-      const updateChatSelection = chats.results.filter((item) => item.uuid === uuid)[0]
-      console.log("TBS SEL MSG", uuid, allMessagesSel[uuid], allMessagesSel)
-      dispatch({type: SLECTED_CHAT, payload: {chat: updateChatSelection, messages: allMessagesSel[uuid]}});
-    }    
+  const updateSelection = (uuid) => {
+    setSelection(uuid);
+    if (uuid !== "empty") {
+      const updateChatSelection = chats.results.filter(
+        (item) => item.uuid === uuid,
+      )[0];
+      console.log("TBS SEL MSG", uuid, allMessagesSel[uuid], allMessagesSel);
+      dispatch({
+        type: SLECTED_CHAT,
+        payload: { chat: updateChatSelection, messages: allMessagesSel[uuid] },
+      });
+    }
   };
-  
-  return <DynamicTwoPageContentDisplay 
+
+  return (
+    <DynamicTwoPageContentDisplay
       focused={contentFocused}
-      selectorContent={<DynamicChatSelector
-          sections={chats.results} 
+      selectorContent={
+        <DynamicChatSelector
+          sections={chats.results}
           selection={selection}
           setSelection={updateSelection}
           setContentFocused={setContentFocused}
           navbarMargin={true}
-        />}
-        navbarMarginContent={false}
-        useDynamicSectionHeader={false}
-        sectionHeaderTitle={chats.results.filter((item) => item.uuid === selection)[0]?.partner.first_name ?? "No Selection"}
-        onSectionHeaderBackClick={() => {
-          setContentFocused(false);
-          //setSelection("empty");
-        }}
-        onBackTransitionEnd={() => {
-          console.log("RESET SELECTION", contentFocused);
-          setSelection("empty");
-        }}
-        selectionContent={<>
-          <DynamicChat selected={isChatSelected} userData={userData} chat={selectedChatInfo} messages={messages}/>
-          <NoSelectionPage selected={selection === "empty"}/>
-        </>}   />
+        />
+      }
+      navbarMarginContent={false}
+      useDynamicSectionHeader={false}
+      sectionHeaderTitle={
+        chats.results.filter((item) => item.uuid === selection)[0]?.partner
+          .first_name ?? "No Selection"
+      }
+      onSectionHeaderBackClick={() => {
+        setContentFocused(false);
+        //setSelection("empty");
+      }}
+      onBackTransitionEnd={() => {
+        console.log("RESET SELECTION", contentFocused);
+        setSelection("empty");
+      }}
+      selectionContent={
+        <>
+          <DynamicChat
+            selected={isChatSelected}
+            userData={userData}
+            chat={selectedChatInfo}
+            messages={messages}
+          />
+          <NoSelectionPage selected={selection === "empty"} />
+        </>
+      }
+    />
+  );
 }

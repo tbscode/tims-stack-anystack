@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "static": "next build && next export",
-    "pretty": "prettier --write \"./**/*.{js,jsx,ts,tsx,json}\"",
+    "pretty": "prettier --write \"./{components,pages,rjsf-daisyui-theme,store}/**/*.{js,jsx,ts,tsx,json}\"",
     "postinstall": "curl -o node_modules/@capacitor/android/capacitor/src/main/assets/native-bridge.js https://raw.githubusercontent.com/tbscode/tims-capacitor/main/android/capacitor/src/main/assets/native-bridge.js"
   },
   "dependencies": {

@@ -59,7 +59,7 @@ function generateKeyedFormData<T>(formData: T[]): KeyedFormDataType<T>[] {
  * @returns - The inner `formData` item(s) in the `keyedFormData`
  */
 function keyedToPlainFormData<T>(
-  keyedFormData: KeyedFormDataType<T> | KeyedFormDataType<T>[]
+  keyedFormData: KeyedFormDataType<T> | KeyedFormDataType<T>[],
 ): T[] {
   if (Array.isArray(keyedFormData)) {
     return keyedFormData.map((keyedItem) => keyedItem.item);
@@ -96,7 +96,7 @@ class ArrayField<T = any, F = any> extends Component<
    */
   static getDerivedStateFromProps<T = any, F = any>(
     nextProps: Readonly<FieldProps<T[], F>>,
-    prevState: Readonly<ArrayFieldState<T>>
+    prevState: Readonly<ArrayFieldState<T>>,
   ) {
     // Don't call getDerivedStateFromProps if keyed formdata was just updated.
     if (prevState.updatedKeyedFormData) {
@@ -130,7 +130,7 @@ class ArrayField<T = any, F = any> extends Component<
     return get(
       schema,
       [ITEMS_KEY, "title"],
-      get(schema, [ITEMS_KEY, "description"], "Item")
+      get(schema, [ITEMS_KEY, "description"], "Item"),
     );
   }
 
@@ -209,7 +209,7 @@ class ArrayField<T = any, F = any> extends Component<
         keyedFormData: newKeyedFormData,
         updatedKeyedFormData: true,
       },
-      () => onChange(keyedToPlainFormData(newKeyedFormData))
+      () => onChange(keyedToPlainFormData(newKeyedFormData)),
     );
   };
 
@@ -238,7 +238,7 @@ class ArrayField<T = any, F = any> extends Component<
           keyedFormData: newKeyedFormData,
           updatedKeyedFormData: true,
         },
-        () => onChange(keyedToPlainFormData(newKeyedFormData))
+        () => onChange(keyedToPlainFormData(newKeyedFormData)),
       );
     };
   };
@@ -278,8 +278,8 @@ class ArrayField<T = any, F = any> extends Component<
         () =>
           onChange(
             keyedToPlainFormData(newKeyedFormData),
-            newErrorSchema as ErrorSchema<T[]>
-          )
+            newErrorSchema as ErrorSchema<T[]>,
+          ),
       );
     };
   };
@@ -332,8 +332,8 @@ class ArrayField<T = any, F = any> extends Component<
         () =>
           onChange(
             keyedToPlainFormData(newKeyedFormData),
-            newErrorSchema as ErrorSchema<T[]>
-          )
+            newErrorSchema as ErrorSchema<T[]>,
+          ),
       );
     };
   };
@@ -359,7 +359,7 @@ class ArrayField<T = any, F = any> extends Component<
           errorSchema && {
             ...errorSchema,
             [index]: newErrorSchema,
-          }
+          },
       );
     };
   };
@@ -453,7 +453,7 @@ class ArrayField<T = any, F = any> extends Component<
           itemIdPrefix,
           itemCast,
           idPrefix,
-          idSeparator
+          idSeparator,
         );
         return this.renderArrayFieldItem({
           key,
@@ -490,7 +490,7 @@ class ArrayField<T = any, F = any> extends Component<
     const Template = getTemplate<"ArrayFieldTemplate", T[], F>(
       "ArrayFieldTemplate",
       registry,
-      uiOptions
+      uiOptions,
     );
     return <Template {...arrayProps} />;
   }
@@ -567,7 +567,7 @@ class ArrayField<T = any, F = any> extends Component<
     const { widgets, schemaUtils, formContext } = registry;
     const itemsSchema = schemaUtils.retrieveSchema(
       schema.items as RJSFSchema,
-      items
+      items,
     );
     const title = schema.title || name;
     const enumOptions = optionsList(itemsSchema);
@@ -673,7 +673,7 @@ class ArrayField<T = any, F = any> extends Component<
       ? (schema.items as RJSFSchema[])
       : [];
     const itemSchemas = _schemaItems.map((item: RJSFSchema, index: number) =>
-      schemaUtils.retrieveSchema(item, formData[index] as unknown as T[])
+      schemaUtils.retrieveSchema(item, formData[index] as unknown as T[]),
     );
     const additionalSchema = isObject(schema.additionalItems)
       ? schemaUtils.retrieveSchema(schema.additionalItems, formData)
@@ -707,7 +707,7 @@ class ArrayField<T = any, F = any> extends Component<
           itemIdPrefix,
           itemCast,
           idPrefix,
-          idSeparator
+          idSeparator,
         );
         const itemUiSchema = additional
           ? uiSchema.additionalItems || {}
@@ -750,7 +750,7 @@ class ArrayField<T = any, F = any> extends Component<
     const Template = getTemplate<"ArrayFieldTemplate", T[], F>(
       "ArrayFieldTemplate",
       registry,
-      uiOptions
+      uiOptions,
     );
     return <Template {...arrayProps} />;
   }
@@ -808,7 +808,7 @@ class ArrayField<T = any, F = any> extends Component<
       fields: { SchemaField },
     } = registry;
     const { orderable = true, removable = true } = getUiOptions<T[], F>(
-      uiSchema
+      uiSchema,
     );
     const has: { [key: string]: boolean } = {
       moveUp: orderable && canMoveUp,

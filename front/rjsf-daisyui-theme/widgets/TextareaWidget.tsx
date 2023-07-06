@@ -21,19 +21,19 @@ function TextareaWidget<T = any, F = any>({
   const handleChange = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLTextAreaElement>) =>
       onChange(value === "" ? options.emptyValue : value),
-    [onChange, options.emptyValue]
+    [onChange, options.emptyValue],
   );
 
   const handleBlur = useCallback(
     ({ target: { value } }: FocusEvent<HTMLTextAreaElement>) =>
       onBlur(id, value),
-    [onBlur, id]
+    [onBlur, id],
   );
 
   const handleFocus = useCallback(
     ({ target: { value } }: FocusEvent<HTMLTextAreaElement>) =>
       onFocus(id, value),
-    [id, onFocus]
+    [id, onFocus],
   );
 
   return (

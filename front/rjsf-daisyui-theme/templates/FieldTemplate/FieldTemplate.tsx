@@ -10,7 +10,7 @@ import WrapIfAdditional from "./WrapIfAdditional";
  * @param props - The `FieldTemplateProps` for this component
  */
 export default function FieldTemplate<T = any, F = any>(
-  props: FieldTemplateProps<T, F>
+  props: FieldTemplateProps<T, F>,
 ) {
   const {
     id,

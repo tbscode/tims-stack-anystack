@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { TitleFieldProps } from "@rjsf/utils";
 import { DynamicMarkdown } from "@/components/dynamic-two-page-selector";
 
@@ -7,12 +7,12 @@ const REQUIRED_FIELD_SYMBOL = "*";
 function convertToReadableFormat(datetime) {
   let now = new Date();
   let oldDate = new Date(datetime);
-  
+
   let seconds = Math.floor((now - oldDate) / 1000);
   let interval = Math.floor(seconds / 31536000);
-  
+
   let baseMessage = "Last changed: ";
-  
+
   if (interval >= 1) {
     return baseMessage + interval + " years ago";
   }
@@ -44,7 +44,7 @@ function convertToReadableFormat(datetime) {
  * @param props - The `TitleFieldProps` for this component
  */
 export default function TitleField<T = any, F = any>(
-  props: TitleFieldProps<T, F>
+  props: TitleFieldProps<T, F>,
 ) {
   const { id, title, required, schema, uiSchema } = props;
   const [time, setTime] = useState(Date.now());
@@ -58,9 +58,21 @@ export default function TitleField<T = any, F = any>(
 
   return (
     <legend id={id}>
-      {'last_updated' in schema && <span className="badge badge-lg">{convertToReadableFormat(schema.last_updated)}</span>}
-      {(('tbsStateOptions' in uiSchema) && ('isFetching' in uiSchema.tbsStateOptions) && uiSchema.tbsStateOptions.isFetching) && <span className="badge badge-lg">saving...</span>}
-      {(('tbsStateOptions' in uiSchema) && ('unsavedChanges' in uiSchema.tbsStateOptions) && uiSchema.tbsStateOptions.unsavedChanges) && <span className="badge badge-lg badge-info">unsaved changes</span>}
+      {"last_updated" in schema && (
+        <span className="badge badge-lg">
+          {convertToReadableFormat(schema.last_updated)}
+        </span>
+      )}
+      {"tbsStateOptions" in uiSchema &&
+        "isFetching" in uiSchema.tbsStateOptions &&
+        uiSchema.tbsStateOptions.isFetching && (
+          <span className="badge badge-lg">saving...</span>
+        )}
+      {"tbsStateOptions" in uiSchema &&
+        "unsavedChanges" in uiSchema.tbsStateOptions &&
+        uiSchema.tbsStateOptions.unsavedChanges && (
+          <span className="badge badge-lg badge-info">unsaved changes</span>
+        )}
       <DynamicMarkdown>{title}</DynamicMarkdown>
       {required && <span className="required">{REQUIRED_FIELD_SYMBOL}</span>}
     </legend>

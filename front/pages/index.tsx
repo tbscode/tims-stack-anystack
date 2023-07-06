@@ -1,40 +1,49 @@
-import Image from 'next/image'
-import { useRouter } from 'next/router';
+import Image from "next/image";
+import { useRouter } from "next/router";
 import { handleStreamedProps, getCookiesAsObject } from "../utils/tools";
 import React, { useState, useEffect } from "react";
-import { ConnectionBanner, connectionStateAndUserData } from "../components/connection-banner";
-import { MainNavigation, ChatsList, ChatMessages } from "../components/navigation-bar";
-import { useDispatch, useSelector } from 'react-redux';
-import { DynamicSelector,DynamicSectionHeader, DynamicTwoPageContentDisplay } from "../components/dynamic-two-page-selector";
-import { Capacitor } from '@capacitor/core';
+import {
+  ConnectionBanner,
+  connectionStateAndUserData,
+} from "../components/connection-banner";
+import {
+  MainNavigation,
+  ChatsList,
+  ChatMessages,
+} from "../components/navigation-bar";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  DynamicSelector,
+  DynamicSectionHeader,
+  DynamicTwoPageContentDisplay,
+} from "../components/dynamic-two-page-selector";
+import { Capacitor } from "@capacitor/core";
 import { FRONTEND_SETTINGS } from "@/store/types";
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from "react-markdown";
 
-
-export const getServerSideProps = async ({req} : {req: any}) => {
+export const getServerSideProps = async ({ req }: { req: any }) => {
   if (req.method == "POST") {
-    const res = await handleStreamedProps({req})
-    console.log("RES", res)
-    return { props: { data: JSON.parse(res), dataLog: {pulled: true} } };
+    const res = await handleStreamedProps({ req });
+    console.log("RES", res);
+    return { props: { data: JSON.parse(res), dataLog: { pulled: true } } };
   }
-  return { props: { dataLog: {pulled: false}} };
+  return { props: { dataLog: { pulled: false } } };
 };
-
 
 const INDEX_SECTIONS = [
   {
-    id: "empty", 
+    id: "empty",
     text: "No Selection",
   },
   {
-    id: "getting_started", 
+    id: "getting_started",
     text: "Getting Started",
   },
   {
-    id: "getting_started2", 
+    id: "getting_started2",
     text: "Getting Started2",
-  }
-]
+  },
+];
 
 const gettingsStarted = `
 # Tim's Stack: Dynamic Cross-platform Web App Stack
@@ -82,7 +91,7 @@ if it fails it can fallback to a cached version allowing the user to view the fu
 - Redis (helm chart)
     - Broker for Celery
     - Database for Django Channels
-`
+`;
 
 const ARTICLES = [
   {
@@ -102,66 +111,85 @@ const ARTICLES = [
     title: "The Frontend",
     released: "2021-09-01",
     content: gettingsStarted,
-  }
-]
+  },
+];
 
 const DynamicMarkdownPage = ({ children, selected }) => {
-  return <div className='flex-grow rounded-xl m-4 mt-2'  style={{display: selected ? "block" : "none"}}>
-        <article className="prose bg-base-300 rounded-xl p-4 pr-8 pl-8 text-neutral-content h-fit">
-          <ReactMarkdown>{ children }</ReactMarkdown>
+  return (
+    <div
+      className="flex-grow rounded-xl m-4 mt-2"
+      style={{ display: selected ? "block" : "none" }}
+    >
+      <article className="prose bg-base-300 rounded-xl p-4 pr-8 pl-8 text-neutral-content h-fit">
+        <ReactMarkdown>{children}</ReactMarkdown>
       </article>
     </div>
-}
+  );
+};
 
-const NoSelectionPage = ({selected}) => {
-  return <article className="prose p-2 text-neutral" style={{display: selected ? "block" : "none"}}>
-        <h1> Select any of the readmes on the left!</h1>
-      </article>
-}
-
+const NoSelectionPage = ({ selected }) => {
+  return (
+    <article
+      className="prose p-2 text-neutral"
+      style={{ display: selected ? "block" : "none" }}
+    >
+      <h1> Select any of the readmes on the left!</h1>
+    </article>
+  );
+};
 
 export default function Index(): JSX.Element {
   const dispatch = useDispatch();
   const stateData = useSelector((state: any) => state.userData);
   const [contentFocused, setContentFocused] = useState(false);
-  const [selection, setSelection] = useState("empty")
-  const [markdown, setMarkdown] = useState("")
-  
-  
-  
+  const [selection, setSelection] = useState("empty");
+  const [markdown, setMarkdown] = useState("");
+
   useEffect(() => {
-    if (selection !== "empty"){
+    if (selection !== "empty") {
       const article = ARTICLES.filter((item) => item.id === selection);
-      if (article.length === 0){
+      if (article.length === 0) {
         setMarkdown("# 404 Article not found");
-      }else{
+      } else {
         setMarkdown(article[0].content);
       }
     }
-  }, [selection])
-  
-  return <DynamicTwoPageContentDisplay 
+  }, [selection]);
+
+  return (
+    <DynamicTwoPageContentDisplay
       focused={contentFocused}
-      selectorContent={<DynamicSelector
-          sections={INDEX_SECTIONS} 
+      selectorContent={
+        <DynamicSelector
+          sections={INDEX_SECTIONS}
           selection={selection}
           setSelection={setSelection}
           setContentFocused={setContentFocused}
           navbarMargin={true}
-        />}
-        useDynamicSectionHeader={true}
-        sectionHeaderTitle={INDEX_SECTIONS.filter((item) => item.id === selection)[0]?.text ?? "No Selection"}
-        navbarMarginContent={true}
-        onSectionHeaderBackClick={() => {
-          setContentFocused(false);
-          //setSelection("empty");
-        }}
-        onBackTransitionEnd={() => {
-          console.log("RESET SELECTION", contentFocused);
-          setSelection("empty");
-        }}
-        selectionContent={<>
-          <NoSelectionPage selected={selection === "empty"}/>
-          <DynamicMarkdownPage selected={selection !== "empty"}>{markdown}</DynamicMarkdownPage>
-        </>}   />
+        />
+      }
+      useDynamicSectionHeader={true}
+      sectionHeaderTitle={
+        INDEX_SECTIONS.filter((item) => item.id === selection)[0]?.text ??
+        "No Selection"
+      }
+      navbarMarginContent={true}
+      onSectionHeaderBackClick={() => {
+        setContentFocused(false);
+        //setSelection("empty");
+      }}
+      onBackTransitionEnd={() => {
+        console.log("RESET SELECTION", contentFocused);
+        setSelection("empty");
+      }}
+      selectionContent={
+        <>
+          <NoSelectionPage selected={selection === "empty"} />
+          <DynamicMarkdownPage selected={selection !== "empty"}>
+            {markdown}
+          </DynamicMarkdownPage>
+        </>
+      }
+    />
+  );
 }

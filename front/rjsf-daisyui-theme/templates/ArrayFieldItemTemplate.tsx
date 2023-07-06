@@ -6,7 +6,7 @@ import { ArrayFieldTemplateItemType } from "@rjsf/utils";
  * @param props - The `ArrayFieldTemplateItemType` props for the component
  */
 export default function ArrayFieldItemTemplate<T = any, F = any>(
-  props: ArrayFieldTemplateItemType<T, F>
+  props: ArrayFieldTemplateItemType<T, F>,
 ) {
   const {
     children,

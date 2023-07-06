@@ -12,7 +12,7 @@ import {
  * @param props - The `ArrayFieldTitleProps` for the component
  */
 export default function ArrayFieldTitleTemplate<T = any, F = any>(
-  props: ArrayFieldTitleProps
+  props: ArrayFieldTitleProps,
 ) {
   const { idSchema, title, uiSchema, required, registry } = props;
   if (!title) {
@@ -23,7 +23,7 @@ export default function ArrayFieldTitleTemplate<T = any, F = any>(
     getTemplate<"TitleFieldTemplate", T, F>(
       "TitleFieldTemplate",
       registry,
-      options
+      options,
     );
   const id = `${idSchema.$id}__title`;
   return (

@@ -46,7 +46,7 @@ class AnyOfField<T = any, F = any> extends Component<
    */
   componentDidUpdate(
     prevProps: Readonly<FieldProps<T, F>>,
-    prevState: Readonly<AnyOfFieldState>
+    prevState: Readonly<AnyOfFieldState>,
   ) {
     const { formData, options, idSchema } = this.props;
     const { selectedOption } = this.state;
@@ -57,7 +57,7 @@ class AnyOfField<T = any, F = any> extends Component<
       const matchingOption = this.getMatchingOption(
         selectedOption,
         formData,
-        options
+        options,
       );
 
       if (!prevState || matchingOption === selectedOption) {
@@ -79,7 +79,7 @@ class AnyOfField<T = any, F = any> extends Component<
   getMatchingOption(
     selectedOption: number,
     formData: T,
-    options: RJSFSchema[]
+    options: RJSFSchema[],
   ) {
     const { schemaUtils } = this.props.registry;
 
@@ -104,7 +104,7 @@ class AnyOfField<T = any, F = any> extends Component<
     const { schemaUtils } = registry;
     const newOption = schemaUtils.retrieveSchema(
       options[selectedOption],
-      formData
+      formData,
     );
 
     // If the new option is of type object and the current data is an object,
@@ -132,7 +132,10 @@ class AnyOfField<T = any, F = any> extends Component<
     }
     // Call getDefaultFormState to make sure defaults are populated on change.
     onChange(
-      schemaUtils.getDefaultFormState(options[selectedOption], newFormData) as T
+      schemaUtils.getDefaultFormState(
+        options[selectedOption],
+        newFormData,
+      ) as T,
     );
 
     this.setState({

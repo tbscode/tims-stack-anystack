@@ -7,7 +7,7 @@ import { WidgetProps } from "@rjsf/utils";
  * @param props - The `WidgetProps` for this component
  */
 export default function RangeWidget<T = any, F = any>(
-  props: WidgetProps<T, F>
+  props: WidgetProps<T, F>,
 ) {
   const {
     value,

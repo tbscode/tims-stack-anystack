@@ -28,7 +28,10 @@ function CheckboxesWidget<T = any, F = any>({
   onChange,
 }: WidgetProps<T, F>) {
   return (
-    <div className={`flex checkboxes ${inline ? 'flex-row gap-2' : 'flex-col'}`} id={id}>
+    <div
+      className={`flex checkboxes ${inline ? "flex-row gap-2" : "flex-col"}`}
+      id={id}
+    >
       {Array.isArray(enumOptions) &&
         enumOptions.map((option, index) => {
           const checked = value.indexOf(option.value) !== -1;

@@ -8,14 +8,14 @@ import { useState, useEffect } from "react";
  * @param props - The `DescriptionFieldProps` for this component
  */
 export default function DescriptionField<T = any, F = any>(
-  props: DescriptionFieldProps<T, F>
+  props: DescriptionFieldProps<T, F>,
 ) {
   const { id, description: initDescription } = props;
   const [description, setDescription] = useState("loading");
-  
+
   useEffect(() => {
     setDescription(initDescription);
-  },[]);
+  }, []);
 
   if (typeof description === "string") {
     return (

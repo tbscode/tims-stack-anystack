@@ -14,7 +14,7 @@ import {
  * @param props - The `ObjectFieldTemplateProps` for this component
  */
 export default function ObjectFieldTemplate<T = any, F = any>(
-  props: ObjectFieldTemplateProps<T, F>
+  props: ObjectFieldTemplateProps<T, F>,
 ) {
   const {
     description,
@@ -34,7 +34,7 @@ export default function ObjectFieldTemplate<T = any, F = any>(
   const TitleFieldTemplate = getTemplate<"TitleFieldTemplate", T, F>(
     "TitleFieldTemplate",
     registry,
-    options
+    options,
   );
   const DescriptionFieldTemplate = getTemplate<
     "DescriptionFieldTemplate",

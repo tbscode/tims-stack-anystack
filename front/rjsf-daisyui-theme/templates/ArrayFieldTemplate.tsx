@@ -11,7 +11,7 @@ import {
  * @param props - The `ArrayFieldTemplateItemType` props for the component
  */
 export default function ArrayFieldTemplate<T = any, F = any>(
-  props: ArrayFieldTemplateProps<T, F>
+  props: ArrayFieldTemplateProps<T, F>,
 ) {
   const {
     canAdd,
@@ -36,12 +36,12 @@ export default function ArrayFieldTemplate<T = any, F = any>(
   const ArrayFieldItemTemplate = getTemplate<"ArrayFieldItemTemplate", T, F>(
     "ArrayFieldItemTemplate",
     registry,
-    uiOptions
+    uiOptions,
   );
   const ArrayFieldTitleTemplate = getTemplate<"ArrayFieldTitleTemplate", T, F>(
     "ArrayFieldTitleTemplate",
     registry,
-    uiOptions
+    uiOptions,
   );
   // Button templates are not overridden in the uiSchema
   const {

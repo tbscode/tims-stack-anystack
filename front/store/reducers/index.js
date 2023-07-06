@@ -1,12 +1,12 @@
-import { combineReducers } from 'redux'
-import userDataReducer from "./userDataReducer"
-import connectionStateRecuder from "./connectionStateReducer"
-import deviceStateReducer from "./deviceStateReducer"
-import frontendSettingsRecuder from "./frontendSettingsReducer"
-import userProfileReducer from "./userProfileReducer"
-import chatsReducer from "./chatsReducer"
-import messagesReducer from "./messagesReducer"
-import selectedChatReducer from "./selectedChatReducer"
+import { combineReducers } from "redux";
+import userDataReducer from "./userDataReducer";
+import connectionStateRecuder from "./connectionStateReducer";
+import deviceStateReducer from "./deviceStateReducer";
+import frontendSettingsRecuder from "./frontendSettingsReducer";
+import userProfileReducer from "./userProfileReducer";
+import chatsReducer from "./chatsReducer";
+import messagesReducer from "./messagesReducer";
+import selectedChatReducer from "./selectedChatReducer";
 
 /**
  * We want to carefully devide our data into multiple reducers
@@ -24,5 +24,5 @@ export default combineReducers({
   profile: userProfileReducer,
   chats: chatsReducer,
   messages: messagesReducer,
-  selectedChat: selectedChatReducer
-})
+  selectedChat: selectedChatReducer,
+});
