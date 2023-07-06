@@ -4,6 +4,9 @@ import connectionStateRecuder from "./connectionStateReducer"
 import deviceStateReducer from "./deviceStateReducer"
 import frontendSettingsRecuder from "./frontendSettingsReducer"
 import userProfileReducer from "./userProfileReducer"
+import chatsReducer from "./chatsReducer"
+import messagesReducer from "./messagesReducer"
+import selectedChatReducer from "./selectedChatReducer"
 
 /**
  * We want to carefully devide our data into multiple reducers
@@ -18,5 +21,8 @@ export default combineReducers({
   frontendSettings: frontendSettingsRecuder,
   connection: connectionStateRecuder,
   userData: userDataReducer,
-  profile: userProfileReducer
+  profile: userProfileReducer,
+  chats: chatsReducer,
+  messages: messagesReducer,
+  selectedChat: selectedChatReducer
 })
