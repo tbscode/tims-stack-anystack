@@ -37,18 +37,7 @@ def debug_request(request):
     print("Query Params: ", request.query_params)
     print("--------------------------")
 
-def get_user_data(user):
-    """
-    All the relevant user data for one user 
-    TODO paginate everything!
-    """
-    return {
-        "uuid": str(user.uuid),
-        "email": user.email,
-        "profile": UserProfileSerializer(user.profile).data,
-    }
-    
-def get_user_data_context(user, request):
+def get_user_data(user, request):
     """
     All the relevant user data for one user 
     TODO paginate everything!
@@ -65,18 +54,11 @@ def get_user_data_context(user, request):
     return {
         "uuid": str(user.uuid),
         "email": user.email,
+        "is_staff": user.is_staff,
         "chats": chats_paginated,
         "messages": messages,
         "profile": UserProfileSerializer(user.profile).data,
     }
-
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsAuthenticated])
-def request_user_data_context(request):
-
-    response = Response(get_user_data_context(request.user, request=request), status=status.HTTP_200_OK, content_type="application/json")
-    return response
 
 @extend_schema(
     auth=["SessionAuthentication"],
@@ -86,5 +68,5 @@ def request_user_data_context(request):
 @permission_classes([IsAuthenticated])
 def request_user_data(request):
 
-    response = Response(get_user_data(request.user), status=status.HTTP_200_OK, content_type="application/json")
+    response = Response(get_user_data(request.user, request), status=status.HTTP_200_OK, content_type="application/json")
     return response
