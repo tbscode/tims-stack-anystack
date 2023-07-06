@@ -24,6 +24,7 @@ export const MainNavigation = ({children}) => {
   const dispatch = useDispatch();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const frontendSettings = useSelector((state: any) => state.frontendSettings);
+  const userData = useSelector((state: any) => state.userData);
   const navItems = [
     {id: "index", text: "Index", href: "/"},
     {id: "settings", text: "Settings", href: "/settings"},
@@ -54,7 +55,7 @@ export const MainNavigation = ({children}) => {
   }}/> 
   <div id="dynamicScrollContainer" className={`drawer-content flex flex-col overflow-x-hidden overflow-y-auto`}>
     <div className={`w-auto navbar rounded-xl fixed z-20 ${frontendSettings.mainNavigationTranslucent ? 'blur-sm hover:blur-none opacity-75' : ''}`} style={{display: frontendSettings.mainNavigationHidden ? 'none' : 'flex'}}>
-      <div className='bg-base-300 blur-none p-3 rounded-xl'>
+      <div className={`bg-base-300 blur-none p-3 rounded-xl ${userData?.is_staff ? 'bg-error' : ''} `}>
         <div className="flex-none lg:hidden">
           <label htmlFor="my-drawer-3" className="btn btn-square btn-ghost">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
