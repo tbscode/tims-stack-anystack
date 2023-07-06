@@ -6,6 +6,24 @@ import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { useRouter } from 'next/router';
 import { CapacitorCookies } from '@capacitor/core';
+import { USER_DATA, USER_PROFILE, MESSAGES, CHATS } from '@/store/types';
+import { useDispatch } from 'react-redux';
+
+export function updateBaseData(baseData : any) {
+  return dispatch => {
+      let data = baseData;
+
+      dispatch({type: USER_PROFILE, payload: data.profile})
+      dispatch({type: MESSAGES, payload: data.messages})
+      dispatch({type: CHATS, payload: data.chats})
+
+      delete data.profile
+      delete data.messages
+      delete data.chats
+
+      dispatch({type: USER_DATA, payload: data})
+  }
+}
 
 export async function handleStreamedProps({req}){
     const streamPromise = new Promise( ( resolve, reject ) => {
