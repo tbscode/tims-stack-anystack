@@ -144,6 +144,21 @@ microk8s_attach_backend:
 microk8s_route_backend_local:
 	microk8s kubectl port-forward $(backend_pod_name) 8000:8000 -n $(kubernetes_namespace)
 	
+bunnyshell_android:
+	$(call base_domain, base_domain, yout 'base_domain' variable is not defined)
+	# make bunnyshell_android ws_path='wss://app-{{ env.base_domain }}/api/core/ws' ws_path_android='wss://app-{{ env.base_domain }}/api/core/ws' host_web='https://app-{{ env.base_domain }}' host_android='https://app-{{ env.base_domain }}' host_name='app-{{ env.base_domain }}
+	$(call ws_path, ws_path, yout 'ws_path' variable is not defined)
+	$(call ws_path_android, ws_path_android, yout 'ws_path_android' variable is not defined)
+	$(call host_web, host_web, yout 'host_web' variable is not defined)
+	$(call host_android, host_android, yout 'host_android' variable is not defined)
+	$(call host_name, host_name, yout 'host_name' variable is not defined)
+	
+	docker build --build-arg WS_PATH=$(ws_path) WS_PATH_ANDROID=$(ws_path_android) HOST_WEB=$(host_web) HOST_ANDROID=$(host_android) HOST_NAME=$(host_name) --progress=plain -t $(registry_url)/$(bunnyshell_image_name):$(tag) -f Dockerfile.android .
+	
+bunnyshell_android_quick_build:
+	$(call check_defined, base_domain, yout 'base_domain' variable is not defined)
+	docker build --build-arg WS_PATH='wss://app-$(base_domain)/api/core/ws' --build-arg WS_PATH_ANDROID='wss://app-$(base_domain)/api/core/ws' --build-arg HOST_WEB='https://app-$(base_domain)' --build-arg HOST_ANDROID='https://app-$(base_domain)' --build-arg HOST_NAME='app-$(base_domain)' -f Dockerfile.android ./front/
+	
 microk8s_setup:
 	microk8s status
 	microk8s start
