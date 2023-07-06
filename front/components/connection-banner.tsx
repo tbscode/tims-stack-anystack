@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { getCookiesAsObject, getEnv } from "@/utils/tools";
+import { getCookiesAsObject, getEnv, updateBaseData } from "@/utils/tools";
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from "@capacitor/core";
 import { useRouter } from "next/router";
@@ -208,8 +208,7 @@ export const ConnectionBanner: React.FC = () => {
           }else{
             console.log("SETTING PAGE STATE", connectionState);
             dispatch({type: CONNECTION_STATE, payload: connectionState})
-            dispatch({type: USER_DATA, payload: connectionState.userData})
-            dispatch({type: USER_PROFILE, payload: connectionState.userData.profile})
+            dispatch(updateBaseData(connectionState.userData))
           }
       
         })
