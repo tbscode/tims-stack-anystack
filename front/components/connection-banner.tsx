@@ -102,13 +102,17 @@ interface ConnectionState {
   isNative: boolean;
 }
 
-export const connectionStateAndUserData = async (state) => {
+export const connectionStateAndUserData = async ({
+  state, 
+  userData
+}) => {
   let connectionState: ConnectionState = {
     userData: {},
     state: BannerState.offline,
     isNative: Capacitor.isNativePlatform(),
     info: {},
   };
+  let updatedUserData = userData;
 
   if (typeof window === "undefined") {
     // then we are still on serverside
@@ -118,9 +122,10 @@ export const connectionStateAndUserData = async (state) => {
   console.log("STATE XY", state);
   console.log("COOKIES", getCookiesAsObject());
 
-  if (state.data === undefined || state.data.uuid === undefined) {
+  if (!(userData && ('uuid' in userData))) {
     console.log("COOKIES", getCookiesAsObject());
     try {
+      console.log("PROFILE PRE FETCH", userData);
       const res = await fetch(`${getEnv().serverUrl}/api/user_data`, {
         method: "POST",
         credentials: "include",
@@ -134,19 +139,18 @@ export const connectionStateAndUserData = async (state) => {
 
       if (res.ok) {
         const data = await res.json();
-        connectionState.userData = data;
+        updatedUserData = data;
         connectionState.state = BannerState.online;
         connectionState.info = "Online, data updated";
         Preferences.set({
           key: "data",
-          value: JSON.stringify({ ...state.data, ...data }),
+          value: JSON.stringify({ ...userData, ...data }),
         });
       } else if (res.status === 401 || res.status === 403) {
         connectionState.state = BannerState.unauthenticated;
         connectionState.info = `Offline, not logged in ${res.status} ${res.statusText}`;
         console.log("FETCHDATA", "unauthenticated", res.status, res.statusText);
       } else {
-        connectionState.userData = {}; // getCookiesAsObject();
         connectionState.state = BannerState.error;
         connectionState.info = `Offline, error unknown reason ${res.status} ${res.statusText}`;
         console.log("FETCHDATA", "error", connectionState.info);
@@ -156,7 +160,7 @@ export const connectionStateAndUserData = async (state) => {
         const { value } = await Preferences.get({ key: "data" });
 
         if (value !== null) {
-          connectionState.userData = JSON.parse(value);
+          updatedUserData = JSON.parse(value);
           connectionState.state = BannerState.offlineCache;
           connectionState.info = "Offline, using cached data";
         } else {
@@ -168,23 +172,22 @@ export const connectionStateAndUserData = async (state) => {
       }
     }
   } else {
+    console.log("PROFILE PRE STATE",state, userData);
     if (
-      !(state.stateData.state === undefined) &&
-      state.stateData.state === BannerState.unauthenticated
+      !(state.state === undefined) &&
+      (state.state === BannerState.unauthenticated)
     ) {
-      connectionState.userData = state.data;
       connectionState.state = BannerState.unauthenticated;
       connectionState.info = `Offline, not logged in ${res.status} ${res.statusText}`;
     } else {
       // Then we should be online alreadychat
-      connectionState.userData = state.data;
       connectionState.state = BannerState.online;
       connectionState.info = "Online, data loaded";
-      Preferences.set({ key: "data", value: JSON.stringify(state) });
+      Preferences.set({ key: "data", value: JSON.stringify(userData) });
     }
   }
 
-  return connectionState;
+  return {connectionState, userData: updatedUserData};
 };
 
 export const ConnectionBanner: React.FC = () => {
@@ -197,6 +200,7 @@ export const ConnectionBanner: React.FC = () => {
    * when in online state automatically switch to 'idle' after 10 seconds
    */
   const currentConnectionState = useSelector((state: any) => state.connection);
+  const userData = useSelector((state: any) => state.userData);
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -206,8 +210,12 @@ export const ConnectionBanner: React.FC = () => {
       currentConnectionState.state !== BannerState.unauthenticated
     ) {
       const connectionState = connectionStateAndUserData({
-        currentConnectionState,
-      }).then((connectionState) => {
+        state: currentConnectionState,
+        userData,
+      }).then(({
+        connectionState, 
+        userData
+      }) => {
         console.log("CONNECTION STATE", connectionState);
         if (connectionState.state === "unauthenticated") {
           dispatch({ type: CONNECTION_STATE, payload: connectionState });
@@ -215,7 +223,7 @@ export const ConnectionBanner: React.FC = () => {
         } else {
           console.log("SETTING PAGE STATE", connectionState);
           dispatch({ type: CONNECTION_STATE, payload: connectionState });
-          dispatch(updateBaseData(connectionState.userData));
+          dispatch(updateBaseData(userData));
         }
       });
     }
