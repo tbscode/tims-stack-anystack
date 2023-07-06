@@ -236,7 +236,10 @@ class ChatSerializer(serializers.ModelSerializer):
         
         if 'request' in self.context:
             user = self.context['request'].user
-            representation['partner'] = str(instance.get_partner(user).uuid)
+            partner = instance.get_partner(user)
+            profile = UserProfileSerializer(partner.profile).data
+            profile['uuid'] = str(partner.uuid)
+            representation['partner'] = profile
             del representation['u1']
             del representation['u2']
         else:
