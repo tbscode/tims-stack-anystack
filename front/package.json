@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "static": "next build && next export",
+    "pretty": "prettier --write \"./**/*.{js,jsx,ts,tsx,json}\"",
     "postinstall": "curl -o node_modules/@capacitor/android/capacitor/src/main/assets/native-bridge.js https://raw.githubusercontent.com/tbscode/tims-capacitor/main/android/capacitor/src/main/assets/native-bridge.js"
   },
   "dependencies": {
@@ -44,6 +45,7 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
-    "@capacitor/cli": "^5.0.2"
+    "@capacitor/cli": "^5.0.2",
+    "prettier": "3.0.0"
   }
 }
