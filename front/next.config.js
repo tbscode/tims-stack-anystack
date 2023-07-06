@@ -8,6 +8,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    optimizeCss: true, // enabling this will enable SSR for Tailwind
+  },
 };
 
 module.exports = nextConfig;
