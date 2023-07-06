@@ -24,6 +24,7 @@
     "@types/react": "18.2.0",
     "@types/react-dom": "18.2.1",
     "autoprefixer": "10.4.14",
+    "critters": "^0.0.19",
     "daisyui": "^2.51.6",
     "eslint": "8.39.0",
     "eslint-config-next": "13.3.1",
