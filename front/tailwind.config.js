@@ -10,6 +10,7 @@ module.exports = {
     extend: {
       width: {
         '180': '45rem',
+        '200': '50rem',
       },
       backgroundImage: {
         'gradient-radial':
