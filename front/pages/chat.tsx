@@ -32,6 +32,15 @@ import { clear } from "console";
 import { init } from "next/dist/compiled/@vercel/og/satori";
 import { DynamicForm } from "@/rjsf-daisyui-theme/form/form";
 
+export const getServerSideProps = async ({ req }: { req: any }) => {
+  if (req.method == "POST") {
+    const res = await handleStreamedProps({ req });
+    console.log("RES", res);
+    return { props: { data: JSON.parse(res), dataLog: { pulled: true } } };
+  }
+  return { props: { dataLog: { pulled: false } } };
+};
+
 export default function Chat(): JSX.Element {
   const [selection, setSelection] = useState("empty");
 
