@@ -25,7 +25,7 @@ export function updateBaseData(baseData : any) {
   }
 }
 
-export const receiveMessage = (messages, chat_uuid, selected) => {
+export const receiveMessage = (messages, chat_uuid, selected, postRun = () => {}) => {
   return dispatch => {
       dispatch({
         type: MESSAGES_RECEIVE,
@@ -37,6 +37,7 @@ export const receiveMessage = (messages, chat_uuid, selected) => {
           type: MESSAGES_RECEIVE_CURRENT_CHAT, 
           payload: { messages }});
       }
+      postRun();
   }  
 }
 
