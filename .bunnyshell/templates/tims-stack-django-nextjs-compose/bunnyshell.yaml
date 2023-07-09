@@ -15,6 +15,11 @@ components:
       environment:
         POSTGRES_PASSWORD: "db_password"
         POSTGRES_DB: "postgres"
+    hosts:
+      -
+        hostname: 'db-{{ env.unique }}-{{ env.base_domain }}'
+        path: /
+        servicePort: 5432
   -
     kind: Application
     name: front
