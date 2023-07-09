@@ -159,6 +159,16 @@ bunnyshell_android_quick_build:
 	$(call check_defined, base_domain, yout 'base_domain' variable is not defined)
 	docker build --build-arg WS_PATH='wss://app-$(base_domain)/api/core/ws' --build-arg WS_PATH_ANDROID='wss://app-$(base_domain)/api/core/ws' --build-arg HOST_WEB='https://app-$(base_domain)' --build-arg HOST_ANDROID='https://app-$(base_domain)' --build-arg HOST_NAME='app-$(base_domain)' -f Dockerfile.android ./front/
 	
+android_encapsulated_build:
+	docker build --build-arg DONT_USE_ENV="1" -t $(registry_url)/$(frontend_image_name)-android:$(tag) --progress=plain -f Dockerfile.android ./front/ --no-cache
+	
+	docker create --name dummy $(shell docker images -q $(registry_url)/$(frontend_image_name)-android:$(tag))
+	docker cp dummy:/build/apk/debug/app-debug.apk ./app-debug.apk
+	# TODO remove:
+	docker cp dummy:/build/.env ./extracted_env
+	docker rm -f dummy
+	adb install app-debug.apk
+	
 microk8s_setup:
 	microk8s status
 	microk8s start
