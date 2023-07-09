@@ -73,7 +73,14 @@ export const NoSelectionPage = ({ selected }) => {
   );
 };
 
-export const DynamicChat = ({ selected, userData, chat, messages }) => {
+export const DynamicChat = ({ 
+    selected, 
+    userData, 
+    chat, 
+    messages, 
+    onBackClick, 
+    sendMessage 
+  }) => {
   console.log("TBS CHAT", chat, messages);
   if (!selected) return <></>;
   return (
@@ -84,7 +91,25 @@ export const DynamicChat = ({ selected, userData, chat, messages }) => {
     >
       <div className="flex flex-row items-center bg-base-300 h-20 w-full rounded-xl p-2 pr-4 mb-1 max-w-full">
         <div className="flex flex-grow bg-base-100 h-full mr-4 rounded-xl justify-center content-center items-center">
-          <div className="text-xl prose">
+          <div className="pr-4 pl-4">
+            <button className="btn btn-square" onClick={onBackClick}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M14 5l-7 7 7 7"
+                />
+              </svg>
+            </button>
+          </div>
+          <div className="text-xl prose flex flex-grow items-center content-center justify-center">
             <h2>{chat.partner.first_name}</h2>
           </div>
         </div>
@@ -119,11 +144,19 @@ export const DynamicChat = ({ selected, userData, chat, messages }) => {
       <div className="bg-base-300 bottom-0 h-fit rounded-xl mt-1 p-2">
         <div className="flex flex-row items-center">
           <textarea
+            id="sendMessageContainer"
             placeholder="Type a Message ..."
             className="textarea textarea-bordered textarea-lg flex flex-grow p-1 pl-2 h-24"
           ></textarea>
           <div className="w-32 flex justify-center">
-            <button className="btn btn-xl">Send</button>
+            <button 
+              onClick={() => {
+                sendMessage(document.getElementById("sendMessageContainer").value, chat.uuid);
+                document.getElementById("sendMessageContainer").value = ""; 
+              }}
+              className="btn btn-xl">
+                Send
+            </button>
           </div>
         </div>
       </div>
