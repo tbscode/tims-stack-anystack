@@ -127,7 +127,7 @@ export const connectionStateAndUserData = async ({
     try {
       console.log("PROFILE PRE FETCH", userData);
       const res = await fetch(`${getEnv().serverUrl}/api/user_data`, {
-        method: "POST",
+        method: "GET",
         credentials: "include",
         headers: {
           "X-CSRFToken": getCookiesAsObject().csrftoken,
