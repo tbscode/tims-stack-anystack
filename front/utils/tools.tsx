@@ -6,7 +6,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { useRouter } from 'next/router';
 import { CapacitorCookies } from '@capacitor/core';
-import {MESSAGES_RECEIVE_CURRENT_CHAT ,MESSAGES_RECEIVE,USER_DATA, USER_PROFILE, MESSAGES, CHATS } from '@/store/types';
+import {MESSAGES_RECEIVE_CURRENT_CHAT ,MESSAGES_RECEIVE,USER_DATA, USER_PROFILE, MESSAGES, CHATS, CONNECTION_STATE } from '@/store/types';
 import { useDispatch } from 'react-redux';
 
 export function updateBaseData(baseData : any) {
@@ -16,6 +16,10 @@ export function updateBaseData(baseData : any) {
       dispatch({type: USER_PROFILE, payload: data.profile})
       dispatch({type: MESSAGES, payload: data.messages})
       dispatch({type: CHATS, payload: data.chats})
+      if('connection' in data){
+        dispatch({type: CONNECTION_STATE, payload: data.connection})
+        delete data.connection
+      }
 
       delete data.profile
       delete data.messages
