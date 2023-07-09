@@ -4,6 +4,7 @@ import {
   handleStreamedProps,
   getCookiesAsObject,
   getEnv,
+  receiveMessage
 } from "../utils/tools";
 import React, { useState, useEffect, useRef, createRef } from "react";
 import {
@@ -16,7 +17,7 @@ import {
   ChatMessages,
 } from "../components/navigation-bar";
 import { useDispatch, useSelector } from "react-redux";
-import { FRONTEND_SETTINGS, SLECTED_CHAT } from "../store/types";
+import { FRONTEND_SETTINGS, MESSAGES_RECEIVE, SLECTED_CHAT } from "../store/types";
 import {
   DynamicChatSelector,
   DynamicChat,
@@ -41,6 +42,30 @@ export const getServerSideProps = async ({ req }: { req: any }) => {
   return { props: { dataLog: { pulled: false } } };
 };
 
+const NewMessagesMonitor = ({selectedChat}) => {
+  const newMessages = useSelector((state: any) => state.newMessages);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    if(newMessages.messages.length === 0) return;
+    let chatsUpdates = {};
+
+    newMessages.messages.forEach((item) => {
+      if(!(item.chat_uuid in chatsUpdates)){
+        chatsUpdates[item.chat_uuid] = [];
+      }
+      chatsUpdates[item.chat_uuid].push(item);
+    });
+    
+    Object.keys(chatsUpdates).forEach((messages, chat_uuid) => {
+      dispatch(receiveMessage(messages, chat_uuid));
+    });
+    
+  }, [newMessages]);
+
+  return <></>
+};
+
 export default function Chat(): JSX.Element {
   const [selection, setSelection] = useState("empty");
 
@@ -49,7 +74,7 @@ export default function Chat(): JSX.Element {
   const profile = useSelector((state: any) => state.profile);
   const userData = useSelector((state: any) => state.userData);
   const chats = useSelector((state: any) => state.chats);
-  const allMessagesSel = useSelector((state: any) => state.messages);
+  const allMessagesSel = useSelector((state: any) => state.messages.messages);
 
   const [selectedChatInfo, setSelectedChatInfo] = useState({});
 
@@ -64,6 +89,7 @@ export default function Chat(): JSX.Element {
   }, [allMessagesSel]);
 
   useEffect(() => {
+    console.log("SLECTED CHAT STATE UPDATE", selectedChat);
     setSelectedChatInfo(selectedChat.chat);
     setMessages(selectedChat.messages);
     setIsChatSelected(true);
@@ -72,6 +98,27 @@ export default function Chat(): JSX.Element {
   useEffect(() => {
     setIsChatSelected(false);
   }, []);
+  
+  const sendMessage = (message, chat_uuid) => {
+    fetch(`${getEnv().serverUrl}/api/messages/${chat_uuid}/send/`, {
+      credentials: "include",
+      method: "POST",
+      headers: {
+          "X-CSRFToken": getCookiesAsObject().csrftoken,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+      },
+      body: JSON.stringify({
+        text: message,
+      }),
+    }).then((res) => { 
+      if(res.ok) {
+        res.json().then((data) => {
+          dispatch(receiveMessage([data], selectedChat.chat.uuid, true));
+        }); 
+      }
+    });
+  };
 
   const updateSelection = (uuid) => {
     setSelection(uuid);
@@ -110,16 +157,19 @@ export default function Chat(): JSX.Element {
         //setSelection("empty");
       }}
       onBackTransitionEnd={() => {
-        console.log("RESET SELECTION", contentFocused);
         setSelection("empty");
       }}
       selectionContent={
         <>
           <DynamicChat
+            onBackClick={() => {
+              setContentFocused(false); 
+            }}
             selected={isChatSelected}
             userData={userData}
             chat={selectedChatInfo}
             messages={messages}
+            sendMessage={sendMessage}
           />
           <NoSelectionPage selected={selection === "empty"} />
         </>
