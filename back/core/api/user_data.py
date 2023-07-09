@@ -60,10 +60,11 @@ def get_user_data(user, request):
         "profile": UserProfileSerializer(user.profile).data,
     }
 
+@api_view(['GET'])
 @extend_schema(
     auth=["SessionAuthentication"],
+    request=inline_serializer(name="GetUserData", fields={})
 )
-@api_view(['GET', 'POST'])
 @authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated])
 def request_user_data(request):
