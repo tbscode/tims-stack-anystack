@@ -1,4 +1,4 @@
-import { SLECTED_CHAT, defaultPaginatedObject } from "../types";
+import { MESSAGES_RECEIVE_CURRENT_CHAT, SLECTED_CHAT, defaultPaginatedObject } from "../types";
 
 const initialState = {
   loading: true,
@@ -15,6 +15,14 @@ export default function (state = initialState, action) {
         ...action.payload,
         loading: false,
       };
+    case MESSAGES_RECEIVE_CURRENT_CHAT:
+      console.log("UPDATED SELECT CHAT", action.payload)
+      const allMessages = state.messages.results.concat(action.payload.messages)
+      state.messages.results = Array.from(new Set(allMessages.map(m => m.uuid))).map(uuid => {
+        return allMessages.find(m => m.uuid === uuid)
+      });
+      console.log("UPDATED RES", state.messages.results, Array.from(new Set(allMessages.map(m => m.uuid))));
+      return { ...state };
     default:
       return state;
   }
