@@ -1,0 +1,114 @@
+kind: Environment
+name: Express / React / PostgreSQL boilerplate, with Helm and Kubernetes manifests
+type: primary
+environmentVariables:
+  GIT_USER: 'tbscode'
+components:
+  -
+    kind: Application
+    name: front
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    gitApplicationPath: '/'
+    dockerCompose:
+      build:
+        context: ./front
+        dockerfile: ../Dockerfile.front
+        args:
+          WS_PATH: 'wss://app-{{ env.base_domain }}/api/core/ws'
+          WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}/api/core/ws'
+          HOST_WEB: 'https://app-{{ env.base_domain }}'
+          HOST_ANDROID: 'https://app-{{ env.base_domain }}'
+      ports:
+        - "3000:3000"
+      environment:
+        WS_PATH: 'wss://app-{{ env.base_domain }}/api/core/ws'
+        WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}/api/core/ws'
+        HOST_WEB: 'https://app-{{ env.base_domain }}'
+        HOST_ANDROID: 'https://app-{{ env.base_domain }}'
+    hosts:
+      -
+        hostname: 'front-{{ env.base_domain }}'
+        path: /
+        servicePort: 3000
+      -
+        hostname: 'app-{{ env.base_domain }}'
+        path: /_next/
+        servicePort: 3000
+      -
+        hostname: 'app-{{ env.base_domain }}'
+        path: /_nstat/
+        servicePort: 3000
+  -
+    kind: Application
+    name: redis
+    dockerCompose:
+      image: redis:5
+      ports:
+        - "6379:6379"
+    hosts:
+      -
+        hostname: 'rds-{{ env.unique }}-{{ env.base_domain }}'
+        path: /
+        servicePort: 6379
+  -
+    kind: Application
+    name: android
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    gitApplicationPath: '/'
+    dockerCompose:
+      build:
+        context: ./front
+        dockerfile: ../Dockerfile.android
+        args:
+          WS_PATH: 'wss://app-{{ env.base_domain }}/api/core/ws'
+          WS_PATH_ANDROID: 'wss://app-{{ env.base_domain }}/api/core/ws'
+          HOST_WEB: 'https://app-{{ env.base_domain }}'
+          HOST_ANDROID: 'https://app-{{ env.base_domain }}'
+          HOST_NAME: 'app-{{ env.base_domain }}'
+      ports:
+        - "8001:8001"
+    hosts:
+      -
+        hostname: 'android-{{ env.base_domain }}'
+        path: /
+        servicePort: 8001
+  -
+    kind: Application
+    name: app
+    gitBranch: main
+    gitRepo: 'https://github.com/user-1024/tims-stack-anystack.git'
+    gitApplicationPath: '/'
+    dockerCompose:
+      build:
+        context: ./back
+        dockerfile: ../Dockerfile.back
+      ports:
+        - "8000:8000"
+      environment:
+        DJANGO_DEBUG: 'true'
+        PRODUCTION: 'true'
+        ROOT_URL: 'http://localhost'
+        ROOT_HOST: 'app-{{ env.base_domain }}'
+        EXTRA_TRUSTED_ORIGINS: 'https://{{ components.redis.ingress.hosts[0] }},https://{{ components.front.ingress.hosts[0] }},https://app-{{ env.base_domain }},https://*.bunnyenv.com'
+        DJANGO_SECRET_KEY: 'SomeSecret'
+        DJANGO_ALLOWED_HOSTS: '*'
+        REDIS_URL: 'redis://redis.env-{{ env.unique }}.svc.cluster.local:6379'
+        USE_NEXTJS_PROXY_ROUTES: 'true'
+        NEXTJS_HOST_URL: 'http://front.env-{{ env.unique }}.svc.cluster.local:3000'
+        BASE_ADMIN_USERNAME: 'admin'
+        BASE_ADMIN_USER_PASSWORD: 'password'
+    hosts:
+      -
+        hostname: 'app-{{ env.base_domain }}'
+        path: /
+        servicePort: 8000
+      -
+        hostname: 'front-{{ env.base_domain }}'
+        path: /api/
+        servicePort: 8000
+      -
+        hostname: 'front-{{ env.base_domain }}'
+        path: /media/
+        servicePort: 8000
