@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { FRONTEND_SETTINGS } from "../store/types";
 import ReactMarkdown from "react-markdown";
+import { receiveMessage } from "@/utils/tools";
 
 export const DynamicMarkdown = ({ children, ...props }) => {
   return (
@@ -10,6 +11,47 @@ export const DynamicMarkdown = ({ children, ...props }) => {
       <ReactMarkdown>{children}</ReactMarkdown>
     </article>
   );
+};
+
+
+const NewMessagesMonitor = ({
+    selectedChat,
+    scrollToBottom
+  }) => {
+  const newMessages = useSelector((state: any) => state.newMessages);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+  
+    console.log("NEW MESSAGES", newMessages);
+    if(newMessages.messages.length === 0) return;
+    let chatsUpdates = {};
+
+    newMessages.messages.forEach((item) => {
+      if(!(item.chat_uuid in chatsUpdates)){
+        chatsUpdates[item.chat_uuid] = [];
+      }
+      chatsUpdates[item.chat_uuid].push(item);
+    });
+    console.log("NEW MESSAGES", 2, chatsUpdates);
+    
+    Object.keys(chatsUpdates).forEach((key) => {
+      const isChatSelected = key === selectedChat.uuid;
+      dispatch(receiveMessage(chatsUpdates[key], key, isChatSelected, () => {
+        if(isChatSelected){
+          setTimeout(() => {
+            scrollToBottom();
+          }, 100);
+          console.log("SCZ T")
+        }
+      }));
+    });
+    
+  }, [newMessages]);
+  
+  
+
+  return <></>
 };
 
 export const DynamicSectionHeader = ({
@@ -82,8 +124,15 @@ export const DynamicChat = ({
     sendMessage 
   }) => {
   console.log("TBS CHAT", chat, messages);
+  
+  const scrollToBottom = () => {
+    const chat = document.getElementById("chat-scroll");
+    chat.scrollTop = chat.scrollHeight;  
+  };
+
   if (!selected) return <></>;
   return (
+    <><NewMessagesMonitor selectedChat={chat} scrollToBottom={scrollToBottom}/>
     <div
       className={`w-200 max-w-full h-full flex flex-col pb-4 pt-2 ${
         selected ? "" : "hidden"
@@ -119,14 +168,14 @@ export const DynamicChat = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-col grow p-1 rounded-xl overflow-y-auto max-h-full">
+      <div id="chat-scroll" className="flex flex-col grow p-1 rounded-xl overflow-y-auto max-h-full">
         <div className="flex flex-col w-full">
           {chat?.next && (
             <div className="w-full flex content-center justify-center">
               <button className="btn btn-xs">Load more</button>
             </div>
           )}
-          {messages.results.map((message, i) => {
+          {messages.results.toReversed().map((message, i) => {
             console.log("message", message, message.sender, userData.uuid);
             return (
               <div key={i} className="w-full relative">
@@ -160,7 +209,7 @@ export const DynamicChat = ({
           </div>
         </div>
       </div>
-    </div>
+    </div></>
   );
 };
 
