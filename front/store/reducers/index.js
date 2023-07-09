@@ -7,6 +7,7 @@ import userProfileReducer from "./userProfileReducer";
 import chatsReducer from "./chatsReducer";
 import messagesReducer from "./messagesReducer";
 import selectedChatReducer from "./selectedChatReducer";
+import newMessagesReducer from "./newMessageReducer";
 
 /**
  * We want to carefully devide our data into multiple reducers
@@ -25,4 +26,5 @@ export default combineReducers({
   chats: chatsReducer,
   messages: messagesReducer,
   selectedChat: selectedChatReducer,
+  newMessages: newMessagesReducer,
 });
