@@ -6,6 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from core.api.viewsets import UserStaffRestricedModelViewsetMixin
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
+from core import models
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -89,7 +90,21 @@ class MessagesModelViewSet(UserStaffRestricedModelViewsetMixin, viewsets.ModelVi
         chat.messages.add(message)
         chat.save()
         
-        return Response(self.serializer_class(message).data, status=200)
+        serialized_message = self.serializer_class(message).data
+        
+        # Now notify all participant about the new message
+        models.ConsumerConnections.notify_connections(
+            partner, 
+            event="reduction",
+            payload={
+                "action": "NEW_MESSAGES",
+                "payload": {
+                    "messages": [serialized_message]                    
+                }
+            }
+        )
+        
+        return Response(serialized_message, status=200)
 
     
     
