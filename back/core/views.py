@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from core.api.user_data import get_user_data
 from django.shortcuts import redirect
 from rest_framework.request import Request
+from django.http import HttpResponseRedirect
 
 
 @api_view(['GET'])
@@ -13,7 +14,13 @@ def index(request, path):
     if request.user.is_authenticated:
         return render_nextjs_page(get_user_data(request.user, request), path=path)
     else:
-        return render_nextjs_page({"redirect": "/login"}, path=path)
+        if not (path in ["/login", "login"]):
+            return HttpResponseRedirect("/login")
+        return render_nextjs_page({
+            "connection": {
+                "state": "unauthenticated"
+            }
+        }, path=path)
 
 
 def render_nextjs_page(data, path=""):
