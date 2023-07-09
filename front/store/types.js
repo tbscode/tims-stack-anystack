@@ -7,6 +7,7 @@ export const MESSAGES = "MESSAGES";
 export const MESSAGES_RECEIVE = "MESSAGES_RECEIVE";
 export const CHATS = "CHATS";
 export const SLECTED_CHAT = "SLECTED_CHAT";
+export const NEW_MESSAGES = "NEW_MESSAGES";
 
 export const defaultPaginatedObject = {
   count: 0,
