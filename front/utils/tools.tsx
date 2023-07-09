@@ -6,7 +6,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { useRouter } from 'next/router';
 import { CapacitorCookies } from '@capacitor/core';
-import { USER_DATA, USER_PROFILE, MESSAGES, CHATS } from '@/store/types';
+import {MESSAGES_RECEIVE_CURRENT_CHAT ,MESSAGES_RECEIVE,USER_DATA, USER_PROFILE, MESSAGES, CHATS } from '@/store/types';
 import { useDispatch } from 'react-redux';
 
 export function updateBaseData(baseData : any) {
@@ -23,6 +23,21 @@ export function updateBaseData(baseData : any) {
 
       dispatch({type: USER_DATA, payload: data})
   }
+}
+
+export const receiveMessage = (messages, chat_uuid, selected) => {
+  return dispatch => {
+      dispatch({
+        type: MESSAGES_RECEIVE,
+        payload: { messages, chat_uuid }
+      });
+
+      if(selected) {
+        dispatch({
+          type: MESSAGES_RECEIVE_CURRENT_CHAT, 
+          payload: { messages }});
+      }
+  }  
 }
 
 export async function handleStreamedProps({req}){
