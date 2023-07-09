@@ -245,6 +245,7 @@ class ChatSerializer(serializers.ModelSerializer):
         else:
             representation['u1'] = str(instance.u1.uuid)
             representation['u2'] = str(instance.u2.uuid)
+            
         
         return representation
     
@@ -258,6 +259,7 @@ class MessageSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['sender'] = str(instance.sender.uuid)
         representation['recipient'] = str(instance.recipient.uuid)
+        representation['chat_uuid'] = str(instance.chat.uuid)
         
         return representation
     
