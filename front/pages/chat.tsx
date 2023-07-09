@@ -42,29 +42,6 @@ export const getServerSideProps = async ({ req }: { req: any }) => {
   return { props: { dataLog: { pulled: false } } };
 };
 
-const NewMessagesMonitor = ({selectedChat}) => {
-  const newMessages = useSelector((state: any) => state.newMessages);
-  const dispatch = useDispatch();
-  
-  useEffect(() => {
-    if(newMessages.messages.length === 0) return;
-    let chatsUpdates = {};
-
-    newMessages.messages.forEach((item) => {
-      if(!(item.chat_uuid in chatsUpdates)){
-        chatsUpdates[item.chat_uuid] = [];
-      }
-      chatsUpdates[item.chat_uuid].push(item);
-    });
-    
-    Object.keys(chatsUpdates).forEach((messages, chat_uuid) => {
-      dispatch(receiveMessage(messages, chat_uuid));
-    });
-    
-  }, [newMessages]);
-
-  return <></>
-};
 
 export default function Chat(): JSX.Element {
   const [selection, setSelection] = useState("empty");
