@@ -13,7 +13,7 @@ class ChatsModelViewSet(viewsets.ModelViewSet, UserStaffRestricedModelViewsetMix
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = DetailedPaginationMixin
-    queryset = Chat.objects.all()
+    queryset = Chat.objects.all().order_by("-created")
 
     def get_queryset(self):
         if not self.request.user.is_staff:
