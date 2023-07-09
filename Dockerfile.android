@@ -1,5 +1,8 @@
 FROM node:16-alpine as node-image
 
+ARG DONT_USE_ENV
+ENV DONT_USE_ENV $DONT_USE_ENV
+
 ARG WS_PATH
 ENV WS_PATH $WS_PATH
 
@@ -18,7 +21,7 @@ ENV HOST_NAME $HOST_NAME
 WORKDIR /front
 
 COPY . .
-RUN mv .env.production .env
+RUN if [[ "$DONT_USE_ENV" = "1" ]] ; then rm -f .env.production ; else mv .env.production .env ; fi
 
 RUN apk add curl
 
@@ -27,9 +30,9 @@ RUN npm install --save-dev
 RUN cd ./pages/ && grep -rl getServerSideProps . | xargs sed -i 's/getServerSideProps/DONTgetServerSideProps/g'
 
 # In the capacitor config we replace the default android url '10.0.2.2:8000'
-RUN sed -i "s~10.0.2.2:8000~$HOST_NAME~g" ./capacitor.config.ts
+RUN if ! [[ "$DONT_USE_ENV" = "1" ]] ; then sed -i "s~10.0.2.2:8000~$HOST_NAME~g" ./capacitor.config.ts ; fi
 # enable android scheme https TODO: just update the config too use env vars
-RUN sed -i "s~//androidScheme~androidScheme~g" ./capacitor.config.ts
+RUN if ! [[ "$DONT_USE_ENV" = "1" ]] ; then sed -i "s~//androidScheme~androidScheme~g" ./capacitor.config.ts ; fi
 
 RUN npm run static
 RUN ./node_modules/.bin/cap sync
