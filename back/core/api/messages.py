@@ -28,12 +28,12 @@ class MessagesModelViewSet(UserStaffRestricedModelViewsetMixin, viewsets.ModelVi
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = StandardResultsSetPagination
-    queryset = Message.objects.all()
+    queryset = Message.objects.all().order_by("-created")
     resp_chat_403 = Response({'error': 'Chat doesn\'t exist or you have no permission to interact with it!'}, status=403)
     
     def filter_queryset(self, queryset):
         if hasattr(self, 'chat_uuid'):
-            return Chat.objects.get(uuid=self.chat_uuid).messages.all()
+            return Chat.objects.get(uuid=self.chat_uuid).messages.all().order_by("-created")
         return super().filter_queryset(queryset)
     
     def list(self, request, *args, **kwargs):
@@ -43,7 +43,7 @@ class MessagesModelViewSet(UserStaffRestricedModelViewsetMixin, viewsets.ModelVi
     
     def get_queryset(self):
         if not self.request.user.is_staff:
-            return Message.objects.filter(chat__in=Chat.get_chats(self.request.user))
+            return Message.objects.filter(chat__in=Chat.get_chats(self.request.user)).order_by("-created")
         else:
             return self.queryset
         
@@ -93,16 +93,17 @@ class MessagesModelViewSet(UserStaffRestricedModelViewsetMixin, viewsets.ModelVi
         serialized_message = self.serializer_class(message).data
         
         # Now notify all participant about the new message
-        models.ConsumerConnections.notify_connections(
-            partner, 
-            event="reduction",
-            payload={
-                "action": "NEW_MESSAGES",
-                "payload": {
-                    "messages": [serialized_message]                    
+        for u in [request.user, partner]:
+            models.ConsumerConnections.async_notify_connections(
+                u, 
+                event="reduction",
+                payload={
+                    "action": "NEW_MESSAGES",
+                    "payload": {
+                        "messages": [serialized_message]                    
+                    }
                 }
-            }
-        )
+            )
         
         return Response(serialized_message, status=200)
 
