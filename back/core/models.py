@@ -10,6 +10,7 @@ from uuid import uuid4
 from channels.layers import get_channel_layer
 from rest_framework import serializers
 from model_utils import FieldTracker
+from threading import Thread
 
 import random
 
@@ -147,6 +148,14 @@ class ConsumerConnections(models.Model):
         self.save()
         
     @classmethod
+    def async_notify_connections(cls, user, event="reduction", payload={}):
+        """
+        Runs notify connections in a seperate thread
+        """
+        thread = Thread(target=cls.notify_connections, args=(user, event, payload))
+        thread.start()
+        
+    @classmethod
     def notify_connections(cls, user, event="reduction", payload={}):
         
         consumer_connection = cls.get_or_create(user)
@@ -194,11 +203,11 @@ class Chat(models.Model):
 
     @classmethod
     def get_chats(cls, user):
-        return Chat.objects.filter(Q(u1=user) | Q(u2=user))
+        return Chat.objects.filter(Q(u1=user) | Q(u2=user)).order_by("-created")
     
     @classmethod
     def get_chat(cls, users):
-        chat = Chat.objects.filter(u1__in=users, u2__in=users)
+        chat = Chat.objects.filter(u1__in=users, u2__in=users).order_by("-created")
         if chat.exists():
             return chat.first()
         return None
