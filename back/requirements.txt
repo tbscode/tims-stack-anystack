@@ -20,3 +20,4 @@ whitenoise
 jinja2
 psycopg2-binary
 django-model-utils
+requests
