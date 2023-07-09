@@ -17,7 +17,7 @@ export default function (state = initialState, action) {
       };
     case MESSAGES_RECEIVE_CURRENT_CHAT:
       console.log("UPDATED SELECT CHAT", action.payload)
-      const allMessages = state.messages.results.concat(action.payload.messages)
+      const allMessages = action.payload.messages.concat(state.messages.results)
       state.messages.results = Array.from(new Set(allMessages.map(m => m.uuid))).map(uuid => {
         return allMessages.find(m => m.uuid === uuid)
       });
