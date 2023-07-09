@@ -1,4 +1,4 @@
-name: Tims Stack Django + NextJS
+name: Tim's Stack:: Django ( REST-framework, Channels, Celery ) + NextJS ( React, Redux, Tailwind, DasyUI, JSON schema form ) + PostgreSQL + Redis
 description: Tim's bunnyshell hackathon submission
 tags: [ nodejs, nextjs, react, typescript, postgres, django ]
 icons: [ nodejs, nextjs, react, typescript, postgres, django, helm, kubernetes, redis, typescript ]
