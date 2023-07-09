@@ -12,7 +12,6 @@ djangorestframework==3.14.0
 djangorestframework-dataclasses
 drf-spectacular[sidecar]
 django_nextjs
-openai
 ipython
 django-jazzmin
 psycopg2-binary
