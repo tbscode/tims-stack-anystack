@@ -17,10 +17,10 @@ export default function (state = initialState, action) {
       };
     case MESSAGES_RECEIVE:
       // In this case we expect chat_uuid and messages to be part of the redux call
-      console.log("STATE CUR", state);
+      console.log("STATE CUR", state, action);
       state.messages[action.payload.chat_uuid].results = [
-        ...state.messages[action.payload.chat_uuid].results,
         ...action.payload.messages,
+        ...state.messages[action.payload.chat_uuid].results,
       ];
       return { ...state };
     default:
