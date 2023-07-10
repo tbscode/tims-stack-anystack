@@ -1,6 +1,6 @@
 name: "Tim's Stack: Django ( REST-framework, Channels, Celery ) + NextJS ( React, Redux, Tailwind, DasyUI, JSON schema form ) + PostgreSQL + Redis"
 description: Tim's bunnyshell hackathon submission
-tags: [ nodejs, nextjs, react, typescript, postgres, django ]
+tags: [ nodejs, nextjs, react, typescript, postgres, django, bunnyshell-hackathon ]
 icons: [ nodejs, nextjs, react, typescript, postgres, django, helm, kubernetes, redis, typescript ]
 stack:
   packages:
