@@ -1,5 +1,52 @@
 # Tim's Stack Bunnyshell Template
 
+> **This is the Helm Version, and can only be deployed on private kubernetes clusters**, use the compose version to deploy on the bunnyshell cluster
+
+[![Click to play](../../../_misc/video_indicator.png)](http://www.youtube.com/watch?v=Z8c0EL0vgfo "Tim Stack Showcase Bunnyshell hackathon")
+
+### Formal Overview
+
+![stack overview](../../../_misc/overview_graph.png)
+
+## Use Case
+
+This stack is designed for dynamic real-time web apps with mobile clients.
+Backend changes can be directly sent to clients using a live WebSocket connection,
+state in the client is managed with Redux.
+This allows automatically updating all affected clients on any backend changes.
+
+For the web-application setting, the Django backend dynamically requests Next.js pages,
+this includes dynamic page data so we get full SSR for all pages.
+
+The Next.js frontend is integrated with Capacitor and directly exports to Android and iOS.
+In a native setting, the frontend will try to request user data from the backend,
+if it fails it can fallback to a cached version allowing the user to view the full state of the app in an 'offline' mode.
+
+## Stack Components
+
+- Next.js + React frontend (deployment)
+    - Tailwind CSS + DaisyUI
+    - Automatic platform adjustments for API calls, authentication, and native functions (my custom implementation)
+    - Global Redis store + auto background update WebSocket
+    - Capacitor setup for native integrations and iOS / Android PWA export
+
+- Django backend (deployment)
+    - Celery for task management (or for offloading time-intensive tasks)
+    - Django REST Framework + django_rest_dataclasses for rapid REST API development
+    - Django proxy for authenticating views on other pods like the docs
+    - DRF Spectacular for auto-generated API documentation
+    - Django Channels for managing WebSockets and sending updates to clients
+
+- Documentation (deployment)
+    - pdoc3 code documentation generated from backend code
+
+- PostgreSQL (helm chart)
+    - Main backend database
+
+- Redis (helm chart)
+    - Broker for Celery
+    - Database for Django Channels
+
 This stack template utilizes `Generic Components` for image builds, which enables the usage of the same `Makefile` for local development.
 
 Images are pushed to a private GitHub container registry, and the cluster is automatically configured to authorize pulling these images using a fine-grained GitHub access token.
