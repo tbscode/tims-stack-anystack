@@ -1,4 +1,4 @@
-name: Tims Stack Django + NextJS
+name: Tims Stack (Helm) Django + NextJS
 description: Tim's bunnyshell hackathon submission
 tags: [ nodejs, nextjs, react, typescript, postgres, django, bunnyshell-hackathon ]
 icons: [ nodejs, nextjs, react, typescript, postgres, django ]
