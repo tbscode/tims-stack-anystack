@@ -175,7 +175,7 @@ export const DynamicChat = ({
               <button className="btn btn-xs">Load more</button>
             </div>
           )}
-          {messages.results.toReversed().map((message, i) => {
+          {messages.results && messages.results.toReversed().map((message, i) => {
             console.log("message", message, message.sender, userData.uuid);
             return (
               <div key={i} className="w-full relative">
