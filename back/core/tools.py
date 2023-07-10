@@ -6,6 +6,8 @@ from itertools import combinations
 from .random_init import MESSAGES
 import random
 
+def base_admin_exists():
+    return User.objects.filter(username=settings.BASE_ADMIN_USERNAME).exists()
 
 def get_or_create_base_admin():
     user = User.objects.filter(username=settings.BASE_ADMIN_USERNAME)
