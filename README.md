@@ -48,7 +48,12 @@ if it fails it can fallback to a cached version allowing the user to view the fu
 
 As this repo uses Helm charts, you will need either a Bunnyshell business account or a private cluster to connect to your Bunnyshell account.
 
-### Demo Video
+### Demo Video (Compose Template)
+
+[![Click to play](./_misc/video_indicator2.jpg)](https://www.youtube.com/watch?v=_06vvSltvvY "Tim Stack Showcase Bunnyshell hackathon")
+
+
+#### Demo Video Old (Helm Chart)
 
 [![Click to play](./_misc/video_indicator.png)](http://www.youtube.com/watch?v=Z8c0EL0vgfo "Tim Stack Showcase Bunnyshell hackathon")
 
@@ -58,9 +63,10 @@ As this repo uses Helm charts, you will need either a Bunnyshell business accoun
 There are two templates here:
 
 - [`tims-stack-django-nextjs`](.bunnyshell/templates/tims-stack-django-nextjs/README.md): The stack shown in the demo video, automatically rebuilds backend and frontend images and manages the ingress for your personal domain.
-- [`tims-stack-django-nextjs-static`](.bunnyshell/templates/tims-stack-django-nextjs-static/README.md): Same stack as above but uses pre-built images and uses ingress annotation `bns-ingress`
+- ~~[`tims-stack-django-nextjs-static`](.bunnyshell/templates/tims-stack-django-nextjs-static/README.md): Same stack as above but uses pre-built images and uses ingress annotation `bns-ingress`~~
 
-> NOTE: `tims-stack-django-nextjs-static` is meant for the judges because it shouldn't require setting up a GitHub access token. I couldn't test this, though since I can't install Helm templates on the Bunnyshell cluster.
+> There is not static template. **but even better there is a compose template now**, this can be deployed completely on the bunnyshell cluster, check it here: ``
+
 
 ### Setting up a Private Microk8s Cluster
 
@@ -205,5 +211,3 @@ Runtime dependencies:
 - [`python > 3.8`]():
 - [`node.js`]()
 - [`microk8s`]()
-
-Docker images:
