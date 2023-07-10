@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "static": "next build && next export",
+    "prebuild": "NODE_ENV=production ./node_modules/.bin/tailwind build -o styles/tailwindSSR.css && cp styles/tailwindSSR.css .next/static/",
     "pretty": "prettier --write \"./{components,pages,rjsf-daisyui-theme,store}/**/*.{js,jsx,ts,tsx,json}\"",
     "postinstall": "curl -o node_modules/@capacitor/android/capacitor/src/main/assets/native-bridge.js https://raw.githubusercontent.com/tbscode/tims-capacitor/main/android/capacitor/src/main/assets/native-bridge.js"
   },
