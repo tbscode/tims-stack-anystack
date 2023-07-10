@@ -6,11 +6,13 @@ from core.api.user_data import get_user_data
 from django.shortcuts import redirect
 from rest_framework.request import Request
 from django.http import HttpResponseRedirect
+from core import tools
 
 
 @api_view(['GET'])
 def index(request, path):
     # TODO: use authentication based redirect instead
+
     if request.user.is_authenticated:
         return render_nextjs_page(get_user_data(request.user, request), path=path)
     else:
