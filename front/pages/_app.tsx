@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import "@/styles/tailwindSSR.css";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import { wrapper, store } from "../store/store";
