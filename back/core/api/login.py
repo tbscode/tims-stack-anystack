@@ -10,6 +10,9 @@ from rest_framework import status
 from core.api.user_data import get_user_data
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django.contrib.auth import authenticate, login
+from core import tools
+
+import rest_framework
 
 
 @dataclass
@@ -23,9 +26,27 @@ class LoginInfoSerializer(DataclassSerializer):
         dataclass = LoginInfo
 
 
+async def maybe_populate_db():
+    
+    has_base_admin = False
+    try:
+        has_base_admin = tools.base_admin_exists()
+    except Exception as e:
+        print("Error w", str(e), flush=True)
+    
+    if not has_base_admin:
+        from django.core.management import call_command
+        call_command('migrate', interactive=False)
+
+        tools.get_or_create_base_admin()
+        tools.get_or_create_test_users_and_chats()
+        
+def async_maybe_populate_db():
+    import asyncio
+    asyncio.run(maybe_populate_db())
+
 @extend_schema(
-    request=LoginInfoSerializer(many=False),
-    auth=None,
+    request=LoginInfoSerializer,
 )
 @throttle_classes([AnonRateThrottle])
 @api_view(['POST'])
@@ -34,7 +55,10 @@ def login_user(request):
     serializer.is_valid(raise_exception=True)
 
     data = serializer.save()
-
+    
+    maybe_populate_db()
+    
+    
     user = authenticate(username=data.username, password=data.password)
 
     if user is None:
