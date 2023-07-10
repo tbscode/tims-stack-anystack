@@ -32,6 +32,7 @@ const LoginHero = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const frontendSettings = useSelector((state: any) => state.frontendSettings);
+  const [loadingLogin, setLoadingLogin] = useState(false);
 
   const [loginData, setLoginData] = useState({
     username: "testUser1",
@@ -39,6 +40,7 @@ const LoginHero = () => {
   });
 
   const loginRequest = () => {
+    setLoadingLogin(true);
     fetch(`${getEnv().serverUrl}/api/login`, {
       method: "POST",
       headers: {
@@ -58,9 +60,12 @@ const LoginHero = () => {
           },
         });
         res.json().then((data) => {
+          setLoadingLogin(false);
           dispatch(updateBaseData(data));
           router.push("/");
         });
+      }else{
+        setLoadingLogin(false);
       }
     });
   };
@@ -91,27 +96,22 @@ const LoginHero = () => {
     </div>
   </div>
     <div className="w-full flex flex-row absolute items-center justify-center p-8 overflow-x-auto bottom-0">
-      <div className="p-8 bg-neutral-content text-neutral rounded-xl rounded-xl">
-          <img className={cs} src="https://nodejs.org/static/images/logo.svg" alt="Node.js logo"/>
-          <h2>Node.js</h2>
-          <p>Version: 18</p>
-      </div>
       <div className="bg-neutral-focus h-52 p-8 flex flex-col rounded-xl ml-8 content-center justify-center">
           <img className={`${cs} w-auto h-20`} src="https://raw.githubusercontent.com/reduxjs/redux/master/logo/logo.svg" alt="Redux logo"/>
           <h2>Redux</h2>
-          <p>Version: 4.1.2</p>
+          <p>Version: 8.1.1</p>
       </div>
       <div className="bg-neutral-focus h-52 p-8 flex flex-col rounded-xl ml-8 content-center justify-center">
           <img className={`${cs} w-20 h-20`} src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" alt="React logo"/>
           <h2>React</h2>
-          <p>Version: 5.9.0</p>
+          <p>Version: 18.2.0</p>
       </div>
   </div>
     <div className="h-full flex flex-col absolute items-center justify-center p-8 overflow-x-auto bottom-0 right-0">
       <div className="bg-neutral-focus h-fit p-8 flex flex-col rounded-xl ml-8 content-center justify-center">
           <img className={`${cs} w-auto h-20`} src="https://daisyui.com/images/daisyui-logo/daisyui-logomark.svg" alt="Redux logo"/>
           <h2>DasyUI</h2>
-          <p>Version: 4.1.2</p>
+          <p>Version: 3.2.1</p>
           <p>Theme: {frontendSettings.theme}</p>
           <button className="btn btn-xl bg-accent text-accent-focus" onClick={() => {
             const randomTheme = ALL_THEMES[Math.floor(Math.random() * ALL_THEMES.length)];
@@ -178,7 +178,9 @@ const LoginHero = () => {
             <div className="form-control mt-6">
               <button className="btn btn-primary" onClick={loginRequest}>
                 Login
+                {loadingLogin && <span className="loading loading-spinner loading-md"></span>}
               </button>
+              <span className="text-cs"> ( the compose chat with posgress db included will generate test users and migrate db on first login so might take a little ) </span>
             </div>
           </div>
         </div>
