@@ -121,6 +121,8 @@ export const connectionStateAndUserData = async ({
 
   console.log("STATE XY", state);
   console.log("COOKIES", getCookiesAsObject());
+  
+  console.log("C BAN", userData, !(userData && ('uuid' in userData)));
 
   if (!(userData && ('uuid' in userData))) {
     console.log("COOKIES", getCookiesAsObject());
@@ -134,7 +136,6 @@ export const connectionStateAndUserData = async ({
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({}),
       });
 
       if (res.ok) {
@@ -156,6 +157,7 @@ export const connectionStateAndUserData = async ({
         console.log("FETCHDATA", "error", connectionState.info);
       }
     } catch (err) {
+      console.log("C BAN", "error", err);
       try {
         const { value } = await Preferences.get({ key: "data" });
 
