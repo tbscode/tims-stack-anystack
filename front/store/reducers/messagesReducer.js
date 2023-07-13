@@ -12,7 +12,7 @@ export default function (state = initialState, action) {
     case MESSAGES:
       return {
         ...state,
-        messages: {...state.messages, ...action.payload},
+        messages: { ...state.messages, ...action.payload },
         loading: false,
       };
     case MESSAGES_RECEIVE:
