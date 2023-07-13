@@ -12,13 +12,13 @@ class InlineStylesHead extends Head {
     const { assetPrefix, files } = this.context;
 
     return <>
-      <style
+      {true && <style
         key={'tailwindSSR'}
         data-href={`${assetPrefix}/_next/static/tailwindSSR.css`}
         dangerouslySetInnerHTML={{
           __html: readFileSync(join(process.cwd(), 'styles', 'tailwindSSR.css'), 'utf-8'),
         }}
-      />
+      />}
     {(!(!files || files.length === 0)) && files.filter(file => /\.css$/.test(file)).map(file => (
       <style
         key={file}
