@@ -13,45 +13,39 @@ export const DynamicMarkdown = ({ children, ...props }) => {
   );
 };
 
-
-const NewMessagesMonitor = ({
-    selectedChat,
-    scrollToBottom
-  }) => {
+const NewMessagesMonitor = ({ selectedChat, scrollToBottom }) => {
   const newMessages = useSelector((state: any) => state.newMessages);
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
-  
     console.log("NEW MESSAGES", newMessages);
-    if(newMessages.messages.length === 0) return;
+    if (newMessages.messages.length === 0) return;
     let chatsUpdates = {};
 
     newMessages.messages.forEach((item) => {
-      if(!(item.chat_uuid in chatsUpdates)){
+      if (!(item.chat_uuid in chatsUpdates)) {
         chatsUpdates[item.chat_uuid] = [];
       }
       chatsUpdates[item.chat_uuid].push(item);
     });
     console.log("NEW MESSAGES", 2, chatsUpdates);
-    
+
     Object.keys(chatsUpdates).forEach((key) => {
       const isChatSelected = key === selectedChat.uuid;
-      dispatch(receiveMessage(chatsUpdates[key], key, isChatSelected, () => {
-        if(isChatSelected){
-          setTimeout(() => {
-            scrollToBottom();
-          }, 100);
-          console.log("SCZ T")
-        }
-      }));
+      dispatch(
+        receiveMessage(chatsUpdates[key], key, isChatSelected, () => {
+          if (isChatSelected) {
+            setTimeout(() => {
+              scrollToBottom();
+            }, 100);
+            console.log("SCZ T");
+          }
+        }),
+      );
     });
-    
   }, [newMessages]);
-  
-  
 
-  return <></>
+  return <></>;
 };
 
 export const DynamicSectionHeader = ({
@@ -115,101 +109,112 @@ export const NoSelectionPage = ({ selected }) => {
   );
 };
 
-export const DynamicChat = ({ 
-    selected, 
-    userData, 
-    chat, 
-    messages, 
-    onBackClick, 
-    sendMessage 
-  }) => {
+export const DynamicChat = ({
+  selected,
+  userData,
+  chat,
+  messages,
+  onBackClick,
+  sendMessage,
+}) => {
   console.log("TBS CHAT", chat, messages);
-  
+
   const scrollToBottom = () => {
     const chat = document.getElementById("chat-scroll");
-    chat.scrollTop = chat.scrollHeight;  
+    chat.scrollTop = chat.scrollHeight;
   };
 
   if (!selected) return <></>;
   return (
-    <><NewMessagesMonitor selectedChat={chat} scrollToBottom={scrollToBottom}/>
-    <div
-      className={`w-200 max-w-full h-full flex flex-col pb-4 pt-2 ${
-        selected ? "" : "hidden"
-      }`}
-    >
-      <div className="flex flex-row items-center bg-base-300 h-20 w-full rounded-xl p-2 pr-4 mb-1 max-w-full">
-        <div className="flex flex-grow bg-base-100 h-full mr-4 rounded-xl justify-center content-center items-center">
-          <div className="pr-4 pl-4">
-            <button className="btn btn-square" onClick={onBackClick}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M14 5l-7 7 7 7"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="text-xl prose flex flex-grow items-center content-center justify-center">
-            <h2>{chat.partner.first_name}</h2>
-          </div>
-        </div>
-        <div className="avatar online placeholder">
-          <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
-            <span>{chat.partner.first_name.substring(0, 2)}</span>
-          </div>
-        </div>
-      </div>
-      <div id="chat-scroll" className="flex flex-col grow p-1 rounded-xl overflow-y-auto max-h-full">
-        <div className="flex flex-col w-full">
-          {chat?.next && (
-            <div className="w-full flex content-center justify-center">
-              <button className="btn btn-xs">Load more</button>
-            </div>
-          )}
-          {messages.results && messages.results.toReversed().map((message, i) => {
-            console.log("message", message, message.sender, userData.uuid);
-            return (
-              <div key={i} className="w-full relative">
-                <div className={`bg-base-300 w-5/6 h-fit min-w-fit overflow-x-auto rounded-xl p-2 mt-2 ${
-                    message.sender === userData.uuid ? "float-right" : ""
-                  }`}
+    <>
+      <NewMessagesMonitor selectedChat={chat} scrollToBottom={scrollToBottom} />
+      <div
+        className={`w-200 max-w-full h-full flex flex-col pb-4 pt-2 ${
+          selected ? "" : "hidden"
+        }`}
+      >
+        <div className="flex flex-row items-center bg-base-300 h-20 w-full rounded-xl p-2 pr-4 mb-1 max-w-full">
+          <div className="flex flex-grow bg-base-100 h-full mr-4 rounded-xl justify-center content-center items-center">
+            <div className="pr-4 pl-4">
+              <button className="btn btn-square" onClick={onBackClick}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <DynamicMarkdown>{message.text}</DynamicMarkdown>
-                </div>
-              </div>
-            );
-          })}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M14 5l-7 7 7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="text-xl prose flex flex-grow items-center content-center justify-center">
+              <h2>{chat.partner.first_name}</h2>
+            </div>
+          </div>
+          <div className="avatar online placeholder">
+            <div className="bg-neutral-focus text-neutral-content rounded-full w-12">
+              <span>{chat.partner.first_name.substring(0, 2)}</span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="bg-base-300 bottom-0 h-fit rounded-xl mt-1 p-2">
-        <div className="flex flex-row items-center">
-          <textarea
-            id="sendMessageContainer"
-            placeholder="Type a Message ..."
-            className="textarea textarea-bordered textarea-lg flex flex-grow p-1 pl-2 h-24"
-          ></textarea>
-          <div className="w-32 flex justify-center">
-            <button 
-              onClick={() => {
-                sendMessage(document.getElementById("sendMessageContainer").value, chat.uuid);
-                document.getElementById("sendMessageContainer").value = ""; 
-              }}
-              className="btn btn-xl">
+        <div
+          id="chat-scroll"
+          className="flex flex-col grow p-1 rounded-xl overflow-y-auto max-h-full"
+        >
+          <div className="flex flex-col w-full">
+            {chat?.next && (
+              <div className="w-full flex content-center justify-center">
+                <button className="btn btn-xs">Load more</button>
+              </div>
+            )}
+            {messages.results &&
+              messages.results.toReversed().map((message, i) => {
+                console.log("message", message, message.sender, userData.uuid);
+                return (
+                  <div key={i} className="w-full relative">
+                    <div
+                      className={`bg-base-300 w-5/6 h-fit min-w-fit overflow-x-auto rounded-xl p-2 mt-2 ${
+                        message.sender === userData.uuid ? "float-right" : ""
+                      }`}
+                    >
+                      <DynamicMarkdown>{message.text}</DynamicMarkdown>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+        <div className="bg-base-300 bottom-0 h-fit rounded-xl mt-1 p-2">
+          <div className="flex flex-row items-center">
+            <textarea
+              id="sendMessageContainer"
+              placeholder="Type a Message ..."
+              className="textarea textarea-bordered textarea-lg flex flex-grow p-1 pl-2 h-24"
+            ></textarea>
+            <div className="w-32 flex justify-center">
+              <button
+                onClick={() => {
+                  sendMessage(
+                    document.getElementById("sendMessageContainer").value,
+                    chat.uuid,
+                  );
+                  document.getElementById("sendMessageContainer").value = "";
+                }}
+                className="btn btn-xl"
+              >
                 Send
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div></>
+    </>
   );
 };
 

@@ -102,10 +102,7 @@ interface ConnectionState {
   isNative: boolean;
 }
 
-export const connectionStateAndUserData = async ({
-  state, 
-  userData
-}) => {
+export const connectionStateAndUserData = async ({ state, userData }) => {
   let connectionState: ConnectionState = {
     userData: {},
     state: BannerState.offline,
@@ -121,10 +118,10 @@ export const connectionStateAndUserData = async ({
 
   console.log("STATE XY", state);
   console.log("COOKIES", getCookiesAsObject());
-  
-  console.log("C BAN", userData, !(userData && ('uuid' in userData)));
 
-  if (!(userData && ('uuid' in userData))) {
+  console.log("C BAN", userData, !(userData && "uuid" in userData));
+
+  if (!(userData && "uuid" in userData)) {
     console.log("COOKIES", getCookiesAsObject());
     try {
       console.log("PROFILE PRE FETCH", userData);
@@ -174,10 +171,10 @@ export const connectionStateAndUserData = async ({
       }
     }
   } else {
-    console.log("PROFILE PRE STATE",state, userData);
+    console.log("PROFILE PRE STATE", state, userData);
     if (
       !(state.state === undefined) &&
-      (state.state === BannerState.unauthenticated)
+      state.state === BannerState.unauthenticated
     ) {
       connectionState.state = BannerState.unauthenticated;
       connectionState.info = `Offline, not logged in ${res.status} ${res.statusText}`;
@@ -189,7 +186,7 @@ export const connectionStateAndUserData = async ({
     }
   }
 
-  return {connectionState, userData: updatedUserData};
+  return { connectionState, userData: updatedUserData };
 };
 
 export const ConnectionBanner: React.FC = () => {
@@ -214,10 +211,7 @@ export const ConnectionBanner: React.FC = () => {
       const connectionState = connectionStateAndUserData({
         state: currentConnectionState,
         userData,
-      }).then(({
-        connectionState, 
-        userData
-      }) => {
+      }).then(({ connectionState, userData }) => {
         console.log("CONNECTION STATE", connectionState);
         if (connectionState.state === "unauthenticated") {
           dispatch({ type: CONNECTION_STATE, payload: connectionState });
