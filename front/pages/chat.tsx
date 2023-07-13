@@ -4,7 +4,7 @@ import {
   handleStreamedProps,
   getCookiesAsObject,
   getEnv,
-  receiveMessage
+  receiveMessage,
 } from "../utils/tools";
 import React, { useState, useEffect, useRef, createRef } from "react";
 import {
@@ -17,7 +17,11 @@ import {
   ChatMessages,
 } from "../components/navigation-bar";
 import { useDispatch, useSelector } from "react-redux";
-import { FRONTEND_SETTINGS, MESSAGES_RECEIVE, SLECTED_CHAT } from "../store/types";
+import {
+  FRONTEND_SETTINGS,
+  MESSAGES_RECEIVE,
+  SLECTED_CHAT,
+} from "../store/types";
 import {
   DynamicChatSelector,
   DynamicChat,
@@ -41,7 +45,6 @@ export const getServerSideProps = async ({ req }: { req: any }) => {
   }
   return { props: { dataLog: { pulled: false } } };
 };
-
 
 export default function Chat(): JSX.Element {
   const [selection, setSelection] = useState("empty");
@@ -75,24 +78,24 @@ export default function Chat(): JSX.Element {
   useEffect(() => {
     setIsChatSelected(false);
   }, []);
-  
+
   const sendMessage = (message, chat_uuid) => {
     fetch(`${getEnv().serverUrl}/api/messages/${chat_uuid}/send/`, {
       credentials: "include",
       method: "POST",
       headers: {
-          "X-CSRFToken": getCookiesAsObject().csrftoken,
-          "Content-Type": "application/json",
-          Accept: "application/json",
+        "X-CSRFToken": getCookiesAsObject().csrftoken,
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
         text: message,
       }),
-    }).then((res) => { 
-      if(res.ok) {
+    }).then((res) => {
+      if (res.ok) {
         res.json().then((data) => {
           dispatch(receiveMessage([data], selectedChat.chat.uuid, true));
-        }); 
+        });
       }
     });
   };
@@ -140,7 +143,7 @@ export default function Chat(): JSX.Element {
         <>
           <DynamicChat
             onBackClick={() => {
-              setContentFocused(false); 
+              setContentFocused(false);
             }}
             selected={isChatSelected}
             userData={userData}

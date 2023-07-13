@@ -15,12 +15,10 @@ import { CONNECTION_STATE, USER_DATA, USER_PROFILE } from "@/store/types";
 import { updateBaseData } from "@/utils/tools";
 
 import { useState, useEffect } from "react";
-import Router from 'next/router';
-
-
+import Router from "next/router";
 
 const NO_NAVIGATION_ROUTES = ["/login", "/articles"];
-const PUBLIC_PAGES = ["/articles" ]
+const PUBLIC_PAGES = ["/articles"];
 
 function App({ Component, pageProps }: AppProps) {
   const deviceState = useSelector((state: any) => state.device);
@@ -31,7 +29,6 @@ function App({ Component, pageProps }: AppProps) {
 
   const router = useRouter();
   const dispatch = useDispatch();
-  
 
   console.log("PAGE PROPS", pageProps);
 
@@ -41,12 +38,15 @@ function App({ Component, pageProps }: AppProps) {
         // also automaticly means that we are online and rot required to conncet, dispath connection to be online!
         console.log("PROFILE", pageProps.data.profile);
         dispatch(updateBaseData(pageProps.data));
-        dispatch({type: CONNECTION_STATE, payload: {state: BannerState.online}});
+        dispatch({
+          type: CONNECTION_STATE,
+          payload: { state: BannerState.online },
+        });
       }
     }
-    setFirstRender(false)
+    setFirstRender(false);
   }, []);
-  
+
   useEffect(() => {
     const routeEventStart = () => {
       setIsLoading(false);
@@ -55,13 +55,13 @@ function App({ Component, pageProps }: AppProps) {
       setIsLoading(true);
     };
 
-    Router.events.on('routeChangeStart', routeEventStart);
-    Router.events.on('routeChangeComplete', routeEventEnd);
-    Router.events.on('routeChangeError', routeEventEnd);
+    Router.events.on("routeChangeStart", routeEventStart);
+    Router.events.on("routeChangeComplete", routeEventEnd);
+    Router.events.on("routeChangeError", routeEventEnd);
     return () => {
-      Router.events.off('routeChangeStart', routeEventStart);
-      Router.events.off('routeChangeComplete', routeEventEnd);
-      Router.events.off('routeChangeError', routeEventEnd);
+      Router.events.off("routeChangeStart", routeEventStart);
+      Router.events.off("routeChangeComplete", routeEventEnd);
+      Router.events.off("routeChangeError", routeEventEnd);
     };
   }, []);
 
@@ -99,7 +99,9 @@ function App({ Component, pageProps }: AppProps) {
             <Component />
           </MainNavigation>
         )}
-        {(!firstRender && !PUBLIC_PAGES.includes(router.pathname)) && <ConnectionBanner />}
+        {!firstRender && !PUBLIC_PAGES.includes(router.pathname) && (
+          <ConnectionBanner />
+        )}
       </div>
     </Provider>
   );

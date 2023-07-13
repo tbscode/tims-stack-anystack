@@ -9,14 +9,19 @@ import {
   getCookiesAsObject,
   getEnv,
   updateBaseData,
-  ALL_THEMES
+  ALL_THEMES,
 } from "@/utils/tools";
 import {
   ConnectionBanner,
   connectionStateAndUserData,
 } from "../components/connection-banner";
 import { useSelector, useDispatch } from "react-redux";
-import { CONNECTION_STATE, USER_DATA, USER_PROFILE, FRONTEND_SETTINGS } from "@/store/types";
+import {
+  CONNECTION_STATE,
+  USER_DATA,
+  USER_PROFILE,
+  FRONTEND_SETTINGS,
+} from "@/store/types";
 import { BannerState } from "../components/connection-banner";
 import { ArticleNav, ArticleFeed } from "@/components/articles";
 
@@ -33,9 +38,10 @@ export default function Index(): JSX.Element {
   const router = useRouter();
   const dispatch = useDispatch();
   const frontendSettings = useSelector((state: any) => state.frontendSettings);
-  
-  return <div className="flex items-center content-center flex-col">
-    <ArticleNav />
-    <ArticleFeed />
-  </div>
+
+  return (
+    <div className="flex items-center content-center flex-col">
+      <ArticleFeed />
+    </div>
+  );
 }
