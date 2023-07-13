@@ -5,14 +5,16 @@ import { get } from "http";
 let trackUpdateTime = false;
 import validator from "@rjsf/validator-ajv8";
 
+const LOREM = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+
 const ThemedForm = withTheme(rjsfDaisyUiTheme);
 
-export const ArticleNav = () => {
-  return (
-    <div className="navbar bg-base-200 fixed z-30 sm:hidden">
+
+export const ArticleNav = ({}) => {
+  return  <div className="navbar bg-base-200 fixed z-80 sm:hidden">
       <div className="navbar-start">
         <div className="dropdown">
-          <label tabIndex={0} className="btn btn-ghost btn-circle">
+          <label tabIndex={0} htmlFor="my-drawer" className="btn btn-ghost btn-circle">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -33,7 +35,9 @@ export const ArticleNav = () => {
             className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 bg-base-300"
           >
             <li>
-              <a>Homepage</a>
+              <div className="w-52 bg-error h-32">
+                Hello
+              </div>
             </li>
             <li>
               <a>Portfolio</a>
@@ -85,6 +89,28 @@ export const ArticleNav = () => {
         </button>
       </div>
     </div>
+}
+
+export const DynamicLayout = ({children}) => {
+  return (
+    <div className="drawer absolute z-60">
+    <input id="my-drawer" type="checkbox" className="drawer-toggle" />
+    <div className="drawer-content w-full">
+      <ArticleNav />
+      <div className="w-full flex flex-col justify-center content-center items-center">
+        {children}
+      </div>
+    </div> 
+    <div className="drawer-side">
+      <label htmlFor="my-drawer" className="drawer-overlay"></label>
+      <ul className="menu p-4 w-80 h-full bg-base-200 text-base-content">
+        {/* Sidebar content here */}
+        <li><a>Sidebar Item 1</a></li>
+        <li><a>Sidebar Item 2</a></li>
+        
+      </ul>
+    </div>
+  </div>
   );
 };
 
@@ -135,7 +161,7 @@ const generateArticle = ({ i }) => {
 
 
 const ARTICLES = Array.from({ length: 10 }, (_, i) => generateArticle({ i }));
-const dynamicCardBaseStyles = `flex flex-col transition-all w-full h-fit sm:w-96 sm:h-64 lg:w-120 lg:h-72 bg-base-300 rounded-xl justify-center justify-self-center content-center shadow-xl border-natural-content border-solid border`;
+const dynamicCardBaseStyles = `flex flex-col transition-all w-full h-64 sm:h-64 lg:w-120 lg:h-72 bg-base-300 rounded-xl justify-center justify-self-center content-center shadow-xl border-natural-content border-solid border`;
 const gradientTextStyle = `[&::selection]:text-base-content relative col-start-1 row-start-1 bg-[linear-gradient(90deg,hsl(var(--s))_0%,hsl(var(--sf))_9%,hsl(var(--pf))_42%,hsl(var(--p))_47%,hsl(var(--a))_100%)] bg-clip-text [-webkit-text-fill-color:transparent] [&::selection]:bg-blue-700/20 [@supports(color:oklch(0_0_0))]:bg-[linear-gradient(90deg,hsl(var(--s))_4%,color-mix(in_oklch,hsl(var(--sf)),hsl(var(--pf)))_22%,hsl(var(--p))_45%,color-mix(in_oklch,hsl(var(--p)),hsl(var(--a)))_67%,hsl(var(--a))_100.2%)] text-5xl h-fit`;
 
 const getArticleBaseStyles = ({
@@ -260,7 +286,7 @@ export const ArticleFooter = ({ article, articleController }) => {
 };
 
 export const ArticleContent = ({ article, articleController }) => {
-  return <div className="flex flex-grow w-full p-1 pl-4 sm:pl-8">Content</div>;
+  return <div className="flex flex-grow w-full p-1 pl-4 sm:pl-8 max-h-full overflow-hidden text-gray-700">{LOREM}</div>;
 };
 
 export const ArticlePreview = ({ article, articleController }) => {
@@ -354,8 +380,24 @@ export const ArticleFeedMenuBar = ({articleController}) => {
   }
 
   return (
-    <div className="relative flex flex-row w-full h-32 items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 sticky top-2 z-40 bg-base-100 bg-opacity-90">
-      <div className="flex flex-col w-2/3 content-center justify-center text-center items-center pointer-events-auto">
+    <div className="hidden sm:flex relative flex flex-row w-full h-32 items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 sticky top-2 z-40 bg-base-100 bg-opacity-90">
+      <div className="flex flex-col w-1/3 content-center justify-center text-center items-center pointer-events-auto">
+        <span className="font-bold p-1 rounded-xl">Authors</span>
+        <ThemedForm
+          schema={filterShema}
+          extraErrors={{}}
+          showErrorList="bottom"
+          uiSchema={{
+            "ui:submitButtonOptions": {
+              norender: true,
+            },
+          }}
+          formData={{}}
+          validator={validator}
+          onChange={() => {}}
+        />
+      </div>
+      <div className="flex flex-col w-1/3 content-center justify-center text-center items-center pointer-events-auto">
         <span className="font-bold p-1 rounded-xl">Filter</span>
         <ThemedForm
           schema={filterShema}
@@ -425,22 +467,24 @@ export const ArticleFeed = () => {
   }
 
   return (
-    <div className="relative w-full 3xl:w-400">
-      <ArticleFeedHeader />
-      <ArticleFeedMenuBar articleController={articleController}/>
-      <div className="grid relative lg:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 gap-4 w-full z-30">
-        {ARTICLES.filter(article => filterArticles(article)).map((article, i) => {
-          return (
-            <ArticlePreview
-              key={i}
-              article={article}
-              articleController={articleController}
-            />
-          );
-        })}
-        <LoadMoreCard />
+    <DynamicLayout>
+      <div className="relative w-full 3xl:w-400">
+        <ArticleFeedHeader />
+        <ArticleFeedMenuBar articleController={articleController}/>
+        <div className="grid relative lg:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 gap-4 w-full z-30">
+          {ARTICLES.filter(article => filterArticles(article)).map((article, i) => {
+            return (
+              <ArticlePreview
+                key={i}
+                article={article}
+                articleController={articleController}
+              />
+            );
+          })}
+          <LoadMoreCard />
+        </div>
+        <ArticleFeedFooter />
       </div>
-      <ArticleFeedFooter />
-    </div>
+  </DynamicLayout>
   );
 };
