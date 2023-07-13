@@ -1,4 +1,12 @@
 import { useState } from "react"
+import { rjsfDaisyUiTheme } from "../rjsf-daisyui-theme/rjsfDaisyUiTheme";
+import { withTheme } from "@rjsf/core";
+import { get } from "http";
+let trackUpdateTime = false;
+import validator from "@rjsf/validator-ajv8";
+
+const ThemedForm = withTheme(rjsfDaisyUiTheme);
+
 export const ArticleNav = () => {
     return <div className="navbar bg-base-200 fixed z-30 sm:hidden">
     <div className="navbar-start">
@@ -30,93 +38,38 @@ export const ArticleNav = () => {
   </div>
 }
 
-const ARTICLES = [
-  {
-  title: "Article 1",
-  uuid: "1234",
-  tags: ["tag1", "tag2", "tag3"],
-  description: "This is the first article",
-  image: "https://picsum.photos/seed/picsum/200/300",
-    author: {
-      first_name: "John",
-      second_name: "Doe",
-      image: "https://picsum.photos/seed/picsum/200/300"
-    }
-  },
-  {
-  title: "Article 2",
-  uuid: "1235s",
-  description: "This is the first article",
-  tags: ["tag1", "tag2", "tag3"],
-  image: "https://picsum.photos/seed/picsum/200/300",
-    author: {
-      first_name: "John",
-      second_name: "Doe",
-      image: "https://picsum.photos/seed/picsum/200/300"
-    }
-  },
-  {
-  title: "Article 3",
-  uuid: "1236asss",
-  description: "This is the first article",
-  tags: ["tag1", "tag2", "tag3"],
-  image: "https://picsum.photos/seed/picsum/200/300",
-    author: {
-      first_name: "John",
-      second_name: "Doe",
-      image: "https://picsum.photos/seed/picsum/200/300"
-    }
-  },
-  {
-  title: "Article 4",
-  uuid: "123adas6",
-  description: "This is the first article",
-  tags: ["tag1", "tag2", "tag3"],
-  image: "https://picsum.photos/seed/picsum/200/300",
-    author: {
-      first_name: "John",
-      second_name: "Doe",
-      image: "https://picsum.photos/seed/picsum/200/300"
-    }
-  },
-  {
-  title: "Article 5",
-  uuid: "12361",
-  description: "This is the first article",
-  tags: ["tag1", "tag3"],
-  image: "https://picsum.photos/seed/picsum/200/300",
-    author: {
-      first_name: "John",
-      second_name: "Doe",
-      image: "https://picsum.photos/seed/picsum/200/300"
-    }
-  },
-  {
-  title: "Article 6",
-  uuid: "1236",
-  description: "This is the first article",
-  tags: ["tag1", "tag2", "tag3"],
-  image: "https://picsum.photos/seed/picsum/200/300",
-    author: {
-      first_name: "John",
-      second_name: "Doe",
-      image: "https://picsum.photos/seed/picsum/200/300"
-    }
-  },
-  {
-  title: "Article 7",
-  uuid: "1237",
-  description: "This is the first article",
-  tags: ["tag1", "tag2", "tag3"],
-  image: "https://picsum.photos/seed/picsum/200/300",
-    author: {
-      first_name: "John",
-      second_name: "Doe",
-      image: "https://picsum.photos/seed/picsum/200/300"
-    }
-  },
-]
+const generateRandomTags = ({amount}) => {
+  const tags = ["tag1", "tag2", "tag3"]
+  return tags.sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random() * 3))
+}
 
+const hundretRandomTags = Array.from({length: 100}, (_, i) => generateRandomTags({amount: 3}))
+
+const generateArticle = ({i}) => {
+  return {
+    title: `Article ${i}`,
+    uuid: `id-${i}`,
+    tags: hundretRandomTags[i],
+    description: "This is the first article",
+    image: "https://picsum.photos/seed/picsum/200/300",
+    author: {
+      first_name: "John",
+      second_name: "Doe",
+      image: "https://picsum.photos/seed/picsum/200/300"
+    }
+  }
+}
+
+const filterShema = {
+  type: "array",
+  uniqueItems: true,
+  items: {
+    type: "string",
+    enum: ["tag1", "tag2", "tag3"]
+  } 
+}
+
+const ARTICLES = Array.from({length: 10}, (_, i) => generateArticle({i})) 
 const dynamicCardBaseStyles = `flex flex-col transition-all w-full h-fit sm:w-96 sm:h-64 lg:w-120 lg:h-72 bg-base-300 rounded-xl justify-center justify-self-center content-center shadow-xl border-natural-content border-solid border`
 const gradientTextStyle = `[&::selection]:text-base-content relative col-start-1 row-start-1 bg-[linear-gradient(90deg,hsl(var(--s))_0%,hsl(var(--sf))_9%,hsl(var(--pf))_42%,hsl(var(--p))_47%,hsl(var(--a))_100%)] bg-clip-text [-webkit-text-fill-color:transparent] [&::selection]:bg-blue-700/20 [@supports(color:oklch(0_0_0))]:bg-[linear-gradient(90deg,hsl(var(--s))_4%,color-mix(in_oklch,hsl(var(--sf)),hsl(var(--pf)))_22%,hsl(var(--p))_45%,color-mix(in_oklch,hsl(var(--p)),hsl(var(--a)))_67%,hsl(var(--a))_100.2%)] text-5xl h-fit`
 
@@ -194,8 +147,8 @@ export const ArticleFooter = ({article, articleController}) => {
           </div>
         </div> 
         <div className="flex flex-col flex-grow prose p-1 justify-center">
-          <h2 className="mb-0 text-xl sm:text-xl lg:text-2xl">Name</h2>
-          <h4 className="mt-0 text-xs lg:text-lg">description</h4>
+          <h2 className="mb-0 text-xl sm:text-xl lg:text-2xl">{article.author.first_name}</h2>
+          <h4 className="mt-0 text-xs lg:text-lg">{article.author.second_name}</h4>
         </div>
       </div> 
       <div className="bg-base-100 w-3/12 rounded-xl flex justify-center">
@@ -266,9 +219,40 @@ export const ArticleFeedHeader = () => {
   </div>
 }
 
+export const ArticleFeedFooter = () => {
+  return <div className="relative w-full h-64 grid items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 bg-base-100">
+      Hello
+  </div>
+}
+
+export const ArticleFeedMenuBar = () => {
+  return <div className="relative flex flex-row w-full h-32 items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 sticky top-2 z-40 bg-base-100 bg-opacity-90">
+    <div className="flex flex-col w-2/3 content-center justify-center text-center items-center pointer-events-auto">
+      <span className="font-bold p-1 bg-base-100 rounded-xl">Filter</span>
+       <ThemedForm
+          schema={filterShema}
+          extraErrors={{}}
+          showErrorList="bottom"
+          uiSchema={{
+            "ui:submitButtonOptions": {
+              norender: true,
+            }
+          }}
+          validator={validator}
+          onChange={() => {}}
+        />
+    </div>
+    <div className="flex flex-col w-1/3 content-center justify-center text-center items-center">
+      <span className="font-bold pb-3">Search</span>
+      <input type="text" placeholder="title or phrase" className="input input-bordered w-full max-w-xs" />
+    </div>
+  </div>
+}
+
 export const ArticleFeed = () => {
   const [hoveredArticle, setHoveredArticle] = useState(null)
   const [hoveredTag, setHoveredTag] = useState(null)
+  const [filters, setFilters] = useState([])
   
   const articleController = {
     hoverController: {
@@ -276,14 +260,20 @@ export const ArticleFeed = () => {
       setHoverId: setHoveredArticle,
       hoverTag: hoveredTag,
       setHoverTag: setHoveredTag
+    },
+    filterController: {
+      filters: filters,
+      setFilters: setFilters
     }
   }
 
   return <div className="relative w-full 3xl:w-400">
       <ArticleFeedHeader />
+      <ArticleFeedMenuBar />
       <div className="grid relative lg:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 gap-4 w-full z-30">{ARTICLES.map((article, i) => {
-        return <ArticlePreview key={i} article={article} articleController={articleController}/>
-      })}<LoadMoreCard />
+          return <ArticlePreview key={i} article={article} articleController={articleController}/>
+        })}<LoadMoreCard />
       </div>
+      <ArticleFeedFooter />
     </div>
 }
