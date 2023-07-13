@@ -1,5 +1,4 @@
 import "@/styles/globals.css";
-import "@/styles/tailwindSSR.css";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import { wrapper, store } from "../store/store";
@@ -20,7 +19,8 @@ import Router from 'next/router';
 
 
 
-const NO_NAVIGATION_ROUTES = ["/login"];
+const NO_NAVIGATION_ROUTES = ["/login", "/articles"];
+const PUBLIC_PAGES = ["/articles" ]
 
 function App({ Component, pageProps }: AppProps) {
   const deviceState = useSelector((state: any) => state.device);
@@ -99,7 +99,7 @@ function App({ Component, pageProps }: AppProps) {
             <Component />
           </MainNavigation>
         )}
-        {!firstRender && <ConnectionBanner />}
+        {(!firstRender && !PUBLIC_PAGES.includes(router.pathname)) && <ConnectionBanner />}
       </div>
     </Provider>
   );
