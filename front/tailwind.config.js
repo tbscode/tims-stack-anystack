@@ -8,9 +8,19 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        '3xl': '1920px',
+      },
       width: {
+        '120': '30rem',
+        '140': '35rem',
+        '160': '40rem',
         '180': '45rem',
         '200': '50rem',
+        '240': '60rem',
+        '280': '70rem',
+        '320': '80rem',
+        '400': '100rem',
       },
       backgroundImage: {
         'gradient-radial':
