@@ -4,12 +4,17 @@ import { ArticleHeader } from "./preview-header";
 import { ArticleTagBar } from "./preview-tag-bar";
 import { ArticleContent } from "./preview-content";
 import { ArticleFooter } from "./preview-footer";
+import Draggable from 'react-draggable';
+import { useRef, useState } from "react";
 
 const getArticleBaseStyles = ({
   hoverId,
   articleId,
   articleTags,
   hoverTag,
+  collapsed,
+  otherArticleDragged,
+  beingDragged,
 }) => {
   let style = ``;
   if (hoverId === articleId) {
@@ -19,11 +24,23 @@ const getArticleBaseStyles = ({
   } else {
     style = dynamicCardBaseStyles;
   }
+  
+  if(otherArticleDragged) {
+    style = `${style} blur-sm`;
+  }
 
   if (hoverTag !== null && !articleTags.includes(hoverTag)) {
     style = `${style} blur-sm`;
   } else if (hoverTag !== null && articleTags.includes(hoverTag)) {
     style = `${style} border-success border-solid border-2`;
+  }
+  
+  if (collapsed) {
+    style = `${style} xl:h-32`;  
+  }
+  
+  if(beingDragged) {
+    style = `${style} z-140`;  
   }
   return style;
 };
@@ -41,7 +58,98 @@ export const LoadMoreCard = () => {
   );
 };
 
-export const ArticlePreview = ({ article, articleController }) => {
+export const BaseArticlePreviewContent = ({ 
+    article, 
+    articleController, 
+    previewCollapsed }) => {
+  return !previewCollapsed && <>
+            <ArticleTagBar article={article} articleController={articleController} />
+            <ArticleContent article={article} articleController={articleController} />
+            <ArticleFooter article={article} articleController={articleController} />
+          </>
+}
+
+export const BaseArticlePreview = ({ 
+        article, 
+        dragRef, 
+        onStopDrag, 
+        onDrag, 
+        baseSyles, 
+        onMouseEnter, 
+        onMouseLeave, 
+        articleHeader,
+        articleBaseContent
+       }) => {
+    return <Draggable 
+        position={{x: 0, y: 0}}
+            nodeRef={dragRef}
+          defaultClassName={`transition-none`} 
+          defaultClassNameDragging="transition-none"
+          onDrag={onDrag}
+          onStop={onStopDrag}
+          >
+        <div
+            ref={dragRef}
+          className={baseSyles}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+        >
+          {articleHeader}
+          {articleBaseContent}
+        </div>
+    </Draggable>
+};
+
+export const ReadLaterListArticlePreview = ({ article, articleController, readLaterListRef }) => {
+  const dragRef = useRef(null);
+  const [previewCollapsed, setPreviewCollapsed] = useState(true);
+  
+  const onMouseEnter = () => {};
+
+  const onMouseLeave = () => {};
+  
+  let baseSyles = getArticleBaseStyles({
+    hoverId: articleController.hoverController.hoverId,
+    articleId: article.uuid,
+    hoverTag: articleController.hoverController.hoverTag,
+    articleTags: article.tags,
+    collapsed: previewCollapsed,
+    otherArticleDragged: false,
+    beingDragged: false,
+  });
+  
+  // as lon as this is in the list we also decrease the width!
+  baseSyles = `${baseSyles} xl:w-52 xl:h-20`;
+
+  return (<BaseArticlePreview 
+        article={article}
+        dragRef={dragRef}
+        onStopDrag={() => {}}
+        onDrag={() => {}}
+        baseSyles={baseSyles}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        articleHeader={<ArticleHeader 
+          article={article} 
+          articleHeaderClassName="mt-0 mb-0"
+          articleHeaderTitleClassName="xl:text-2xl" />}
+        articleBaseContent={<></>} />);
+};
+
+const areOverlapping = (ref1, ref2) => {
+  const r1 = ref1.current.getBoundingClientRect();
+  const r2 = ref2.current.getBoundingClientRect();
+  let overlap = !(r1.right < r2.left || 
+          r1.left > r2.right || 
+          r1.bottom < r2.top || 
+          r1.top > r2.bottom)
+  return overlap;
+}
+
+export const ArticlePreview = ({ article, articleController, readLaterListRef }) => {
+  const dragRef = useRef(null);
+  const [previewCollapsed, setPreviewCollapsed] = useState(false);
+
   const onMouseEnter = () => {
     if (articleController.hoverController.hoverId !== article.uuid) {
       articleController.hoverController.setHoverId(article.uuid);
@@ -59,18 +167,56 @@ export const ArticlePreview = ({ article, articleController }) => {
     articleId: article.uuid,
     hoverTag: articleController.hoverController.hoverTag,
     articleTags: article.tags,
+    collapsed: previewCollapsed,
+    otherArticleDragged: (articleController.dragController.draggingPreview !== null) && (articleController.dragController.draggingPreview !== article.uuid),
+    beingDragged: articleController.dragController.draggingPreview === article.uuid,
   });
+  
+  const onDrag = (e, data) => {
+    let overlap = areOverlapping(dragRef, readLaterListRef);
+    if(overlap){
+      console.log("OVERLAP");  
+    }
+    if(!articleController.dragController.draggingPreview){
+      articleController.dragController.setDraggingPreview(article.uuid);
+    }
+    if(overlap && !previewCollapsed){
+      setPreviewCollapsed(true);
+      articleController.dragController.setDraggingArticleOverlapDropZone(false)
+    } else if(!overlap && previewCollapsed){
+      setPreviewCollapsed(false);
+      articleController.dragController.setDraggingArticleOverlapDropZone(true)
+    }
+  };
+  
+  const onStopDrag = (e, data) => {
+    console.log("REF", dragRef.current);
+    if(dragRef.current){
+      // if released while not on hover area just transform back to original position
+      dragRef.current.style.transform = `translate(0px, 0px)`;
+    }
+        
+    if(articleController.dragController.draggingPreview){
+      articleController.dragController.setDraggingPreview(null);
+    }
+  }
+  
 
-  return (
-    <div
-      className={baseSyles}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
-      <ArticleHeader article={article} articleController={articleController} />
-      <ArticleTagBar article={article} articleController={articleController} />
-      <ArticleContent article={article} articleController={articleController} />
-      <ArticleFooter article={article} articleController={articleController} />
-    </div>
-  );
+  // return the base article preview
+  return (<BaseArticlePreview 
+        article={article}
+        dragRef={dragRef}
+        onStopDrag={onStopDrag}
+        onDrag={onDrag}
+        baseSyles={baseSyles}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        articleHeader={<ArticleHeader article={article} />}
+        articleBaseContent={
+          <BaseArticlePreviewContent 
+            article={article}
+            articleController={articleController}
+            previewCollapsed={previewCollapsed}
+          />
+        } />);
 };
