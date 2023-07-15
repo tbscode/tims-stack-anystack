@@ -13,19 +13,24 @@ const filterShema = {
   },
 };
 
-export const ArticleFeedMenuBar = ({articleController, inSidebar}) => {
+export const ArticleFeedMenuBar = ({articleController, inSidebar, draggingPreview}) => {
   const changeChangeForm = ({formData}) => {
     console.log("UPDATED", formData);
     articleController.filterController.setFilters(formData)
   }
   
-  const baseMenuFeedStyles = (() => {
-    if(inSidebar) {
-      return "sm:flex relative flex flex-col w-full items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 z-40 bg-base-100 bg-opacity-90 gap-4"
-    }else{
-      return "hidden sm:flex relative flex flex-row w-full h-32 items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 sticky top-2 z-40 bg-base-100 bg-opacity-90"
-    }
-  })()
+  let baseMenuFeedStyles = ""
+  if(inSidebar) {
+    baseMenuFeedStyles = "sm:flex relative flex flex-col w-full items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 z-40 bg-base-100 bg-opacity-90 gap-4"
+  }else{
+    baseMenuFeedStyles = "transition-all hidden sm:flex opacity-60 hover:opacity-100 relative flex flex-row w-full h-20 pb-10 overflow-hidden hover:h-fit items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 sticky top-2 z-40 bg-base-100 bg-opacity-90"
+  }
+  
+  
+  if(articleController.dragController.draggingPreview) {
+    // if an article preview is being dragged, we want to hide the menu bar   
+    baseMenuFeedStyles = `${baseMenuFeedStyles} h-0 opacity-0` 
+  }
   
   const baseMenuItemsStyles = (() => {
     if(inSidebar) {
