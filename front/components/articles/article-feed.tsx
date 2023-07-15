@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DynamicLayout } from "./dynamic-layout";
 import { SideBarCollapsible } from "./collapsibles";
 import { ArticleFeedMenuBar } from "./feed-menu-bar";
 import { ArticleFeedHeader } from "./feed-header";
 import { ArticleFeedFooter } from "./feed-footer";
-import { ArticlePreview, LoadMoreCard } from "./preview";
+import { ArticlePreview, ReadLaterListArticlePreview, LoadMoreCard } from "./preview";
 import { ARTICLES } from "./moc";
 
 interface HoverController {
@@ -12,6 +12,13 @@ interface HoverController {
   setHoverId: CallableFunction;
   hoverTag: string | null;
   setHoverTag: CallableFunction;
+}
+
+interface DragController {
+  draggingPreview: null | string;
+  setDraggingPreview: CallableFunction;
+  dragginArticleOverlapDropZone: boolean;
+  setDraggingArticleOverlapDropZone: CallableFunction;
 }
 
 interface FilterController {
@@ -22,12 +29,48 @@ interface FilterController {
 interface ArticleController {
   hoverController: HoverController;
   filterController: FilterController;
+  dragController: DragController;
+}
+
+export function ArticleReadLaterListDropZone({ articleController, readLaterListRef, readLaterArticles }) {
+  let dropZoneStyles = `relative w-full rounded-xl h-32 bg-opacity-80 p-2 pl-7 z-120  rounded-xl border-natural-content border-solid border bg-base-100`
+  let dropContainerStyles = `transition-all absolute -translate-x-52 w-52 h-fit top-0 bottom-0 mt-auto mb-auto -left-5 z-120`
+  
+  //if(articleController.dragController.draggingPreview) {
+  if(true){ // TODO debug
+    dropContainerStyles = `${dropContainerStyles} translate-x-0`  
+  }
+  
+  if(articleController.dragController.dragginArticleOverlapDropZone) {
+    dropZoneStyles = `${dropZoneStyles} bg-primary`
+  }
+  return <div className={dropContainerStyles}>
+        <div className={dropZoneStyles} ref={readLaterListRef}>
+          {readLaterArticles.length === 0 && <div>
+            Drag an article here to save it for later reading!
+          </div>}
+          {readLaterArticles.map((article, i) => {
+            return (
+              <ReadLaterListArticlePreview
+                key={i}
+                article={article}
+                articleController={articleController}
+                readLaterListRef={readLaterListRef}
+              />
+            );
+          })}
+        </div>
+    </div>
 }
 
 export function ArticleFeed() {
+  const [readLaterArticles, setReadLaterArticles] = useState([ARTICLES[0]]);
   const [hoveredArticle, setHoveredArticle] = useState(null);
   const [hoveredTag, setHoveredTag] = useState(null);
   const [filters, setFilters] = useState([]);
+  const [draggingPreview, setDraggingPreview] = useState(null);
+  const [dragginArticleOverlapDropZone, setDraggingArticleOverlapDropZone] = useState(false);
+  const readLaterListRef = useRef(null);
 
   const articleController: ArticleController = {
     hoverController: {
@@ -40,6 +83,12 @@ export function ArticleFeed() {
       filters: filters,
       setFilters: setFilters,
     },
+    dragController: {
+      draggingPreview: draggingPreview,
+      setDraggingPreview: setDraggingPreview,
+      dragginArticleOverlapDropZone: dragginArticleOverlapDropZone,
+      setDraggingArticleOverlapDropZone: setDraggingArticleOverlapDropZone,
+    }
   };
   
   const filterArticles = (article) => {
@@ -54,17 +103,17 @@ export function ArticleFeed() {
         <SideBarCollapsible collapsibles={[
         {
           title: "Filters",
-          content: (<ArticleFeedMenuBar articleController={articleController} inSidebar={true}/>)
+          content: (<ArticleFeedMenuBar articleController={articleController} inSidebar={true} draggingPreview={draggingPreview}/>)
         },
         {
           title: "Authors 2",
-          content: (<ArticleFeedMenuBar articleController={articleController} inSidebar={true}/>)
+          content: (<ArticleFeedMenuBar articleController={articleController} inSidebar={true} draggingPreview={draggingPreview}/>)
         },
       ]} />}
       articleController={articleController}>
       <div className="relative w-full 3xl:w-400">
         <ArticleFeedHeader />
-        <ArticleFeedMenuBar articleController={articleController} inSidebar={false}/>
+        <ArticleFeedMenuBar articleController={articleController} inSidebar={false} draggingPreview={draggingPreview}/>
         <div className="grid relative lg:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 gap-4 w-full z-30">
           {ARTICLES.filter(article => filterArticles(article)).map((article, i) => {
             return (
@@ -72,6 +121,7 @@ export function ArticleFeed() {
                 key={i}
                 article={article}
                 articleController={articleController}
+                readLaterListRef={readLaterListRef}
               />
             );
           })}
@@ -79,6 +129,7 @@ export function ArticleFeed() {
         </div>
         <ArticleFeedFooter />
       </div>
+      <ArticleReadLaterListDropZone articleController={articleController} readLaterListRef={readLaterListRef} readLaterArticles={readLaterArticles} />
   </DynamicLayout>
   );
 };
