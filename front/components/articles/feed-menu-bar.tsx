@@ -23,42 +23,28 @@ export const ArticleFeedMenuBar = ({articleController, inSidebar, draggingPrevie
   if(inSidebar) {
     baseMenuFeedStyles = "sm:flex relative flex flex-col w-full items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 z-40 bg-base-100 bg-opacity-90 gap-4"
   }else{
-    baseMenuFeedStyles = "transition-all hidden sm:flex opacity-60 hover:opacity-100 relative flex flex-row w-full h-20 pb-10 overflow-hidden hover:h-fit items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 sticky top-2 z-40 bg-base-100 bg-opacity-90"
+    baseMenuFeedStyles = "transition-all duration-750 hidden sm:flex opacity-60 hover:opacity-100 relative flex flex-row w-240 h-20 pb-10 overflow-hidden hover:h-32 items-center p-4  2xl:mb-10 2xl:mt-10 rounded-xl border border-2 sticky top-2 z-40 bg-base-100 bg-opacity-90 mb-4"
   }
   
   
-  if(articleController.dragController.draggingPreview) {
-    // if an article preview is being dragged, we want to hide the menu bar   
-    baseMenuFeedStyles = `${baseMenuFeedStyles} h-0 opacity-0` 
-  }
   
-  const baseMenuItemsStyles = (() => {
+  let baseMenuItemsStyles = (() => {
     if(inSidebar) {
       return "flex flex-col content-center justify-center text-center items-center pointer-events-auto"
     }else{
-      return "flex flex-col w-1/3 content-center justify-center text-center items-center pointer-events-auto"
+      return "flex flex-col w-1/2 content-center justify-center text-center items-center pointer-events-auto"
     }
   })()
+
+  if(articleController.dragController.draggingPreview) {
+    // if an article preview is being dragged, we want to hide the menu bar   
+    baseMenuItemsStyles = `${baseMenuItemsStyles} hidden`
+    baseMenuFeedStyles = `${baseMenuFeedStyles} h-0 opacity-0 z-10 hover:h-0 hover:opacity-0 hover:z-10 pointer-events-none` 
+  }
   
 
   return (
     <div className={baseMenuFeedStyles}>
-      <div className={baseMenuItemsStyles}>
-        <span className="font-bold p-1 rounded-xl">Authors</span>
-        <ThemedForm
-          schema={filterShema}
-          extraErrors={{}}
-          showErrorList="bottom"
-          uiSchema={{
-            "ui:submitButtonOptions": {
-              norender: true,
-            },
-          }}
-          formData={{}}
-          validator={validator}
-          onChange={() => {}}
-        />
-      </div>
       <div className={baseMenuItemsStyles}>
         <span className="font-bold p-1 rounded-xl">Filter</span>
         <ThemedForm

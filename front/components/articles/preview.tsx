@@ -5,7 +5,7 @@ import { ArticleTagBar } from "./preview-tag-bar";
 import { ArticleContent } from "./preview-content";
 import { ArticleFooter } from "./preview-footer";
 import Draggable from 'react-draggable';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const getArticleBaseStyles = ({
   hoverId,
@@ -36,7 +36,7 @@ const getArticleBaseStyles = ({
   }
   
   if (collapsed) {
-    style = `${style} xl:h-32`;  
+    style = `${style} xl:h-20`;  
   }
   
   if(beingDragged) {
@@ -118,21 +118,27 @@ export const ReadLaterListArticlePreview = ({ article, articleController, readLa
     beingDragged: false,
   });
   
-  // as lon as this is in the list we also decrease the width!
-  baseSyles = `${baseSyles} xl:w-52 xl:h-20`;
+  useEffect(() => {
+    // runs after the components renders so will have access too the ref
+    if(dragRef.current){
+      if('initalTransform' in article){
+        dragRef.current.style.transform = article.initalTransform;
+      }
+    }
+  }, []);
 
   return (<BaseArticlePreview 
         article={article}
         dragRef={dragRef}
         onStopDrag={() => {}}
         onDrag={() => {}}
-        baseSyles={baseSyles}
+        baseSyles={`2xl:h-20 xl:h-20 ${baseSyles} xl:w-52 xl:h-20 lg:h-20 lg:w-52 sm:h-20 h-20 mb-2`}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         articleHeader={<ArticleHeader 
           article={article} 
           articleHeaderClassName="mt-0 mb-0"
-          articleHeaderTitleClassName="xl:text-2xl" />}
+          articleHeaderTitleClassName="text-2xl lg:text-2xl xl:text-2xl 2xl:text-2xl 3xl:text-2xl" />}
         articleBaseContent={<></>} />);
 };
 
@@ -186,11 +192,18 @@ export const ArticlePreview = ({ article, articleController, readLaterListRef })
     } else if(!overlap && previewCollapsed){
       setPreviewCollapsed(false);
       articleController.dragController.setDraggingArticleOverlapDropZone(true)
-    }
+    }  
   };
   
   const onStopDrag = (e, data) => {
-    console.log("REF", dragRef.current);
+
+    // then if there is overlap also add it to the read later list
+    let overlap = areOverlapping(dragRef, readLaterListRef);
+    console.log("DROP", "overlapping", overlap)
+    if(overlap){
+      articleController.dragController.addReadLaterArticleViaDrop(article, dragRef);
+    }
+
     if(dragRef.current){
       // if released while not on hover area just transform back to original position
       dragRef.current.style.transform = `translate(0px, 0px)`;
@@ -198,6 +211,10 @@ export const ArticlePreview = ({ article, articleController, readLaterListRef })
         
     if(articleController.dragController.draggingPreview){
       articleController.dragController.setDraggingPreview(null);
+    }
+    
+    if(previewCollapsed){
+      setPreviewCollapsed(false);
     }
   }
   

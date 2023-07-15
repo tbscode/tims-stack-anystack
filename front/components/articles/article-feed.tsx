@@ -34,10 +34,12 @@ interface ArticleController {
 }
 
 export function ArticleReadLaterListDropZone({ articleController, readLaterListRef, readLaterArticles }) {
+  const [readLaterArticlesCollapsed, setReadLaterArticlesCollapsed] = useState(false);
   let dropZoneStyles = `relative w-full rounded-xl h-32 bg-opacity-80 p-2 pl-7 z-120  rounded-xl border-natural-content border-solid border bg-base-100`
   let dropContainerStyles = `transition-all absolute -translate-x-52 w-52 h-fit top-0 bottom-0 mt-auto mb-auto -left-5 z-120 duration-750`
+  let dropContainerHeaderStyles = `transition-all w-fit p-2 z-130 absolute rounded-xl border-natural-content border-solid border bg-base-100 left-4 top-4 flex flex-row content-center justify-center items-center gap-2`
   
-  if(articleController.dragController.draggingPreview) {
+  if(articleController.dragController.draggingPreview || readLaterArticlesCollapsed) {
   //if(true){ // TODO debug
     dropContainerStyles = `${dropContainerStyles} translate-x-0`  
   }
@@ -49,7 +51,14 @@ export function ArticleReadLaterListDropZone({ articleController, readLaterListR
   if(readLaterArticles.length > 0) {
     dropZoneStyles = `${dropZoneStyles} h-auto`
   }
-  return <div className={dropContainerStyles}>
+  return <>
+            <div className={dropContainerHeaderStyles} onClick={() => setReadLaterArticlesCollapsed(!readLaterArticlesCollapsed)}>
+              <input type="checkbox" className="toggle toggle-xs" checked={readLaterArticlesCollapsed} onChange={() => {setReadLaterArticlesCollapsed(!readLaterArticlesCollapsed)}} />
+              <div>
+                 Read Later Articles 
+              </div>
+            </div>
+  <div className={dropContainerStyles}>
         <div className={dropZoneStyles} ref={readLaterListRef}>
           {readLaterArticles.length === 0 && <div>
             Drag an article here to save it for later reading!
@@ -66,10 +75,11 @@ export function ArticleReadLaterListDropZone({ articleController, readLaterListR
           })}
         </div>
     </div>
+    </>
 }
 
 export function ArticleFeed() {
-  const [readLaterArticles, setReadLaterArticles] = useState([ARTICLES[0]]);
+  const [readLaterArticles, setReadLaterArticles] = useState([]);
   const [hoveredArticle, setHoveredArticle] = useState(null);
   const [hoveredTag, setHoveredTag] = useState(null);
   const [filters, setFilters] = useState([]);
@@ -131,7 +141,7 @@ export function ArticleFeed() {
         },
       ]} />}
       articleController={articleController}>
-      <div className="relative w-full 3xl:w-400">
+      <div className="relative flex flex-col w-full 3xl:w-400 content-center items-center justify-center">
         <ArticleFeedHeader />
         <ArticleFeedMenuBar articleController={articleController} inSidebar={false} draggingPreview={draggingPreview}/>
         <div className="grid relative lg:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 gap-4 w-full z-30">
