@@ -19,6 +19,7 @@ interface DragController {
   setDraggingPreview: CallableFunction;
   dragginArticleOverlapDropZone: boolean;
   setDraggingArticleOverlapDropZone: CallableFunction;
+  addReadLaterArticleViaDrop: CallableFunction;
 }
 
 interface FilterController {
@@ -34,15 +35,19 @@ interface ArticleController {
 
 export function ArticleReadLaterListDropZone({ articleController, readLaterListRef, readLaterArticles }) {
   let dropZoneStyles = `relative w-full rounded-xl h-32 bg-opacity-80 p-2 pl-7 z-120  rounded-xl border-natural-content border-solid border bg-base-100`
-  let dropContainerStyles = `transition-all absolute -translate-x-52 w-52 h-fit top-0 bottom-0 mt-auto mb-auto -left-5 z-120`
+  let dropContainerStyles = `transition-all absolute -translate-x-52 w-52 h-fit top-0 bottom-0 mt-auto mb-auto -left-5 z-120 duration-750`
   
-  //if(articleController.dragController.draggingPreview) {
-  if(true){ // TODO debug
+  if(articleController.dragController.draggingPreview) {
+  //if(true){ // TODO debug
     dropContainerStyles = `${dropContainerStyles} translate-x-0`  
   }
   
   if(articleController.dragController.dragginArticleOverlapDropZone) {
     dropZoneStyles = `${dropZoneStyles} bg-primary`
+  }
+  
+  if(readLaterArticles.length > 0) {
+    dropZoneStyles = `${dropZoneStyles} h-auto`
   }
   return <div className={dropContainerStyles}>
         <div className={dropZoneStyles} ref={readLaterListRef}>
@@ -71,6 +76,19 @@ export function ArticleFeed() {
   const [draggingPreview, setDraggingPreview] = useState(null);
   const [dragginArticleOverlapDropZone, setDraggingArticleOverlapDropZone] = useState(false);
   const readLaterListRef = useRef(null);
+  
+  const addReadLaterArticleViaDrop = (article, articleRef) => {
+    // no adding if already in clist, check if article with uuid is already in readLaterArticles
+    if (readLaterArticles.find((a) => a.uuid === article.uuid)) return;
+    
+    // now since we added the article via drag we need to add a transform prop to the inital position of the article
+    const boundingRect = articleRef.current.getBoundingClientRect();
+    articleRef.current.style.transform = `translate(${boundingRect.left}px, ${boundingRect.top}px)`;
+    let articleWithInitalTransform = {...article, initalTransform: `translate(0px, 0px)`}
+
+    setReadLaterArticles([...readLaterArticles, article]);
+
+  }
 
   const articleController: ArticleController = {
     hoverController: {
@@ -88,6 +106,7 @@ export function ArticleFeed() {
       setDraggingPreview: setDraggingPreview,
       dragginArticleOverlapDropZone: dragginArticleOverlapDropZone,
       setDraggingArticleOverlapDropZone: setDraggingArticleOverlapDropZone,
+      addReadLaterArticleViaDrop: addReadLaterArticleViaDrop, 
     }
   };
   
@@ -96,6 +115,7 @@ export function ArticleFeed() {
     // must include all filters!
     return filters.every(filter => article.tags.includes(filter))
   }
+  
 
   return (
     <DynamicLayout 
