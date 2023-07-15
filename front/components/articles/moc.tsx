@@ -19,7 +19,7 @@ export const hundretRandomTags = Array.from({ length: 100 }, (_, i) =>
 );
 
 
-const generateArticle = ({ i }) => {
+export const generateArticle = ({ i }) => {
   return {
     title: `Article ${i}`,
     uuid: `id-${i}`,
@@ -33,4 +33,5 @@ const generateArticle = ({ i }) => {
     },
   };
 };
+
 export const ARTICLES = Array.from({ length: 10 }, (_, i) => generateArticle({ i }));
