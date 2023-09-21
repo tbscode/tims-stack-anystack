@@ -7,7 +7,7 @@ export const ArticleFeedHeader = () => {
       <div className="stats shadow w-fit justify-center justify-self-center fixed mt-32 z-2 bg-none">
         <div className="stat w-fit text-center">
           <div className="stat-title">Unique Page Views</div>
-          <div className="stat-value">89,400</div>
+          <div className="stat-value">69.420</div>
           <div className="stat-desc">counting only /articles/ starting DATE</div>
         </div>
       </div>

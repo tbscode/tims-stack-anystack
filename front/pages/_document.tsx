@@ -13,7 +13,7 @@ class InlineStylesHead extends Head {
 
     return (
       <>
-        {true && (
+        {false && (
           <style
             key={"tailwindSSR"}
             data-href={`${assetPrefix}/_next/static/tailwindSSR.css`}

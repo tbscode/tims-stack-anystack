@@ -33,8 +33,10 @@ interface ArticleController {
   dragController: DragController;
 }
 
+
 export function ArticleReadLaterListDropZone({ articleController, readLaterListRef, readLaterArticles }) {
   const [readLaterArticlesCollapsed, setReadLaterArticlesCollapsed] = useState(false);
+  const readLaterRefs = useRef({});
   let dropZoneStyles = `relative w-full rounded-xl h-32 bg-opacity-80 p-2 pl-7 z-120  rounded-xl border-natural-content border-solid border bg-base-100`
   let dropContainerStyles = `transition-all absolute -translate-x-52 w-52 h-fit top-0 bottom-0 mt-auto mb-auto -left-5 z-120 duration-750`
   let dropContainerHeaderStyles = `transition-all w-fit p-2 z-130 absolute rounded-xl border-natural-content border-solid border bg-base-100 left-4 top-4 flex flex-row content-center justify-center items-center gap-2`
@@ -64,13 +66,15 @@ export function ArticleReadLaterListDropZone({ articleController, readLaterListR
             Drag an article here to save it for later reading!
           </div>}
           {readLaterArticles.map((article, i) => {
-            return (
-              <ReadLaterListArticlePreview
-                key={i}
-                article={article}
-                articleController={articleController}
-                readLaterListRef={readLaterListRef}
-              />
+            return (<>
+                <ReadLaterListArticlePreview
+                  key={i}
+                  article={article}
+                  articleController={articleController}
+                  readLaterListRef={readLaterListRef}
+                  readLaterItemRefs={readLaterRefs}
+                />
+              </>
             );
           })}
         </div>
@@ -79,6 +83,7 @@ export function ArticleReadLaterListDropZone({ articleController, readLaterListR
 }
 
 export function ArticleFeed() {
+  const [articles, setArticles] = useState(ARTICLES);
   const [readLaterArticles, setReadLaterArticles] = useState([]);
   const [hoveredArticle, setHoveredArticle] = useState(null);
   const [hoveredTag, setHoveredTag] = useState(null);
@@ -145,7 +150,7 @@ export function ArticleFeed() {
         <ArticleFeedHeader />
         <ArticleFeedMenuBar articleController={articleController} inSidebar={false} draggingPreview={draggingPreview}/>
         <div className="grid relative lg:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-3 gap-4 w-full z-30">
-          {ARTICLES.filter(article => filterArticles(article)).map((article, i) => {
+          {articles.filter(article => filterArticles(article)).map((article, i) => {
             return (
               <ArticlePreview
                 key={i}

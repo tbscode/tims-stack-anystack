@@ -10,7 +10,6 @@ const initialState = {
 };
 
 export default function (state = initialState, action) {
-  console.log("action device state", action);
   switch (action.type) {
     case FRONTEND_SETTINGS:
       return {

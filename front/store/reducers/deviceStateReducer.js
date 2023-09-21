@@ -8,7 +8,6 @@ const initialState = {
 };
 
 export default function (state = initialState, action) {
-  console.log("action device state", action);
   switch (action.type) {
     case DEVICE_STATE:
       return {

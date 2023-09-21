@@ -40,7 +40,7 @@ const getArticleBaseStyles = ({
   }
   
   if(beingDragged) {
-    style = `${style} z-140`;  
+    style = `${style} z-150`;  
   }
   return style;
 };
@@ -100,13 +100,61 @@ export const BaseArticlePreview = ({
     </Draggable>
 };
 
-export const ReadLaterListArticlePreview = ({ article, articleController, readLaterListRef }) => {
+const OverflowHandler = ({dragging, isTop, overflowRef, expand}) => {
+  const hidden = true;
+  // this basicly has one detection and one expansion element
+  let style = `absolute w-52 bg-error z-140 h-8 pointer-events-none`;
+  if(isTop) {
+    style = `${style} bg-info`;  
+  }else{
+    style = `${style} -mt-10`;
+  }
+  if(dragging) {
+    style = `${style} hidden`;
+  }
+  
+  if(hidden){
+    style = `${style} bg-transparent`;
+  }
+  return <>
+    <div className={style} ref={overflowRef}></div>
+    {expand && <div className="w-full bg-accent"></div>}
+  </>
+}
+
+
+export const ReadLaterListArticlePreview = ({ article, articleController, readLaterListRef, readLaterItemRefs }) => {
   const dragRef = useRef(null);
   const [previewCollapsed, setPreviewCollapsed] = useState(true);
+  const [articleDragging, setArticleDragging] = useState(false);
+  const topOverflowRef = useRef(null);
+  const bottomOverflowRef = useRef(null);
   
   const onMouseEnter = () => {};
 
   const onMouseLeave = () => {};
+  
+  const onDrag = () => {
+    if(!articleDragging){
+      setArticleDragging(true);
+    }
+    
+    // Now we want to check if this overlaps with any of the other articles overflow handlers
+    Object.keys(readLaterItemRefs.current).forEach((key) => {
+      const { topOverflowRef, bottomOverflowRef } = readLaterItemRefs.current[key];
+      if(topOverflowRef.current && bottomOverflowRef.current){
+        const topOverflowRect = topOverflowRef.current.getBoundingClientRect();
+        const bottomOverflowRect = bottomOverflowRef.current.getBoundingClientRect();
+        //areOverlapping(topOverflowRect, );
+      }
+    });
+  };
+  
+  const onStopDrag = () => {
+    if(articleDragging){
+      setArticleDragging(false);
+    }
+  }
   
   let baseSyles = getArticleBaseStyles({
     hoverId: articleController.hoverController.hoverId,
@@ -119,6 +167,15 @@ export const ReadLaterListArticlePreview = ({ article, articleController, readLa
   });
   
   useEffect(() => {
+    readLaterItemRefs.current = { ...readLaterItemRefs.current ,[article.uuid]: {
+      topOverflowRef,
+      itemRef: dragRef,
+      bottomOverflowRef,
+    }};
+    console.log("ITEM REFS ", readLaterItemRefs.current);
+  },[]);
+  
+  useEffect(() => {
     // runs after the components renders so will have access too the ref
     if(dragRef.current){
       if('initalTransform' in article){
@@ -127,11 +184,13 @@ export const ReadLaterListArticlePreview = ({ article, articleController, readLa
     }
   }, []);
 
-  return (<BaseArticlePreview 
+  return (<>
+      <OverflowHandler dragging={articleDragging} isTop={true} overflowRef={topOverflowRef} expand={false}/>
+      <BaseArticlePreview 
         article={article}
         dragRef={dragRef}
-        onStopDrag={() => {}}
-        onDrag={() => {}}
+        onStopDrag={onStopDrag}
+        onDrag={onDrag}
         baseSyles={`2xl:h-20 xl:h-20 ${baseSyles} xl:w-52 xl:h-20 lg:h-20 lg:w-52 sm:h-20 h-20 mb-2`}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -139,7 +198,9 @@ export const ReadLaterListArticlePreview = ({ article, articleController, readLa
           article={article} 
           articleHeaderClassName="mt-0 mb-0"
           articleHeaderTitleClassName="text-2xl lg:text-2xl xl:text-2xl 2xl:text-2xl 3xl:text-2xl" />}
-        articleBaseContent={<></>} />);
+        articleBaseContent={<></>} />
+      <OverflowHandler dragging={articleDragging} isTop={false} overflowRef={bottomOverflowRef} expand={false}/>
+    </>);
 };
 
 const areOverlapping = (ref1, ref2) => {
@@ -188,10 +249,10 @@ export const ArticlePreview = ({ article, articleController, readLaterListRef })
     }
     if(overlap && !previewCollapsed){
       setPreviewCollapsed(true);
-      articleController.dragController.setDraggingArticleOverlapDropZone(false)
+      articleController.dragController.setDraggingArticleOverlapDropZone(true)
     } else if(!overlap && previewCollapsed){
       setPreviewCollapsed(false);
-      articleController.dragController.setDraggingArticleOverlapDropZone(true)
+      articleController.dragController.setDraggingArticleOverlapDropZone(false)
     }  
   };
   
